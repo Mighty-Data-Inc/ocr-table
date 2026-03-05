@@ -25,7 +25,10 @@ const _startOcrTableConversation = (
   pagePngBuffer: Buffer,
   pagePositionInDocument?: 'first' | 'last' | 'middle',
   additionalInstructions?: string,
-  nextPagePngBuffer?: Buffer
+  nextPagePngBuffer?: Buffer,
+  tableName?: string,
+  tableDescription?: string,
+  columnNames?: string[]
 ): GptConversation => {
   const convo = new GptConversation([], {
     openaiClient,
@@ -85,6 +88,31 @@ table.
 
   if (additionalInstructions) {
     convo.addUserMessage(additionalInstructions);
+  }
+
+  if (tableName || tableDescription || columnNames) {
+    tableName =
+      tableName ||
+      `(No name provided; use your best judgment ` +
+        `to determine which table we're talking about.)`;
+    tableDescription =
+      tableDescription ||
+      `(No description provided; what you see is what you get.)`;
+
+    let sSpecificTable = `
+For the purposes of this work session, we'll be focusing specifically and
+exclusively on the following table:
+
+Name/Identifier: ${tableName}
+Description: ${tableDescription}
+`;
+    if (columnNames && columnNames.length > 0) {
+      sSpecificTable += `
+Columns:
+- ${columnNames.join('\n- ')}
+`;
+    }
+    convo.addDeveloperMessage(sSpecificTable);
   }
 
   return convo;
@@ -296,15 +324,10 @@ export const ocrImagesExtractTableColumnHeaders = async (
     pagePngBuffer,
     undefined,
     additionalInstructions,
-    nextPagePngBuffer
+    nextPagePngBuffer,
+    tableName,
+    tableDescription
   );
-
-  convo.addUserMessage(`
-For the purposes of this work session, we'll be focusing specifically and
-exclusively on the following table:
-Name/Identifier: ${tableName}
-Description: ${tableDescription || '(No description provided; what you see is what you get.)'}
-`);
 
   convo.addUserMessage(`
 What are the column names of this table? Please provide a list of the column names, 
@@ -390,6 +413,224 @@ then the value for that column should be an empty string.
   return schema;
 };
 
+export const ocrTranscribeTableRowsFromCurrentPage = async (
+  openaiClient: OpenAI,
+  tableName: string,
+  tableDescription: string,
+  columns: string[],
+  pagePngBuffer: Buffer,
+  doesTableStartOnThisPage: boolean,
+  shouldIgnoreTopSplitRow: boolean,
+  additionalInstructions?: string,
+  nextPagePngBuffer?: Buffer
+): Promise<{
+  rows: Array<Record<string, string>>;
+  doesTableContinueOnNextPage: boolean;
+}> => {
+  // TODO: Run this in a double-barrel shotgun
+  const convo = _startOcrTableConversation(
+    openaiClient,
+    pagePngBuffer,
+    undefined,
+    additionalInstructions,
+    undefined,
+    tableName,
+    tableDescription,
+    columns
+  );
+
+  convo.addDeveloperMessage(`
+In this work session, we'll be transcribing the rows of this table (the one
+called "${tableName}") as they appear on this page. You'll try to faithfully
+replicate the data in each row as accurately as possible, capturing all of the
+text in each of the columns for each row.
+
+We only care about "body rows", not header rows, footer rows, or summary/aggregation rows.
+If you see any such non-body rows, you can ignore them and leave them out of the structured
+data output.
+
+We only care about the rows of table ${tableName}. If that table ends, and other
+text or tables appear after it on the page, you can ignore all of that other content.
+Just focus on transcribing the rows of this one table.
+
+If a particular cell is empty, just put an empty string for that cell's value.
+`);
+
+  if (!doesTableStartOnThisPage) {
+    convo.addUserMessage(`
+This table, ${tableName}, doesn't actually start on this page. What you see at the top of this
+page is a continuation of the table that started on a previous page. As such, I know you can't
+see the table's title or column headers and other metadata. But you can see its column list
+and its rows, so that should be enough for you to be able to transcribe its contents.
+`);
+  }
+
+  if (shouldIgnoreTopSplitRow) {
+    convo.addUserMessage(`
+You've probably noticed that the topmost row on this page looks messy, incomplete,
+or incoherent. This is because it's been split across a page break, with part of
+the row on the previous page and part of it on this page.
+You should ignore this row and not include it in the structured data output.
+We'll handle this row separately in a different step; don't worry about it for now.
+`);
+  }
+
+  convo.addUserMessage(`
+In order to handle an edge case, we'll now also show you the *next* page of the document.
+Sometimes, a table's body continues onto the next page. Hopefully, that isn't the case for
+our current table of interest: table "${tableName}". But just in case it is -- that is,
+if the next page does indeed contain more rows of this table, then you should be given the
+chance to see the next page in order to make that determination. As such, I will show it
+to you now.
+
+If the table "${tableName}" *does* continue onto the next page, then it could be doing via
+a "clean break", or via a "split row". A "split row" is when a single row of the table is 
+so large/tall that it gets cut in half by the page break, resulting in part of the row's data
+appearing on one page and part of it appearing on the next page. A "clean break" is when a
+full and complete row is the last row on one page, and then the next row is the first row on
+the next page, with no splitting of any individual rows across the page break.
+
+To be clear! In either case, we *do not* care about the rows on the next page in this step.
+For now, just focus on transcribing the rows of table "${tableName}" that appear on *this*
+page. We'll deal with the next page later.
+
+If this table does end in a split row on this page, we'll handle it as a special case;
+don't include it in your transcriptions.
+`);
+
+  if (nextPagePngBuffer) {
+    convo.addImage(
+      'user',
+      'Here is the next page of the document.',
+      `data:image/png;base64,${nextPagePngBuffer.toString('base64')}`
+    );
+  } else {
+    convo.addUserMessage(`
+[NO NEXT PAGE IMAGE AVAILABLE.]
+End of document reached. There is no next page.
+The table "${tableName}" cannot continue onto the next page, because there is no next page.
+This makes your job a little easier!
+`);
+  }
+
+  const jsonSchemaForTablePage = {
+    name: 'ocr_extract_data_from_one_table',
+    description: `
+Extract all of the data rows from the table "${tableName}"
+as they appear on the current page.
+`,
+    type: 'json_schema',
+    strict: true,
+    schema: {
+      type: 'object',
+      properties: {
+        does_table_have_rows_on_this_page: {
+          type: 'boolean',
+          description: `
+A boolean indicating whether or not this table has any body rows on the current page.
+This will presumably always be true for the first page that the table appears on;
+for subsequent pages, it can be false for a number of reasons, e.g.:
+- If the table continued to the end of the previous page but ended there.
+- If the table continued onto this new page, but only has a footer or summary row here.
+- Etc.
+If this is false, then the "rows" field can be left as an empty array.
+`,
+        },
+        rows: {
+          type: 'array',
+          items: _jsonSchemaForExtractingOneRowOfTableData(columns),
+          description: `
+An array of the table's body rows that are on the current page.
+If the table "${tableName}" doesn't actually have any body rows on this page,
+this can be an empty array.
+
+(Remember: In the edge case in which the last row at the bottom of this page
+gets split across a page break, DO NOT include that split row in this array. 
+We handle it separately.)
+`,
+        },
+        discuss_if_table_continues_on_next_page: {
+          type: 'string',
+          description: `
+A discussion about whether or not our table of interest, "${tableName}", looks like it
+continues onto the next page. Does this table run to the end of the current page? 
+Does the top of the next page look like a continuation of this table? Did the last row
+of this table on this page get split across a page break? Discuss.
+
+This field is for your own benefit as part of a chain-of-thought. It won't be 
+included in the final output. However, it's crucial that you use this field to lay out
+your reasoning and thinking processes, because this will inform your subsequent decisions
+about other fields below.
+`,
+        },
+        does_table_continue_on_next_page: {
+          type: 'boolean',
+          description: `
+A boolean indicating your conclusion (as you just reasoned about) about whether or not
+this table continues onto the next page.
+`,
+        },
+        does_last_row_get_split_across_page_break: {
+          type: 'boolean',
+          description: `
+A boolean indicating your conclusion (as you just reasoned about) about whether or not
+the last row of this table gets split across a page break.
+`,
+        },
+      } as any,
+      required: [
+        'does_table_have_rows_on_this_page',
+        'rows',
+        'discuss_if_table_reaches_bottom_of_page',
+        'does_table_continue_on_next_page',
+        'does_last_row_get_split_across_page_break',
+      ],
+      additionalProperties: false,
+    },
+  };
+
+  await convo.submit(undefined, undefined, {
+    jsonResponse: { format: jsonSchemaForTablePage },
+  });
+
+  let hasRowsOnThisPage = convo.getLastReplyDictField(
+    'does_table_have_rows_on_this_page',
+    false
+  ) as boolean;
+  if (!hasRowsOnThisPage) {
+    return {
+      rows: [],
+      doesTableContinueOnNextPage: false,
+    };
+  }
+
+  let rowsFromOcr = convo.getLastReplyDictField('rows', []) as Array<any>;
+  let rows: Array<Record<string, string>> = [];
+  for (const row of rowsFromOcr) {
+    const rowData = row.row_data as Record<string, string>;
+    rows.push(rowData);
+  }
+
+  let doesTableContinueOnNextPage = convo.getLastReplyDictField(
+    'does_table_continue_on_next_page',
+    false
+  ) as boolean;
+
+  let doesLastRowGetSplitAcrossPageBreak = convo.getLastReplyDictField(
+    'does_last_row_get_split_across_page_break',
+    false
+  ) as boolean;
+  // TODO: Handle the split row.
+
+  // TODO REMOVE THIS
+  console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
+
+  return {
+    rows,
+    doesTableContinueOnNextPage,
+  };
+};
+
 /**
  * Populates the data rows of a single table by reading its page images.
  *
@@ -421,6 +662,9 @@ export const ocrImagesPopulateTableContents = async (
   pagePngBuffers: Buffer[],
   additionalInstructions?: string
 ): Promise<void> => {
+  throw new Error(
+    'This function is being refactored and should not be used in its current form.'
+  );
   let pagePngBufferCurrent = pagePngBuffers[table.page_start - 1];
 
   const convo = _startOcrTableConversation(

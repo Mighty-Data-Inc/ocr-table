@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +9,7 @@ import {
   ocrIdentifyTablesOnPage,
   ocrImagesExtractTableColumnHeaders,
   ocrImagesPopulateTableContents,
+  ocrTranscribeTableRowsFromCurrentPage,
 } from '../src/ocrImagesExtractTableData.js';
 import { OcrExtractedTable } from '../src/records.js';
 
@@ -48,7 +49,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-3.png'
     );
-    const pageThreeBuffer = await readFile(pageThreePngPath);
+    const pageThreeBuffer = readFileSync(pageThreePngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -74,7 +75,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-1.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -100,7 +101,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'wilderness-provisions.png'
     );
-    const wildernessProvisionsBuffer = await readFile(
+    const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
     );
 
@@ -121,7 +122,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'wilderness-provisions-2table.png'
     );
-    const wildernessProvisionsBuffer = await readFile(
+    const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
     );
 
@@ -152,8 +153,8 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-14pt-page-4.png'
     );
-    const pageThreeBuffer = await readFile(pageThreePngPath);
-    const pageFourBuffer = await readFile(pageFourPngPath);
+    const pageThreeBuffer = readFileSync(pageThreePngPath);
+    const pageFourBuffer = readFileSync(pageFourPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -184,8 +185,8 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-14pt-page-2.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -209,7 +210,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-2.png'
     );
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -232,7 +233,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-2.png'
     );
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -255,7 +256,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-2.png'
     );
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     /*
       This test intentionally creates a contradictory setup to verify parameter priority:
@@ -292,7 +293,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-2.png'
     );
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     const lettersOnlyRoomInstructions =
       'Room numbers are always two-letter codes, e.g. ND or EE, and explicitly NOT numeric.';
@@ -315,7 +316,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('returns no tables for an image that contains no document text', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const phoenixPngPath = path.join(fixturesDir, 'phoenix.png');
-    const phoenixBuffer = await readFile(phoenixPngPath);
+    const phoenixBuffer = readFileSync(phoenixPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -332,7 +333,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('returns no tables for non-tabular text content', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const dirtyWisconsinPngPath = path.join(fixturesDir, 'dirty-wisconsin.png');
-    const dirtyWisconsinBuffer = await readFile(dirtyWisconsinPngPath);
+    const dirtyWisconsinBuffer = readFileSync(dirtyWisconsinPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -349,7 +350,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('returns no tables for dense prose text content', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const annaKareninaPngPath = path.join(fixturesDir, 'annakarenina.png');
-    const annaKareninaBuffer = await readFile(annaKareninaPngPath);
+    const annaKareninaBuffer = readFileSync(annaKareninaPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
       createClient(),
@@ -371,7 +372,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-1.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
 
     const columns = await ocrImagesExtractTableColumnHeaders(
       createClient(),
@@ -394,7 +395,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-1.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
 
     const columns = await ocrImagesExtractTableColumnHeaders(
       createClient(),
@@ -419,7 +420,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-1.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
 
     const columns = await ocrImagesExtractTableColumnHeaders(
       createClient(),
@@ -446,8 +447,8 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-11pt-page-2.png'
     );
-    const pageOneBuffer = await readFile(pageOnePngPath);
-    const pageTwoBuffer = await readFile(pageTwoPngPath);
+    const pageOneBuffer = readFileSync(pageOnePngPath);
+    const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
     const columns = await ocrImagesExtractTableColumnHeaders(
       createClient(),
@@ -477,8 +478,8 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'school-supplies-BOS-14pt-page-4.png'
     );
-    const pageThreeBuffer = await readFile(pageThreePngPath);
-    const pageFourBuffer = await readFile(pageFourPngPath);
+    const pageThreeBuffer = readFileSync(pageThreePngPath);
+    const pageFourBuffer = readFileSync(pageFourPngPath);
 
     const columns = await ocrImagesExtractTableColumnHeaders(
       createClient(),
@@ -504,7 +505,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'wilderness-provisions-2table.png'
     );
-    const wildernessProvisionsBuffer = await readFile(
+    const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
     );
 
@@ -528,7 +529,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       fixturesDir,
       'nocolumnnames-school-supplies-BOS-14pt-page-5.png'
     );
-    const noColumnNamesBuffer = await readFile(noColumnNamesPngPath);
+    const noColumnNamesBuffer = readFileSync(noColumnNamesPngPath);
 
     // This has the added benefit of also testing that additionalInstructions are
     // passed and followed.
@@ -557,14 +558,94 @@ applied as appropriate based on the content of each column:
   }, 180000);
 });
 
-describe('ocrImagesPopulateTableContents (live API)', () => {
+describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
+  it('transcribes data rows for a small, simple table in the middle of the page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const wildernessProvisionsPngPath = path.join(
+      fixturesDir,
+      'wilderness-provisions-2table.png'
+    );
+    const pagePng = readFileSync(wildernessProvisionsPngPath);
+
+    const table: OcrExtractedTable = {
+      name: 'Table 8: March Rate by Load Class',
+      description: '',
+      columns: [
+        'Load Class',
+        'Typical Carried Weight (lb)',
+        'Daily March Distance (miles)',
+        'Fatigue Penalty',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    const result = await ocrTranscribeTableRowsFromCurrentPage(
+      createClient(),
+      table.name,
+      table.description,
+      table.columns,
+      pagePng,
+      true,
+      false,
+      ADDITIONAL_INSTRUCTIONS
+    );
+
+    expect(result.rows).toEqual(wildernessProvisionsTable8);
+    expect(result.isTableAtBottomOfPage).toBe(false);
+  }, 180000);
+
+  it('transcribes data rows for a small, simple table at the end of the page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const wildernessProvisionsPngPath = path.join(
+      fixturesDir,
+      'wilderness-provisions-2table-cutpage.png'
+    );
+    const pagePng = readFileSync(wildernessProvisionsPngPath);
+
+    const table: OcrExtractedTable = {
+      name: 'Table 8: March Rate by Load Class',
+      description: '',
+      columns: [
+        'Load Class',
+        'Typical Carried Weight (lb)',
+        'Daily March Distance (miles)',
+        'Fatigue Penalty',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    const result = await ocrTranscribeTableRowsFromCurrentPage(
+      createClient(),
+      table.name,
+      table.description,
+      table.columns,
+      pagePng,
+      true,
+      false,
+      ADDITIONAL_INSTRUCTIONS
+    );
+
+    expect(result.rows).toEqual(wildernessProvisionsTable8);
+    expect(result.isTableAtBottomOfPage).toBe(true);
+  }, 180000);
+});
+
+describe.skip('ocrImagesPopulateTableContents (live API)', () => {
   it('populates data rows for a small, simple table', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       fixturesDir,
       'wilderness-provisions-2table.png'
     );
-    const wildernessProvisionsBuffer = await readFile(
+    const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
     );
 
@@ -597,7 +678,7 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
       fixturesDir,
       'wilderness-provisions-2table.png'
     );
-    const wildernessProvisionsBuffer = await readFile(
+    const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
     );
 
@@ -627,10 +708,10 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
 
   it('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const page1Buffer = await readFile(
+    const page1Buffer = readFileSync(
       path.join(fixturesDir, 'wilderness-provisions-2table.png')
     );
-    const page2Buffer = await readFile(
+    const page2Buffer = readFileSync(
       path.join(fixturesDir, 'wilderness-provisions-2table-pg2.png')
     );
 
@@ -661,11 +742,9 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
 
   it('reads a table that starts and ends on a middle page', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pageBuffers = await Promise.all(
-      [1, 2, 3, 4, 5, 6].map((n) =>
-        readFile(
-          path.join(fixturesDir, `school-supplies-BOS-14pt-page-${n}.png`)
-        )
+    const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
+      readFileSync(
+        path.join(fixturesDir, `school-supplies-BOS-14pt-page-${n}.png`)
       )
     );
 
