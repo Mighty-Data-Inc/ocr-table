@@ -1,0 +1,118 @@
+name: Python Release
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "packages/python-ocr-table/**"
+      - ".github/workflows/python-release.yml"
+  pull_request:
+    paths:
+      - "packages/python-ocr-table/**"
+      - ".github/workflows/python-release.yml"
+  workflow_dispatch:
+
+jobs:
+  ci-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+
+    environment: env-cicd
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+
+    defaults:
+      run:
+        working-directory: packages/python-ocr-table
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: packages/python-ocr-table/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install hatch twine
+
+      - name: Run tests
+        run: python -u -m unittest discover -v -s tests
+
+      - name: Build package
+        run: hatch build
+
+      - name: Validate artifacts
+        run: python -m twine check dist/*
+
+      - name: Read current and previous Python versions
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT_VERSION=$(grep -E '^version\s*=\s*"' pyproject.toml | sed -E 's/version\s*=\s*"([^"]+)"/\1/')
+
+          SHOULD_PUBLISH=false
+          CHANGED=false
+          PREVIOUS_VERSION=""
+
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            SHOULD_PUBLISH=true
+            PREVIOUS_VERSION=$(git show HEAD~1:packages/python-ocr-table/pyproject.toml 2>/dev/null | grep -E '^version\s*=\s*"' | sed -E 's/version\s*=\s*"([^"]+)"/\1/' || true)
+          fi
+
+          if [ -z "${PREVIOUS_VERSION}" ]; then
+            if [ "${SHOULD_PUBLISH}" = "true" ]; then
+              CHANGED=true
+            fi
+          elif [ "${CURRENT_VERSION}" != "${PREVIOUS_VERSION}" ]; then
+            CHANGED=true
+          fi
+
+          echo "current=${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "previous=${PREVIOUS_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "changed=${CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "should_publish=${SHOULD_PUBLISH}" >> "$GITHUB_OUTPUT"
+
+      - name: Check if version already exists on PyPI
+        id: published
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.version.outputs.should_publish }}" != "true" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          VERSION="${{ steps.version.outputs.current }}"
+          if curl -fsSL "https://pypi.org/pypi/mightydatainc-ocr-table/json" | VERSION="$VERSION" python -c "import json,os,sys; data=json.load(sys.stdin); raise SystemExit(0 if os.environ['VERSION'] in data.get('releases', {}) else 1)"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to PyPI
+        if: steps.version.outputs.should_publish == 'true' && steps.version.outputs.changed == 'true' && steps.published.outputs.exists != 'true'
+        run: python -m twine upload --non-interactive dist/*
+
+      - name: Report release decision
+        if: steps.version.outputs.should_publish != 'true' || steps.version.outputs.changed != 'true' || steps.published.outputs.exists == 'true'
+        run: |
+          echo "Python publish skipped."
+          echo "should_publish=${{ steps.version.outputs.should_publish }}"
+          echo "version_changed=${{ steps.version.outputs.changed }}"
+          echo "current_version=${{ steps.version.outputs.current }}"
+          echo "previous_version=${{ steps.version.outputs.previous }}"
+          echo "already_published=${{ steps.published.outputs.exists }}"
