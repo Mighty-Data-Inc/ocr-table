@@ -8,7 +8,13 @@ import { describe, expect, it } from 'vitest';
 import {
   ocrIdentifyTablesOnPage,
   ocrImagesExtractTableColumnHeaders,
+  ocrImagesPopulateTableContents,
 } from '../src/ocrImagesExtractTableData.js';
+import { OcrExtractedTable } from '../src/records.js';
+
+import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
+import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
+import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -548,5 +554,146 @@ applied as appropriate based on the content of each column:
       'PricePerUnit',
       'PriceTotal',
     ]);
+  }, 180000);
+});
+
+describe('ocrImagesPopulateTableContents (live API)', () => {
+  it('populates data rows for a small, simple table', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const wildernessProvisionsPngPath = path.join(
+      fixturesDir,
+      'wilderness-provisions-2table.png'
+    );
+    const wildernessProvisionsBuffer = await readFile(
+      wildernessProvisionsPngPath
+    );
+
+    const table: OcrExtractedTable = {
+      name: 'Table 8: March Rate by Load Class',
+      description: 'Daily march distance and fatigue penalty by load class.',
+      columns: [
+        'Load Class',
+        'Typical Carried Weight (lb)',
+        'Daily March Distance (miles)',
+        'Fatigue Penalty',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    await ocrImagesPopulateTableContents(createClient(), table, [
+      wildernessProvisionsBuffer,
+    ]);
+
+    expect(table.data).toEqual(wildernessProvisionsTable8);
+  }, 180000);
+
+  it('populates data rows for a table that reaches the bottom of the only page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const wildernessProvisionsPngPath = path.join(
+      fixturesDir,
+      'wilderness-provisions-2table.png'
+    );
+    const wildernessProvisionsBuffer = await readFile(
+      wildernessProvisionsPngPath
+    );
+
+    const table: OcrExtractedTable = {
+      name: 'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
+      description: 'Weekly provisions required per adventurer by terrain type.',
+      columns: [
+        'Terrain',
+        'Water (gal/day)',
+        'Rations (lb/day)',
+        'Weekly Cost (gp)',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    await ocrImagesPopulateTableContents(createClient(), table, [
+      wildernessProvisionsBuffer,
+    ]);
+
+    expect(table.page_end).toBe(1);
+    expect(table.data).toEqual(wildernessProvisionsTable7);
+  }, 180000);
+
+  it('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const page1Buffer = await readFile(
+      path.join(fixturesDir, 'wilderness-provisions-2table.png')
+    );
+    const page2Buffer = await readFile(
+      path.join(fixturesDir, 'wilderness-provisions-2table-pg2.png')
+    );
+
+    const table: OcrExtractedTable = {
+      name: 'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
+      description: 'Weekly provisions required per adventurer by terrain type.',
+      columns: [
+        'Terrain',
+        'Water (gal/day)',
+        'Rations (lb/day)',
+        'Weekly Cost (gp)',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    await ocrImagesPopulateTableContents(createClient(), table, [
+      page1Buffer,
+      page2Buffer,
+    ]);
+
+    expect(table.page_end).toBe(1);
+    expect(table.data).toEqual(wildernessProvisionsTable7);
+  }, 180000);
+
+  it('reads a table that starts and ends on a middle page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageBuffers = await Promise.all(
+      [1, 2, 3, 4, 5, 6].map((n) =>
+        readFile(
+          path.join(fixturesDir, `school-supplies-BOS-14pt-page-${n}.png`)
+        )
+      )
+    );
+
+    const table: OcrExtractedTable = {
+      name: 'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
+      description: "School supply purchases for Mr. Jonah Reed's classroom.",
+      columns: [
+        'Item Name',
+        'Item Description',
+        'Quantity',
+        'Unit Price (USD)',
+        'Line Total (USD)',
+      ],
+      page_start: 2,
+      page_end: 2,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    await ocrImagesPopulateTableContents(
+      createClient(),
+      table,
+      pageBuffers,
+      ADDITIONAL_INSTRUCTIONS
+    );
+
+    expect(table.page_end).toBe(2);
+    expect(table.data).toEqual(schoolSuppliesJonahReed);
   }, 180000);
 });

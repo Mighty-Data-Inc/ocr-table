@@ -1,0 +1,142 @@
+[
+  {
+    "Item Name": "Pencils #2",
+    "Item Description": "Box of 24 pre-sharpened pencils",
+    "Quantity": "6",
+    "Unit Price (USD)": "$4.25",
+    "Line Total (USD)": "$25.50"
+  },
+  {
+    "Item Name": "Erasers",
+    "Item Description": "Pink block erasers, pack of 12",
+    "Quantity": "4",
+    "Unit Price (USD)": "$3.10",
+    "Line Total (USD)": "$12.40"
+  },
+  {
+    "Item Name": "Notebooks",
+    "Item Description": "Wide-ruled spiral notebooks",
+    "Quantity": "20",
+    "Unit Price (USD)": "$1.85",
+    "Line Total (USD)": "$37.00"
+  },
+  {
+    "Item Name": "Glue Sticks",
+    "Item Description": "Washable glue sticks, pack of 12",
+    "Quantity": "5",
+    "Unit Price (USD)": "$6.40",
+    "Line Total (USD)": "$32.00"
+  },
+  {
+    "Item Name": "Markers",
+    "Item Description": "Broad-tip classroom markers, set of 10",
+    "Quantity": "3",
+    "Unit Price (USD)": "$8.75",
+    "Line Total (USD)": "$26.25"
+  },
+  {
+    "Item Name": "Crayons",
+    "Item Description": "24-count crayon boxes",
+    "Quantity": "18",
+    "Unit Price (USD)": "$2.95",
+    "Line Total (USD)": "$53.10"
+  },
+  {
+    "Item Name": "Construction Paper",
+    "Item Description": "Assorted colors, 200-sheet pack",
+    "Quantity": "3",
+    "Unit Price (USD)": "$9.60",
+    "Line Total (USD)": "$28.80"
+  },
+  {
+    "Item Name": "Scissors",
+    "Item Description": "Blunt-tip student scissors",
+    "Quantity": "15",
+    "Unit Price (USD)": "$2.50",
+    "Line Total (USD)": "$37.50"
+  },
+  {
+    "Item Name": "Folders",
+    "Item Description": "Two-pocket folders",
+    "Quantity": "30",
+    "Unit Price (USD)": "$0.95",
+    "Line Total (USD)": "$28.50"
+  },
+  {
+    "Item Name": "Dry-Erase Markers",
+    "Item Description": "Low-odor marker pack",
+    "Quantity": "4",
+    "Unit Price (USD)": "$7.20",
+    "Line Total (USD)": "$28.80"
+  },
+  {
+    "Item Name": "Index Cards",
+    "Item Description": "3x5 ruled index cards, 100 pack",
+    "Quantity": "6",
+    "Unit Price (USD)": "$1.70",
+    "Line Total (USD)": "$10.20"
+  },
+  {
+    "Item Name": "Highlighters",
+    "Item Description": "Chisel-tip highlighters, set of 5",
+    "Quantity": "4",
+    "Unit Price (USD)": "$5.30",
+    "Line Total (USD)": "$21.20"
+  },
+  {
+    "Item Name": "Sticky Notes",
+    "Item Description": "3x3 sticky notes, 12-pack",
+    "Quantity": "3",
+    "Unit Price (USD)": "$10.10",
+    "Line Total (USD)": "$30.30"
+  },
+  {
+    "Item Name": "Rulers",
+    "Item Description": "12-inch plastic rulers",
+    "Quantity": "22",
+    "Unit Price (USD)": "$1.15",
+    "Line Total (USD)": "$25.30"
+  },
+  {
+    "Item Name": "Tissue Boxes",
+    "Item Description": "Facial tissue, 2-ply",
+    "Quantity": "8",
+    "Unit Price (USD)": "$2.80",
+    "Line Total (USD)": "$22.40"
+  },
+  {
+    "Item Name": "Hand Sanitizer",
+    "Item Description": "8oz pump bottles",
+    "Quantity": "6",
+    "Unit Price (USD)": "$3.95",
+    "Line Total (USD)": "$23.70"
+  },
+  {
+    "Item Name": "Copy Paper",
+    "Item Description": "Letter-size copier paper, ream; teacher requested bright-white stock for student publishing portfolios, bulletin board backing, and parent-night display packets.",
+    "Quantity": "5",
+    "Unit Price (USD)": "$6.90",
+    "Line Total (USD)": "$34.50"
+  },
+  {
+    "Item Name": "Binders",
+    "Item Description": "1-inch view binders; special request includes clear front sleeves for student data trackers, monthly goal sheets, and intervention group materials.",
+    "Quantity": "10",
+    "Unit Price (USD)": "$3.45",
+    "Line Total (USD)": "$34.50"
+  },
+  {
+    "Item Name": "Pens",
+    "Item Description": "Blue ballpoint pens, box of 12; teacher note asks for smooth, quick-dry ink due to left-handed students experiencing smudging on benchmark forms.",
+    "Quantity": "7",
+    "Unit Price (USD)": "$4.90",
+    "Line Total (USD)": "$34.30"
+  },
+  {
+    "Item Name": "Pocket Chart",
+    "Item Description": "Small classroom pocket chart with extra sentence strips; requested for phonics rotation center and daily attendance routine with visual supports.",
+    "Quantity": "1",
+    "Unit Price (USD)": "$18.50",
+    "Line Total (USD)": "$18.50"
+  }
+]

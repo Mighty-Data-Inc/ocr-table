@@ -1,0 +1,38 @@
+[
+  {
+    "Terrain": "Plains, Temperate",
+    "Water (gal/day)": "1.2",
+    "Rations (lb/day)": "1.6",
+    "Weekly Cost (gp)": "3.4"
+  },
+  {
+    "Terrain": "Forest, Mixed",
+    "Water (gal/day)": "1.5",
+    "Rations (lb/day)": "1.7",
+    "Weekly Cost (gp)": "3.9"
+  },
+  {
+    "Terrain": "Hills and Broken Paths",
+    "Water (gal/day)": "1.7",
+    "Rations (lb/day)": "1.8",
+    "Weekly Cost (gp)": "4.3"
+  },
+  {
+    "Terrain": "Mountain Ascent",
+    "Water (gal/day)": "2.1",
+    "Rations (lb/day)": "2.0",
+    "Weekly Cost (gp)": "5.1"
+  },
+  {
+    "Terrain": "Swamp or Fen",
+    "Water (gal/day)": "1.9",
+    "Rations (lb/day)": "1.9",
+    "Weekly Cost (gp)": "4.8"
+  },
+  {
+    "Terrain": "Desert, Dry Wind",
+    "Water (gal/day)": "3.0",
+    "Rations (lb/day)": "2.1",
+    "Weekly Cost (gp)": "6.7"
+  }
+]

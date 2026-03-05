@@ -1,0 +1,26 @@
+[
+  {
+    "Daily March Distance (miles)": "18",
+    "Fatigue Penalty": "None",
+    "Load Class": "Light",
+    "Typical Carried Weight (lb)": "0-25"
+  },
+  {
+    "Daily March Distance (miles)": "15",
+    "Fatigue Penalty": "-1 after 8 hrs",
+    "Load Class": "Standard",
+    "Typical Carried Weight (lb)": "26-45"
+  },
+  {
+    "Daily March Distance (miles)": "12",
+    "Fatigue Penalty": "-2 after 6 hrs",
+    "Load Class": "Heavy",
+    "Typical Carried Weight (lb)": "46-65"
+  },
+  {
+    "Daily March Distance (miles)": "8",
+    "Fatigue Penalty": "-4 after 4 hrs",
+    "Load Class": "Overburdened",
+    "Typical Carried Weight (lb)": "66+"
+  }
+]
