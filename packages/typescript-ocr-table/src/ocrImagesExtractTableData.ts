@@ -107,10 +107,11 @@ to identify potential tables based on the overall layout and organization of the
 In order to handle an edge case, we'll now also show you the *next* page of the document.
 
 We are not directly interested in this next page, but on very rare occasions you might get
-a table whose title appears at the bottom of the current page, but whose data appears at
-the top of the next page. When this happens, all you see at the bottom of the current page
-is some random orphaned title, so you'll need to see the next page in order to see if that
-title is actually the title of a table.
+a table whose title appears at the bottom of the current page, but whose data (sometimes
+including column headers, if this table has a header row) appears at the top of the next page.
+When this happens, all you see at the bottom of the current page is some random orphaned title,
+so you'll need to see the next page in order to see if that title is actually the title of a
+table.
 `;
     const nextPageGptMsgWithImage = _generateGptMessageWithImage(
       nextPagePngBuffer,
@@ -138,6 +139,7 @@ title is actually the title of a table.
  * @param pagePositionInDocument Optional page position hint (`first`, `middle`, or `last`) used for initial context.
  * @param nameOfFirstTableOnPage Optional table name to treat as the first table that starts on this page (used to ignore overflow rows from a prior page).
  * @param additionalInstructions Optional extra user instructions to guide table detection.
+ * @param nextPagePngBuffer Optional PNG bytes for the next page, used to help identify orphaned table titles at the bottom of the current page.
  * @returns List of extracted-table objects for the page, populated from LLM output with names and descriptions plus default values for other fields.
  */
 export const ocrIdentifyTablesOnPage = async (
@@ -300,6 +302,90 @@ that started on the previous page.
   }
 
   return tablesOnThisPage;
+};
+
+/**
+ * Extracts the column headers from a specific named table in a page image.
+ *
+ * Starts an OCR conversation with the provided page image, narrows focus to
+ * the given table by name/description, then asks the model to identify column
+ * names — either by reading explicit header rows or by inferring them from the
+ * cell content when no header row is present.
+ *
+ * @param openaiClient OpenAI client used to drive the conversation.
+ * @param tableName Name or identifier of the table to target on the page.
+ * @param pagePngBuffer PNG bytes of the document page containing the table.
+ * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
+ * @param tableDescription Optional description of the table to help the model locate it.
+ * @param nextPagePngBuffer Optional PNG bytes of the following page, used when the table spans pages.
+ * @returns Ordered array of column name strings extracted from the table.
+ */
+export const ocrImagesExtractTableColumnHeaders = async (
+  openaiClient: OpenAI,
+  tableName: string,
+  pagePngBuffer: Buffer,
+  additionalInstructions?: string,
+  tableDescription?: string,
+  nextPagePngBuffer?: Buffer
+): Promise<string[]> => {
+  const convo = _startOcrTableConversation(
+    openaiClient,
+    pagePngBuffer,
+    undefined,
+    additionalInstructions,
+    nextPagePngBuffer
+  );
+
+  convo.addUserMessage(`
+For the purposes of this work session, we'll be focusing specifically and
+exclusively on the following table:
+Name/Identifier: ${tableName}
+Description: ${tableDescription || '(No description provided; what you see is what you get.)'}
+`);
+
+  convo.addUserMessage(`
+What are the column names of this table? Please provide a list of the column names, 
+based on any headers or other observable information. You'll be provided with an opportunity
+to discuss your reasoning and observations, so please be sure to include a thorough discussion
+of how you identified the column names, what clues you used, and any uncertainties or ambiguities
+you had to navigate in determining the column names.
+
+In most cases, discerning the column names should be straightforward, as they are often explicitly
+stated in header rows. In such cases, simply extract the column names from the headers. Preserve
+them exactly as they appear in the source, without adding any notes or annotations.
+
+In the few cases in which a table does not explicitly state its column names, you'll need to infer
+them based on the content of the cells, their formatting, or their position within the table.
+Use your best judgment and reasoning skills to identify the most likely column names for this
+table.
+`);
+
+  await convo.submit(undefined, undefined, {
+    jsonResponse: JSONSchemaFormat(
+      {
+        discussion: [
+          String,
+          `A detailed discussion of how you are going to identify the column names. ` +
+            `If it's straightforward, simply state that the column names are explicitly ` +
+            `stated in the table headers. ` +
+            `If you have to do any kind of inference or reasoning to determine the column names, ` +
+            `talk through that reasoning process in detail here, discussing any uncertainties ` +
+            `or ambiguities you have to navigate. ` +
+            `This discussion is for your own benefit to help you organize your thoughts; ` +
+            `it won't be included in the final output.`,
+        ],
+        column_names: [String],
+      },
+      'ocr_extract_columns_from_one_table',
+      `Extract the column names from the table called "${tableName}".`
+    ),
+  });
+
+  const columnNames = convo.getLastReplyDictField(
+    'column_names',
+    []
+  ) as string[];
+  return columnNames;
 };
 
 /**

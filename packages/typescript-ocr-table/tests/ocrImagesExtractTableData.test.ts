@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url';
 import { OpenAI } from 'openai';
 import { describe, expect, it } from 'vitest';
 
-import { ocrIdentifyTablesOnPage } from '../src/ocrImagesExtractTableData.js';
+import {
+  ocrIdentifyTablesOnPage,
+  ocrImagesExtractTableColumnHeaders,
+} from '../src/ocrImagesExtractTableData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -352,5 +355,198 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
 
     expect(tables).toEqual([]);
+  }, 180000);
+});
+
+describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
+  it('returns the correct column headers for a straightforward table', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageOnePngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-11pt-page-1.png'
+    );
+    const pageOneBuffer = await readFile(pageOnePngPath);
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      pageOneBuffer
+    );
+
+    expect(columns).toEqual([
+      'Item Name',
+      'Item Description',
+      'Quantity',
+      'Unit Price (USD)',
+      'Line Total (USD)',
+    ]);
+  }, 180000);
+
+  it('obeys additionalInstructions that exclude a specific column', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageOnePngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-11pt-page-1.png'
+    );
+    const pageOneBuffer = await readFile(pageOnePngPath);
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      pageOneBuffer,
+      `Do not include the "Item Description" column in your output. ` +
+        `The item descriptions are too verbose and confusing -- ` +
+        `they do more harm than good. Omit them from your responses.`
+    );
+
+    expect(columns).toEqual([
+      'Item Name',
+      'Quantity',
+      'Unit Price (USD)',
+      'Line Total (USD)',
+    ]);
+  }, 180000);
+
+  it('returns correct column headers even when the table name is not specified exactly', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageOnePngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-11pt-page-1.png'
+    );
+    const pageOneBuffer = await readFile(pageOnePngPath);
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Ms. Alvarez (Room 3A) Classroom Purchases',
+      pageOneBuffer
+    );
+
+    expect(columns).toEqual([
+      'Item Name',
+      'Item Description',
+      'Quantity',
+      'Unit Price (USD)',
+      'Line Total (USD)',
+    ]);
+  }, 180000);
+
+  it('is not confused by the presence of a next-page image', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageOnePngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-11pt-page-1.png'
+    );
+    const pageTwoPngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-11pt-page-2.png'
+    );
+    const pageOneBuffer = await readFile(pageOnePngPath);
+    const pageTwoBuffer = await readFile(pageTwoPngPath);
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      pageOneBuffer,
+      undefined,
+      undefined,
+      pageTwoBuffer
+    );
+
+    expect(columns).toEqual([
+      'Item Name',
+      'Item Description',
+      'Quantity',
+      'Unit Price (USD)',
+      'Line Total (USD)',
+    ]);
+  }, 180000);
+
+  it('can identify column headers for a table whose title is orphaned on the prior page', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pageThreePngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-14pt-page-3.png'
+    );
+    const pageFourPngPath = path.join(
+      fixturesDir,
+      'school-supplies-BOS-14pt-page-4.png'
+    );
+    const pageThreeBuffer = await readFile(pageThreePngPath);
+    const pageFourBuffer = await readFile(pageFourPngPath);
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Classroom Purchases - Ms. Tessa Monroe (Room 2D)',
+      pageThreeBuffer,
+      ADDITIONAL_INSTRUCTIONS,
+      undefined,
+      pageFourBuffer
+    );
+
+    expect(columns).toEqual([
+      'Item Name',
+      'Item Description',
+      'Quantity',
+      'Unit Price (USD)',
+      'Line Total (USD)',
+    ]);
+  }, 180000);
+
+  it('can identify column headers for a table embedded in dense prose', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const wildernessProvisionsPngPath = path.join(
+      fixturesDir,
+      'wilderness-provisions-2table.png'
+    );
+    const wildernessProvisionsBuffer = await readFile(
+      wildernessProvisionsPngPath
+    );
+
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Table 8: March Rate by Load Class',
+      wildernessProvisionsBuffer
+    );
+
+    expect(columns).toEqual([
+      'Load Class',
+      'Typical Carried Weight (lb)',
+      'Daily March Distance (miles)',
+      'Fatigue Penalty',
+    ]);
+  }, 180000);
+
+  it('can infer column names when the table has no explicit header row', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const noColumnNamesPngPath = path.join(
+      fixturesDir,
+      'nocolumnnames-school-supplies-BOS-14pt-page-5.png'
+    );
+    const noColumnNamesBuffer = await readFile(noColumnNamesPngPath);
+
+    // This has the added benefit of also testing that additionalInstructions are
+    // passed and followed.
+    const columns = await ocrImagesExtractTableColumnHeaders(
+      createClient(),
+      'Classroom Purchases - Ms. Claire Donnelly (Room Kindergarten B)',
+      noColumnNamesBuffer,
+      `
+If you cannot find explicit column headers in the table, use the following names,
+applied as appropriate based on the content of each column:
+- PriceTotal
+- Quantity
+- PricePerUnit
+- Description
+- Name
+`
+    );
+
+    expect(columns).toEqual([
+      'Name',
+      'Description',
+      'Quantity',
+      'PricePerUnit',
+      'PriceTotal',
+    ]);
   }, 180000);
 });
