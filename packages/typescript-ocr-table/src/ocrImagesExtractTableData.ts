@@ -426,6 +426,7 @@ export const ocrTranscribeTableRowsFromCurrentPage = async (
 ): Promise<{
   rows: Array<Record<string, string>>;
   doesTableContinueOnNextPage: boolean;
+  isLastRowSplitAcrossPageBreak: boolean;
 }> => {
   // TODO: Run this in a double-barrel shotgun
   const convo = _startOcrTableConversation(
@@ -574,7 +575,37 @@ this table continues onto the next page.
           type: 'boolean',
           description: `
 A boolean indicating your conclusion (as you just reasoned about) about whether or not
-the last row of this table gets split across a page break.
+the last row of this table gets split across a page break. One telltale sign of this is
+if there are some cells in the last row on this page that look incomplete, messy, or
+incoherent, as if they've been chopped in half by a page break.
+`,
+        },
+        split_row_transcription: {
+          description: `
+If does_last_row_get_split_across_page_break is true, then
+this field should contain a transcription of the data in that split row, based on both the
+portion of the row that appears on this page and the portion of the row that appears on the
+next page. This split row can't be included in the "rows" array field above, because that
+field is only for rows that are fully contained on the current page -- so this separate field
+is necessary to handle the split row edge case.
+
+If there is no split row, you can set this field to null.
+`,
+          anyOf: [
+            { type: 'null' },
+            _jsonSchemaForExtractingOneRowOfTableData(columns),
+          ],
+        },
+        did_split_row_get_included_in_rows_array: {
+          type: 'boolean',
+          description: `
+If the split row exists, did you include it in the "rows" array above (presumably as the last 
+row)? You weren't supposed to, but I know that you sometimes do so anyway. I need to know if 
+you did so, so that I can remove the duplicate row from the "rows" array if necessary.
+
+If this table doesn't have a row that splits from this page to the next (that is,
+if the field does_last_row_get_split_across_page_break is false), then you can just set this
+field to false.
 `,
         },
       } as any,
@@ -584,6 +615,8 @@ the last row of this table gets split across a page break.
         'discuss_if_table_continues_on_next_page',
         'does_table_continue_on_next_page',
         'does_last_row_get_split_across_page_break',
+        'split_row_transcription',
+        'did_split_row_get_included_in_rows_array',
       ],
       additionalProperties: false,
     },
@@ -593,6 +626,9 @@ the last row of this table gets split across a page break.
     jsonResponse: { format: jsonSchemaForTablePage },
   });
 
+  // Debugging console output. Uncomment if needed.
+  // console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
+
   let hasRowsOnThisPage = convo.getLastReplyDictField(
     'does_table_have_rows_on_this_page',
     false
@@ -601,6 +637,7 @@ the last row of this table gets split across a page break.
     return {
       rows: [],
       doesTableContinueOnNextPage: false,
+      isLastRowSplitAcrossPageBreak: false,
     };
   }
 
@@ -616,18 +653,35 @@ the last row of this table gets split across a page break.
     false
   ) as boolean;
 
-  let doesLastRowGetSplitAcrossPageBreak = convo.getLastReplyDictField(
-    'does_last_row_get_split_across_page_break',
+  let isLastRowSplitAcrossPageBreak = false;
+  let splitRowTranscription = convo.getLastReplyDictField(
+    'split_row_transcription',
+    null
+  ) as any | null;
+  let splitRow: Record<string, string> | null = null;
+  if (splitRowTranscription) {
+    splitRow = splitRowTranscription.row_data as Record<string, string>;
+  }
+
+  const isSplitRowIncludedInRowsArray = convo.getLastReplyDictField(
+    'did_split_row_get_included_in_rows_array',
     false
   ) as boolean;
-  // TODO: Handle the split row.
-
-  // TODO REMOVE THIS
-  console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
+  if (splitRow) {
+    if (isSplitRowIncludedInRowsArray) {
+      // The split row wasn't supposed to be included in the rows array.
+      // Given that it was included anyway, we need to remove the duplicate row from the rows array.
+      rows.pop();
+    }
+    // The split row becomes the last row of the array.
+    rows.push(splitRow);
+    isLastRowSplitAcrossPageBreak = true;
+  }
 
   return {
     rows,
     doesTableContinueOnNextPage,
+    isLastRowSplitAcrossPageBreak,
   };
 };
 
