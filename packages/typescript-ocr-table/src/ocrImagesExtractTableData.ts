@@ -581,7 +581,7 @@ the last row of this table gets split across a page break.
       required: [
         'does_table_have_rows_on_this_page',
         'rows',
-        'discuss_if_table_reaches_bottom_of_page',
+        'discuss_if_table_continues_on_next_page',
         'does_table_continue_on_next_page',
         'does_last_row_get_split_across_page_break',
       ],

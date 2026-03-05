@@ -1,0 +1,62 @@
+[
+  {
+    "Roll": "1",
+    "Encounter": "Wolf Pack (2d4)",
+    "Terrain": "Forest, Hills",
+    "Notes": "Follows party until driven off or fed"
+  },
+  {
+    "Roll": "2",
+    "Encounter": "Bandit Scouts (1d4)",
+    "Terrain": "Roads, Plains",
+    "Notes": "Signal main band if not stopped"
+  },
+  {
+    "Roll": "3",
+    "Encounter": "Flash Flood",
+    "Terrain": "Ravine, Desert",
+    "Notes": "Lose 1d4 hours; roll for pack loss"
+  },
+  {
+    "Roll": "4",
+    "Encounter": "Merchant Caravan",
+    "Terrain": "Any Road",
+    "Notes": ""
+  },
+  {
+    "Roll": "5",
+    "Encounter": "Diseased Livestock",
+    "Terrain": "Plains, Farmland",
+    "Notes": "Exposes rations to contamination risk"
+  },
+  {
+    "Roll": "6",
+    "Encounter": "Giant Spider (1d2)",
+    "Terrain": "Forest, Cave",
+    "Notes": ""
+  },
+  {
+    "Roll": "7",
+    "Encounter": "Unmarked Grave Site",
+    "Terrain": "Any",
+    "Notes": "May indicate plague or recent battle"
+  },
+  {
+    "Roll": "8",
+    "Encounter": "Toll Collectors (Dubious)",
+    "Terrain": "Bridge, Ford",
+    "Notes": "Negotiation or combat; record outcome"
+  },
+  {
+    "Roll": "9",
+    "Encounter": "Wild Boar (1d3)",
+    "Terrain": "Forest, Scrub",
+    "Notes": ""
+  },
+  {
+    "Roll": "10",
+    "Encounter": "Lost Pilgrim",
+    "Terrain": "Any",
+    "Notes": "May carry useful local knowledge"
+  }
+]

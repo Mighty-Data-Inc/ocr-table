@@ -13,8 +13,9 @@ import {
 } from '../src/ocrImagesExtractTableData.js';
 import { OcrExtractedTable } from '../src/records.js';
 
-import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
 import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
+import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
+import wildernessProvisionsTable9Partial from './fixtures/wildprov-tbl9-partial.json' with { type: 'json' };
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -561,11 +562,11 @@ applied as appropriate based on the content of each column:
 describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes data rows for a small, simple table in the middle of the page', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const wildernessProvisionsPngPath = path.join(
+    const pagePngPath = path.join(
       fixturesDir,
       'wilderness-provisions-2table.png'
     );
-    const pagePng = readFileSync(wildernessProvisionsPngPath);
+    const pagePng = readFileSync(pagePngPath);
 
     const table: OcrExtractedTable = {
       name: 'Table 8: March Rate by Load Class',
@@ -595,26 +596,20 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     );
 
     expect(result.rows).toEqual(wildernessProvisionsTable8);
-    expect(result.isTableAtBottomOfPage).toBe(false);
+    expect(result.doesTableContinueOnNextPage).toBe(false);
   }, 180000);
 
-  it('transcribes data rows for a small, simple table at the end of the page', async () => {
+  it('transcribes table at end of the page with some blank cells', async () => {
+    // The fact that it's at the end of the page has nothing to do with the fact
+    // that it has some blank cells. I'm just recycling test images.
     const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
-      'wilderness-provisions-2table-cutpage.png'
-    );
-    const pagePng = readFileSync(wildernessProvisionsPngPath);
+    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg2.png');
+    const pagePng = readFileSync(pagePngPath);
 
     const table: OcrExtractedTable = {
-      name: 'Table 8: March Rate by Load Class',
+      name: 'Table 9: Wilderness Random Encounters (d20)',
       description: '',
-      columns: [
-        'Load Class',
-        'Typical Carried Weight (lb)',
-        'Daily March Distance (miles)',
-        'Fatigue Penalty',
-      ],
+      columns: ['Roll', 'Encounter', 'Terrain', 'Notes'],
       page_start: 1,
       page_end: 1,
       data: [],
@@ -633,8 +628,43 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       ADDITIONAL_INSTRUCTIONS
     );
 
-    expect(result.rows).toEqual(wildernessProvisionsTable8);
-    expect(result.isTableAtBottomOfPage).toBe(true);
+    expect(result.rows).toEqual(wildernessProvisionsTable9Partial);
+    expect(result.doesTableContinueOnNextPage).toBe(false);
+  }, 180000);
+
+  it('transcribes only table rows on current page but recognizes continuation', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg2.png');
+    const pagePng = readFileSync(pagePngPath);
+
+    const nextPagePngPath = path.join(fixturesDir, 'wildprov3pg-pg3.png');
+    const nextPagePng = readFileSync(nextPagePngPath);
+
+    const table: OcrExtractedTable = {
+      name: 'Table 9: Wilderness Random Encounters (d20)',
+      description: '',
+      columns: ['Roll', 'Encounter', 'Terrain', 'Notes'],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    const result = await ocrTranscribeTableRowsFromCurrentPage(
+      createClient(),
+      table.name,
+      table.description,
+      table.columns,
+      pagePng,
+      true,
+      false,
+      ADDITIONAL_INSTRUCTIONS,
+      nextPagePng
+    );
+
+    expect(result.rows).toEqual(wildernessProvisionsTable9Partial);
+    expect(result.doesTableContinueOnNextPage).toBe(true);
   }, 180000);
 });
 
