@@ -17,6 +17,7 @@ import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7
 import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
 import wildernessProvisionsTable9Partial from './fixtures/wildprov-tbl9-partial.json' with { type: 'json' };
 import candidateEvalPg1 from './fixtures/candidate-eval-pg1.json' with { type: 'json' };
+import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: 'json' };
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -592,7 +593,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       table.columns,
       pagePng,
       true,
-      false,
+      undefined,
       ADDITIONAL_INSTRUCTIONS
     );
 
@@ -625,13 +626,13 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       table.columns,
       pagePng,
       true,
-      false,
+      undefined,
       ADDITIONAL_INSTRUCTIONS
     );
 
     expect(result.rows).toEqual(wildernessProvisionsTable9Partial);
     expect(result.doesTableContinueOnNextPage).toBe(false);
-    expect(result.isLastRowSplitAcrossPageBreak).toBe(false);
+    expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(false);
   }, 180000);
 
   it('transcribes only table rows on current page but recognizes clean-break continuation', async () => {
@@ -660,14 +661,14 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       table.columns,
       pagePng,
       true,
-      false,
+      undefined,
       ADDITIONAL_INSTRUCTIONS,
       nextPagePng
     );
 
     expect(result.rows).toEqual(wildernessProvisionsTable9Partial);
     expect(result.doesTableContinueOnNextPage).toBe(true);
-    expect(result.isLastRowSplitAcrossPageBreak).toBe(false);
+    expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(false);
   }, 180000);
 
   it('transcribes rows on current page and recognizes split row', async () => {
@@ -696,14 +697,56 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       table.columns,
       pagePng,
       true,
-      false,
+      undefined,
       ADDITIONAL_INSTRUCTIONS,
       nextPagePng
     );
 
+    console.log('Result:', JSON.stringify(result, null, 2));
+
     expect(result.rows).toEqual(candidateEvalPg1);
     expect(result.doesTableContinueOnNextPage).toBe(true);
-    expect(result.isLastRowSplitAcrossPageBreak).toBe(true);
+    expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(true);
+  }, 180000);
+
+  it('transcribes a table page that both starts and ends with a split row', async () => {
+    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(fixturesDir, 'candidate-eval-pg2.png');
+    const pagePng = readFileSync(pagePngPath);
+
+    const nextPagePngPath = path.join(fixturesDir, 'candidate-eval-pg3.png');
+    const nextPagePng = readFileSync(nextPagePngPath);
+
+    const table: OcrExtractedTable = {
+      name: 'Candidate Evaluation Report',
+      description: '',
+      columns: ['Name', 'Education', 'Work Experience', 'Notes'],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    const lastRowOfPg1 = candidateEvalPg1[candidateEvalPg1.length - 1];
+
+    const result = await ocrTranscribeTableRowsFromCurrentPage(
+      createClient(),
+      table.name,
+      table.description,
+      table.columns,
+      pagePng,
+      false,
+      lastRowOfPg1,
+      ADDITIONAL_INSTRUCTIONS,
+      nextPagePng
+    );
+
+    console.log('Result:', JSON.stringify(result, null, 2));
+
+    expect(result.rows).toEqual(candidateEvalPg2);
+    expect(result.doesTableContinueOnNextPage).toBe(true);
+    expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(true);
   }, 180000);
 });
 

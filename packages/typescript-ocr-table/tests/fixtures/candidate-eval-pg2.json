@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Svetlana Obrekov",
+    "Education": "B.S. Mathematics, Sofia University, 2009. M.S. Operations Research, Penn State, 2012.",
+    "Work Experience": "Quantitative Analyst, Harborview Asset Management (2012 - 2018): built and maintained factor models for equity portfolio construction; authored internal Python library for back-testing still in active use. Senior Analyst, Lyngate Consulting (2018 - 2024): led analytics engagements for clients in pharma, logistics, and public-sector verticals. Currently unaffiliated (since early 2024) following firm acquisition.",
+    "Notes": "Available immediately. Open to hybrid schedule. Deep expertise in R and Python; lighter exposure to cloud data platforms but willing to upskill quickly per her own assessment."
+  },
+  {
+    "Name": "Darnell Osei",
+    "Education": "B.S. Information Systems, Howard University, 2020.",
+    "Work Experience": "Junior Data Analyst, Nexbridge Technologies (2020 - 2023): supported senior analysts in data cleaning, visualization, and ad hoc reporting. Data Analyst, Strata Health (2023 - present): independently manages patient-flow analytics for two hospital campuses.",
+    "Notes": ""
+  },
+  {
+    "Name": "Camille Tran",
+    "Education": "B.S. Biology, UCLA, 2008. M.P.H. Biostatistics, Johns Hopkins Bloomberg School of Public Health, 2011. Completed additional coursework in machine learning through Coursera and edX (2019 - 2020).",
+    "Work Experience": "Epidemiologist / Data Analyst, Los Angeles County Department of Public Health (2011 - 2020): produced disease surveillance reports and managed outbreak data pipelines. Senior Data Analyst, Helix Genomics (2020 - present): translates clinical trial data into regulatory submission summaries and internal dashboards.",
+    "Notes": ""
+  },
+  {
+    "Name": "Reuben Glasscock",
+    "Education": "",
+    "Work Experience": "",
+    "Notes": "Application was incomplete at submission deadline. Included only a resume cover letter; no resume, portfolio, or references attached. Retained in system per HR policy but not recommended for interview at this time."
+  },
+  {
+    "Name": "Fatima Al-Rashidi",
+    "Education": "B.S. Computer Engineering, American University of Beirut, 2016. M.S. Data Engineering, TU Munich, 2019.",
+    "Work Experience": "Data Engineer / Analyst, Zephyr Cloud (2019 - 2023): built real-time streaming pipelines on Kafka and Spark supporting analytics for a SaaS platform with 1.2 million active users. Analytics Engineer, Stratum Labs (2023 - present): owns dbt transformation layer and collaborates closely with product and science teams on experiment analysis.",
+    "Notes": "Strong technical depth on the engineering side. Panel wants to confirm comfort level with stakeholder-facing presentation work before making offer. Request a second-round presentation exercise."
+  }
+]
