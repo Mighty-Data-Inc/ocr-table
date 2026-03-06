@@ -762,7 +762,6 @@ you should go look at the source image(s) and use your best judgment to determin
 is most likely to be correct.
 `);
   await convo.submit();
-  console.log(convo.getLastReplyStr());
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses regarding
 whether or not the table "${tableName}" continues onto the next page, and whether or not the last

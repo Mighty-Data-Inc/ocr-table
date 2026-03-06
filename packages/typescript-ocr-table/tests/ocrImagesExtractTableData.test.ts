@@ -45,6 +45,12 @@ Classroom numbers are in <number><letter> format, e.g. A3, D9, etc.
 When performing OCR, sometimes a "5" will look like an "S" or a "2" like a "Z",
 and vice versa. However, when you see a classroom number, e.g. "Room 2D",
 you must transcribe it as <number><letter>.
+
+Emit absolutely NO non-typeable characters -- this includes em-dashes, pretty quotes,
+fancy apostrophes, non-breaking spaces, or any other characters that would not be produced 
+if a human were typing on a standard keyboard. Your output is being matched against
+expected values using strict equality, so if you emit any non-typeable characters,
+your output will be considered incorrect.
 `;
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
@@ -684,8 +690,6 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       ADDITIONAL_INSTRUCTIONS,
       nextPagePng
     );
-
-    console.log('Result:', JSON.stringify(result, null, 2));
 
     expect(result.rows).toEqual(candidateEvalPg1);
     expect(result.doesTableContinueOnNextPage).toBe(true);
