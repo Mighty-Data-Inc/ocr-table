@@ -549,17 +549,18 @@ RESPONSE FROM WORKER #${index + 1}
 ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 `);
   });
-
+  convo.addDeveloperMessage(`
+Focus on the differences and discrepancies between the workers' responses. Where do they agree?
+Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
+with the data in the source image(s)?
+`);
+  await convo.submit();
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses.
 In the places where they agree, great. In the places where they disagree, side with
 the one whose argument is most consistent with the data in the source image(s), 
 and with the reasoning that makes the most sense.
-
-Based the workers' judgment as well as your own, come to a conclusion about the data
-in this table on this page and populate the data structure accordingly.
 `);
-
   await convo.submit(undefined, undefined, {
     jsonResponse: { format: jsonSchemaForTablePage },
   });
@@ -696,7 +697,8 @@ Your job now is to determine the following:
         String,
         `If any cell data in the last row is truncated or missing, and there is indeed some ` +
           `errant text or a partially filled row at the top of the next page, then try seeing ` +
-          `what these two pieces of text would look like if you concatenated them together. ` +
+          `what these two pieces of text would look like if you concatenated them together ` +
+          `(remembering, of course, that line breaks in a cell probably count as whitespace). ` +
           `Does the concatenated text (or multiple concatenated texts, if there are multiple ` +
           `potential concatenations to try) look like a plausible full cell of data that could ` +
           `have gotten split across the page break? Does this change your opinion about whether ` +
@@ -734,6 +736,12 @@ RESPONSE FROM WORKER #${index + 1}
 ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 `);
   });
+  convo.addDeveloperMessage(`
+Focus on the differences and discrepancies between the workers' responses. Where do they agree?
+Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
+with the data in the source image(s)?
+`);
+  await convo.submit();
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses regarding
 whether or not the table "${tableName}" continues onto the next page, and whether or not the last
@@ -800,7 +808,8 @@ combining the information from both pages.
       )
     );
     convo.addSystemMessage(
-      `We had ${NUM_SHOTGUN_BARRELS} independent workers re-transcribe the split row. Here are their responses:`
+      `We had ${NUM_SHOTGUN_BARRELS} independent workers re-transcribe the ` +
+        `split row. Here are their responses:`
     );
     convoShotgun.forEach((convoBarrel, index) => {
       convo.addSystemMessage(`
@@ -809,6 +818,12 @@ RESPONSE FROM WORKER #${index + 1}
 ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 `);
     });
+    convo.addDeveloperMessage(`
+Focus on the differences and discrepancies between the workers' responses. Where do they agree?
+Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
+with the data in the source image(s)?
+`);
+    await convo.submit();
     convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses
 regarding the transcription of the split row. In the places where they agree, great.
