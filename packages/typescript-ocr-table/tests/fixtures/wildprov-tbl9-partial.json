@@ -58,5 +58,17 @@
     "Encounter": "Lost Pilgrim",
     "Terrain": "Any",
     "Notes": "May carry useful local knowledge"
+  },
+  {
+    "Roll": "11",
+    "Encounter": "Dense Fog",
+    "Terrain": "Moor, Coast",
+    "Notes": "Navigation checks required; halved pace"
+  },
+  {
+    "Roll": "12",
+    "Encounter": "Brigand Ambush (2d6)",
+    "Terrain": "Roads, Forest",
+    "Notes": "Leader flees if half force is downed"
   }
 ]

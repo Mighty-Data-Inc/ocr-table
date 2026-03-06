@@ -73,7 +73,7 @@
       table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 9.75pt;
+        font-size: 9pt;
         line-height: 1.2;
       }
 
@@ -82,6 +82,7 @@
         border: 1px solid #222;
         padding: 0.04in 0.05in;
         vertical-align: top;
+        text-align: left;
       }
 
       th {
@@ -99,33 +100,43 @@
   <body>
     <div class="page">
       <h1>Provisioning for Wilderness Marches</h1>
-      <p class="subtitle">A practical guide for quartermasters, scouts, and prudent captains.</p>
+      <p class="subtitle">
+        A practical guide for quartermasters, scouts, and prudent captains.
+      </p>
 
       <div class="columns">
         <p>
-          The inexperienced commander imagines that steel and courage are the measure of a campaign.
-          Veterans know better. A company marches no farther than its waterskins, and no faster than the
-          slowest mule under hard load. The wise planner therefore reckons provisions before banners,
-          weather before war songs, and coin before glory. If this seems dull to the boastful, let the
-          boastful learn hunger by the third day of dry road and take the lesson in silence.
+          The inexperienced commander imagines that steel and courage are the
+          measure of a campaign. Veterans know better. A company marches no
+          farther than its waterskins, and no faster than the slowest mule under
+          hard load. The wise planner therefore reckons provisions before
+          banners, weather before war songs, and coin before glory. If this
+          seems dull to the boastful, let the boastful learn hunger by the third
+          day of dry road and take the lesson in silence.
         </p>
         <p>
-          Terrain governs appetite and thirst in unequal ways. A level road across temperate grassland
-          permits disciplined pacing and regular halts, while broken upland demands labor from both leg and
-          lung. Marsh travel compounds effort through wet footing, detours, and spoiled stores. Desert, most
-          infamous of all, extracts water with pitiless arithmetic. It is not enough to carry the same sack
-          of meal from one region to another and hope the gods provide.
+          Terrain governs appetite and thirst in unequal ways. A level road
+          across temperate grassland permits disciplined pacing and regular
+          halts, while broken upland demands labor from both leg and lung. Marsh
+          travel compounds effort through wet footing, detours, and spoiled
+          stores. Desert, most infamous of all, extracts water with pitiless
+          arithmetic. It is not enough to carry the same sack of meal from one
+          region to another and hope the gods provide.
         </p>
         <p>
-          Scribes often ask whether ration standards should account for rank. In this referee's judgment,
-          no advantage of birth exempts one from heat, wind, and distance. Officers may dine better in
-          camp, but on the march each mouth consumes and each skin empties. Distinctions in supply belong
-          to special burdens only: armor weight, medical satchels, drafting tools, and other practical
-          exceptions that can be named, counted, and defended in ledger.
+          Scribes often ask whether ration standards should account for rank. In
+          this referee's judgment, no advantage of birth exempts one from heat,
+          wind, and distance. Officers may dine better in camp, but on the march
+          each mouth consumes and each skin empties. Distinctions in supply
+          belong to special burdens only: armor weight, medical satchels,
+          drafting tools, and other practical exceptions that can be named,
+          counted, and defended in ledger.
         </p>
 
         <section class="table-block" aria-label="Provisioning table">
-          <p class="table-title">Table 7: Weekly Provisions by Terrain (Per Adventurer)</p>
+          <p class="table-title">
+            Table 7: Weekly Provisions by Terrain (Per Adventurer)
+          </p>
           <table>
             <thead>
               <tr>
@@ -177,42 +188,323 @@
         </section>
 
         <p>
-          Use the table as a baseline, then increase totals for extraordinary burdens: forced march,
-          sustained shield use, heavy mining, prolonged cold, or repeated climbing under armor. Keep one
-          reserve day in compact form whenever pack space allows. Salted strips and hard biscuit travel
-          well, and though they weary the tongue, they spare the company from desperate arithmetic at dusk.
+          Use the table as a baseline, then increase totals for extraordinary
+          burdens: forced march, sustained shield use, heavy mining, prolonged
+          cold, or repeated climbing under armor. Keep one reserve day in
+          compact form whenever pack space allows. Salted strips and hard
+          biscuit travel well, and though they weary the tongue, they spare the
+          company from desperate arithmetic at dusk.
         </p>
         <p>
-          Do not trust stream water by appearance alone. Clear flow can conceal rot from upstream camps,
-          and still pools in hot weather betray the careless more often than the wicked. Boiling is slow,
-          but slower still is burying two scouts before noon. A prudent trainmaster assigns one kettle to
-          purification and one to common stew, and marks both by habit so fools do not reverse them.
+          Do not trust stream water by appearance alone. Clear flow can conceal
+          rot from upstream camps, and still pools in hot weather betray the
+          careless more often than the wicked. Boiling is slow, but slower still
+          is burying two scouts before noon. A prudent trainmaster assigns one
+          kettle to purification and one to common stew, and marks both by habit
+          so fools do not reverse them.
+        </p>
+        <section class="table-block" aria-label="March rate table">
+          <p class="table-title">Table 8: March Rate by Load Class</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Load Class</th>
+                <th>Typical Carried Weight (lb)</th>
+                <th>Daily March Distance (miles)</th>
+                <th>Fatigue Penalty</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Light</td>
+                <td class="num">0-25</td>
+                <td class="num">18</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>Standard</td>
+                <td class="num">26-45</td>
+                <td class="num">15</td>
+                <td>-1 after 8 hrs</td>
+              </tr>
+              <tr>
+                <td>Heavy</td>
+                <td class="num">46-65</td>
+                <td class="num">12</td>
+                <td>-2 after 6 hrs</td>
+              </tr>
+              <tr>
+                <td>Overburdened</td>
+                <td class="num">66+</td>
+                <td class="num">8</td>
+                <td>-4 after 4 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <p>
+          Lastly, remember that provisioning is not merely subtraction from
+          sacks and casks. It is also the craft of preserving morale through
+          predictability. Regular issue at regular halts steadies both temper
+          and pace. Men forgive hard roads sooner than they forgive uncertain
+          supper. A captain who masters this plain truth may find his company
+          willing on the eighth day where another's mutters on the fourth.
+        </p>
+
+        <p>
+          Account also for loss by weather and mishap. A torn grain sack, a
+          flooded ford, or one startled mule can erase a careful estimate in an
+          afternoon. For this reason, quartermasters of reputation divide
+          critical stores among several packs instead of trusting all to one
+          beast or cart. This rule seems cautious until the day it becomes the
+          difference between inconvenience and disaster.
         </p>
         <p>
-          Lastly, remember that provisioning is not merely subtraction from sacks and casks. It is also the
-          craft of preserving morale through predictability. Regular issue at regular halts steadies both
-          temper and pace. Men forgive hard roads sooner than they forgive uncertain supper. A captain who
-          masters this plain truth may find his company willing on the eighth day where another's mutters on
-          the fourth.
+          Where local markets are uncertain, carry trade goods suited to rough
+          exchange: needles, lamp wick, common salt, and small iron fittings.
+          Villages that cannot spare coin may still bargain in cheese, dried
+          fruit, or grain meal. Such exchanges should be recorded at once, with
+          witness if available, for memory grows generous after supper and
+          strict at audit.
+        </p>
+
+        <p>
+          In winter travel, fuel may outrank flour for short intervals,
+          especially in wind-scoured country where exposure drains strength
+          before hunger does. A sensible leader sets watch rotations that
+          protect both fire and sleepers, then adjusts morning departure by
+          actual readiness rather than pride. Better one honest delay than three
+          leagues of stumbling march that consume twice the ration and yield
+          half the distance.
+        </p>
+
+        <h2
+          style="
+            font-size: 13pt;
+            font-variant: small-caps;
+            margin: 0.18in 0 0.1in 0;
+          "
+        >
+          Chapter Nine: Resupply Along the Route
+        </h2>
+        <p>
+          No sensible plan survives contact with a fortnight of mud, missing
+          waypoints, and pack animals that decide to be philosophical. Resupply
+          is therefore not a luxury reserved for long campaigns; it is the
+          ordinary arithmetic of any march that lasts beyond a week. The
+          quartermaster who leaves base camp with every provision for the entire
+          journey invites the kind of ruin that makes for cautionary ballads
+          rather than monuments.
         </p>
         <p>
-          Account also for loss by weather and mishap. A torn grain sack, a flooded ford, or one startled
-          mule can erase a careful estimate in an afternoon. For this reason, quartermasters of reputation
-          divide critical stores among several packs instead of trusting all to one beast or cart. This rule
-          seems cautious until the day it becomes the difference between inconvenience and disaster.
+          Resupply nodes fall into three rough categories: friendly garrisons,
+          settled civilian markets, and field caches established before the
+          march begins. Each carries different assumptions about reliability,
+          price, and speed of execution. A garrison may provide on written
+          authority where a market demands coin, and a buried cache makes no
+          demands at all except that someone remembered to dig it in the right
+          clearing three weeks earlier.
         </p>
         <p>
-          Where local markets are uncertain, carry trade goods suited to rough exchange: needles, lamp wick,
-          common salt, and small iron fittings. Villages that cannot spare coin may still bargain in cheese,
-          dried fruit, or grain meal. Such exchanges should be recorded at once, with witness if available,
-          for memory grows generous after supper and strict at audit.
+          When scheduling resupply, calculate backward from the node, not
+          forward from departure. Determine the latest acceptable day of
+          arrival, subtract travel time plus one full day of margin, and post
+          the requirement notice on that date without fail. Quartermasters who
+          calculate forward tend to arrive at the node one day early with
+          optimism and two days late with excuses. Backward planning converts
+          hope into obligation and obligation into habits of mind that survive
+          the first unexpected river ford.
         </p>
         <p>
-          In winter travel, fuel may outrank flour for short intervals, especially in wind-scoured country
-          where exposure drains strength before hunger does. A sensible leader sets watch rotations that
-          protect both fire and sleepers, then adjusts morning departure by actual readiness rather than pride.
-          Better one honest delay than three leagues of stumbling march that consume twice the ration and
-          yield half the distance.
+          Civilian markets deserve particular caution in border regions. Prices
+          fluctuate with rumor as readily as with scarcity, and a column of
+          armed men purchases at rates that reflect the seller's assessment of
+          their mood. Send a small party in plain traveling clothes a half-day
+          ahead if circumstances allow. They will return with accurate prices,
+          accurate stock information, and occasionally an invitation to dine
+          that the main column would never receive. This is not deception; it is
+          tact, which admirable commanders practice without embarrassment.
+        </p>
+        <p>
+          Cache placement requires a separate document of its own, and the
+          interested reader will find one appended to this volume. For now, note
+          only that a cache is only as useful as its description. "The oak by
+          the stream" has proven inadequate documentation in at least seven
+          expeditions this reporter is aware of. Bearings, paced distances from
+          fixed landmarks, and a second confirming reference are the minimum.
+          Bury deeper than comfort suggests and mark the depression with
+          something that will survive rain and a full season of vegetation.
+        </p>
+
+        <section
+          class="table-block"
+          style="break-inside: auto"
+          aria-label="Random encounters table"
+        >
+          <p class="table-title">Table 9: Wilderness Random Encounters (d20)</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Roll</th>
+                <th>Encounter</th>
+                <th>Terrain</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num">1</td>
+                <td>Wolf Pack (2d4)</td>
+                <td>Forest, Hills</td>
+                <td>Follows party until driven off or fed</td>
+              </tr>
+              <tr>
+                <td class="num">2</td>
+                <td>Bandit Scouts (1d4)</td>
+                <td>Roads, Plains</td>
+                <td>Signal main band if not stopped</td>
+              </tr>
+              <tr>
+                <td class="num">3</td>
+                <td>Flash Flood</td>
+                <td>Ravine, Desert</td>
+                <td>Lose 1d4 hours; roll for pack loss</td>
+              </tr>
+              <tr>
+                <td class="num">4</td>
+                <td>Merchant Caravan</td>
+                <td>Any Road</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="num">5</td>
+                <td>Diseased Livestock</td>
+                <td>Plains, Farmland</td>
+                <td>Exposes rations to contamination risk</td>
+              </tr>
+              <tr>
+                <td class="num">6</td>
+                <td>Giant Spider (1d2)</td>
+                <td>Forest, Cave</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="num">7</td>
+                <td>Unmarked Grave Site</td>
+                <td>Any</td>
+                <td>May indicate plague or recent battle</td>
+              </tr>
+              <tr>
+                <td class="num">8</td>
+                <td>Toll Collectors (Dubious)</td>
+                <td>Bridge, Ford</td>
+                <td>Negotiation or combat; record outcome</td>
+              </tr>
+              <tr>
+                <td class="num">9</td>
+                <td>Wild Boar (1d3)</td>
+                <td>Forest, Scrub</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="num">10</td>
+                <td>Lost Pilgrim</td>
+                <td>Any</td>
+                <td>May carry useful local knowledge</td>
+              </tr>
+              <tr>
+                <td class="num">11</td>
+                <td>Dense Fog</td>
+                <td>Moor, Coast</td>
+                <td>Navigation checks required; halved pace</td>
+              </tr>
+              <tr>
+                <td class="num">12</td>
+                <td>Brigand Ambush (2d6)</td>
+                <td>Roads, Forest</td>
+                <td>Leader flees if half force is downed</td>
+              </tr>
+              <tr>
+                <td class="num">13</td>
+                <td>Unstable Ground</td>
+                <td>Swamp, Hills</td>
+                <td>Mounts and carts at risk of injury</td>
+              </tr>
+              <tr>
+                <td class="num">14</td>
+                <td>Refugee Column</td>
+                <td>Plains, Roads</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="num">15</td>
+                <td>Venomous Serpent</td>
+                <td>Desert, Scrub</td>
+                <td>Antidote required within 6 hours</td>
+              </tr>
+              <tr>
+                <td class="num">16</td>
+                <td>Bear, Brown (1)</td>
+                <td>Forest, Mountain</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="num">17</td>
+                <td>Broken Bridge</td>
+                <td>River, Road</td>
+                <td>Add 1d6+2 hours for alternate crossing</td>
+              </tr>
+              <tr>
+                <td class="num">18</td>
+                <td>Deserters (1d6)</td>
+                <td>Any</td>
+                <td>Armed; may bargain or attack</td>
+              </tr>
+              <tr>
+                <td class="num">19</td>
+                <td>Wildfire Scar</td>
+                <td>Plains, Forest</td>
+                <td>Forage yields halved for next 2 days</td>
+              </tr>
+              <tr>
+                <td class="num">20</td>
+                <td>No Encounter</td>
+                <td>Any</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <p>
+          Beyond supply and pace, the prudent planner must account for the
+          unexpected. No march through open wilderness proceeds in perfect
+          quiet. Beasts seek the same water sources as travelers, and not all
+          creatures yield the trail to armed men. Outlaws read road signs as
+          well as any merchant, and the desperate will gamble against odds that
+          a calm observer would decline. A company that fixes its attention
+          entirely on the next supply depot may find that attention interrupted
+          before arrival.
+        </p>
+        <p>
+          The table below catalogs common hazards by frequency of occurrence.
+          Roll one twenty-sided die once per day of travel, or twice on days
+          involving river crossings, elevated passes, or known bandit roads. The
+          Notes column records persistent effects or special conditions; entries
+          left blank indicate encounters that resolve on contact with no lasting
+          consequence.
+        </p>
+
+        <p>
+          Encounters rated at lower rolls tend toward the merely costly; those
+          in the middle range carry the most variable outcomes, depending on
+          party preparedness and luck of ground. High rolls are rewards for
+          careful watch-keeping, route selection, and the slow accumulation of
+          good practice that veterans call habit and novices call caution.
+          Record each encounter in the march journal with terrain, time of day,
+          and resolution, so that the same road may be mapped more accurately on
+          the next passage.
         </p>
       </div>
     </div>
