@@ -671,7 +671,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const table: OcrExtractedTable = {
       name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
-      columns: ['Name', 'Education', 'Work Experience', 'Notes'],
+      columns: ['Name', 'Bio', 'Personal Statement', 'Panel Evaluation'],
       page_start: 1,
       page_end: 1,
       data: [],
@@ -707,7 +707,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const table: OcrExtractedTable = {
       name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
-      columns: ['Name', 'Education', 'Work Experience', 'Notes'],
+      columns: ['Name', 'Bio', 'Personal Statement', 'Panel Evaluation'],
       page_start: 1,
       page_end: 1,
       data: [],
