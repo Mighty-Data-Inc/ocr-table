@@ -79,9 +79,13 @@ you must transcribe it as <number><letter>.
 ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 `;
 
-const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = ``;
+const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = `
+${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
+`;
 
-const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = ``;
+const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = `
+${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
+`;
 
 const ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST = `
 When you list the column headers, write them in ALL CAPS.
@@ -558,6 +562,7 @@ applied as appropriate based on the content of each column:
 - PricePerUnit
 - Description
 - Name
+Make sure that all five of these column names are accounted for.
 `
     );
 
