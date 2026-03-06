@@ -8,6 +8,21 @@ import { OcrExtractedTable } from './records.js';
 import { OpenAI } from 'openai';
 
 /**
+ * Perform chain-of-thought by giving the AI a chance to "ponder"
+ * after submitting a message, before we ask it to respond.
+ * This often improves quality of the response, as it gives the model
+ * a chance to "think" for a moment before responding. However, it burns
+ * time and tokens. Use judiciously!
+ * @param convo
+ */
+const _ponder = async (convo: GptConversation) => {
+  // Noop for performance eval.
+  // true = noop; false = actually ponder.
+  const noop = () => true;
+  noop() || (await convo.submit());
+};
+
+/**
  * Initializes a `GptConversation` for OCR table detection on a single page.
  *
  * Seeds the conversation with a user message that includes the page image,
@@ -176,7 +191,7 @@ onto later pages. This includes tables that might have their title or header on 
 Let's start with a general discussion of what you see on this page. Describe its
 layout and the tables (or table fragments) that you see on it.
 `);
-  await convo.submit();
+  await _ponder(convo);
 
   if (didPreviousPageEndWithTable) {
     convo.addUserMessage(`
@@ -579,7 +594,7 @@ with the data in the source image(s)? Remember, this is an adjudication, not a d
 you should go look at the source image(s) and use your best judgment to determine which worker
 is most likely to be correct.
 `);
-  await convo.submit();
+  await _ponder(convo);
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses.
 In the places where they agree, great. In the places where they disagree, side with
@@ -775,7 +790,7 @@ with the data in the source image(s)? Remember, this is an adjudication, not a d
 you should go look at the source image(s) and use your best judgment to determine which worker
 is most likely to be correct.
 `);
-  await convo.submit();
+  await _ponder(convo);
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses regarding
 whether or not the table "${tableName}" continues onto the next page, and whether or not the last
@@ -858,7 +873,7 @@ with the data in the source image(s)? Remember, this is an adjudication, not a d
 you should go look at the source image(s) and use your best judgment to determine which worker
 is most likely to be correct.
 `);
-    await convo.submit();
+    await _ponder(convo);
     convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses
 regarding the transcription of the split row. In the places where they agree, great.
