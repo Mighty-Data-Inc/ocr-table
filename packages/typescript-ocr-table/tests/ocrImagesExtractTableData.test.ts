@@ -59,7 +59,6 @@ const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = '';
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('can detect two tables on a page when that is all that is on the page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-3.png'
@@ -85,7 +84,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('can detect two table names even when there is other text on the page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
@@ -111,7 +109,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('detects two embedded tables within dense two-column prose', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       FIXTURES_DIR,
       'wildprov3pg-pg1.png'
@@ -138,7 +135,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('can read an orphaned table name', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-3.png'
@@ -172,7 +168,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('does not get distracted by next-page content', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-1.png'
@@ -201,7 +196,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('ignores top-of-page overrun rows when previous page ended with a table', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
@@ -224,7 +218,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('treats top-of-page rows as a new table when previous page did not end with a table', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
@@ -247,7 +240,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('uses first-table anchor to isolate the intended table even when prior-page flag says false', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
@@ -284,7 +276,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('obeys additionalInstructions for guidance in interpreting visual text', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
@@ -310,7 +301,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for an image that contains no document text', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const phoenixPngPath = path.join(FIXTURES_DIR, 'phoenix.png');
     const phoenixBuffer = readFileSync(phoenixPngPath);
 
@@ -327,7 +317,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for non-tabular text content', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const dirtyWisconsinPngPath = path.join(
       FIXTURES_DIR,
       'dirty-wisconsin.png'
@@ -347,7 +336,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for dense prose text content', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const annaKareninaPngPath = path.join(FIXTURES_DIR, 'annakarenina.png');
     const annaKareninaBuffer = readFileSync(annaKareninaPngPath);
 
@@ -366,7 +354,6 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
 
 describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   it('returns the correct column headers for a straightforward table', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
@@ -389,7 +376,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('obeys additionalInstructions that exclude a specific column', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
@@ -414,7 +400,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('returns correct column headers even when the table name is not specified exactly', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
@@ -437,7 +422,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('is not confused by the presence of a next-page image', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
@@ -468,7 +452,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can identify column headers for a table whose title is orphaned on the prior page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
       FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-3.png'
@@ -499,7 +482,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can identify column headers for a table embedded in dense prose', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       FIXTURES_DIR,
       'wildprov3pg-pg1.png'
@@ -523,7 +505,6 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can infer column names when the table has no explicit header row', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const noColumnNamesPngPath = path.join(
       FIXTURES_DIR,
       'nocolumnnames-school-supplies-BOS-14pt-page-5.png'
@@ -559,7 +540,6 @@ applied as appropriate based on the content of each column:
 
 describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes data rows for a small, simple table in the middle of the page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
@@ -597,7 +577,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes table at end of the page with some blank cells', async () => {
     // The fact that it's at the end of the page has nothing to do with the fact
     // that it has some blank cells. I'm just recycling test images.
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+
     const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
@@ -629,7 +609,6 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes only table rows on current page but recognizes clean-break continuation', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
@@ -665,7 +644,6 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes rows on current page and recognizes split row', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
@@ -701,7 +679,6 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes a table page that both starts and ends with a split row', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
@@ -788,7 +765,6 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
 
 describe('ocrTranscribeTableFromPages (live API)', () => {
   it('transcribes a small, simple table from a single page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
     const pagePng = readFileSync(pngPath);
 
@@ -806,8 +782,7 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
     expect(table.data).toEqual(wildernessProvisionsTable8);
   }, 180000);
 
-  it.skip('populates data rows for a table that reaches the bottom of the only page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+  it('transcribes a table that spans a page boundary', async () => {
     const wildernessProvisionsPngPath = path.join(
       FIXTURES_DIR,
       'wildprov3pg-pg1.png'
@@ -843,7 +818,6 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
   }, 180000);
 
   it.skip('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const page1Buffer = readFileSync(
       path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png')
     );
@@ -879,7 +853,6 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
   }, 180000);
 
   it.skip('reads a table that starts and ends on a middle page', async () => {
-    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
       readFileSync(
         path.join(FIXTURES_DIR, `school-supplies-BOS-14pt-page-${n}.png`)
