@@ -8,7 +8,9 @@ import { pdfToPng } from 'pdf-to-png-converter';
  * @returns Array of PNG image buffers, one per page
  * @throws Error if PDF cannot be read or converted
  */
-export const renderPdfPagesToPngBuffers = async (pdfPath: string): Promise<Buffer[]> => {
+export const renderPdfPagesToPngBuffers = async (
+  pdfPath: string
+): Promise<Buffer[]> => {
   const pngPages = await pdfToPng(pdfPath, {
     disableFontFace: true,
     useSystemFonts: false,
@@ -16,6 +18,6 @@ export const renderPdfPagesToPngBuffers = async (pdfPath: string): Promise<Buffe
   });
 
   return pngPages
-    .map(page => page.content)
+    .map((page) => page.content)
     .filter((buffer): buffer is Buffer => buffer !== undefined);
 };

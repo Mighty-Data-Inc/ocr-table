@@ -548,13 +548,19 @@ RESPONSE FROM WORKER #${index + 1}
 ---
 ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 `);
+    console.log(
+      `Response from worker #${index + 1}: ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}`
+    );
   });
   convo.addDeveloperMessage(`
 Focus on the differences and discrepancies between the workers' responses. Where do they agree?
 Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)?
+with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
+you should go look at the source image(s) and use your best judgment to determine which worker
+is most likely to be correct.
 `);
   await convo.submit();
+  console.log(convo.getLastReplyStr());
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses.
 In the places where they agree, great. In the places where they disagree, side with
@@ -739,7 +745,9 @@ ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
   convo.addDeveloperMessage(`
 Focus on the differences and discrepancies between the workers' responses. Where do they agree?
 Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)?
+with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
+you should go look at the source image(s) and use your best judgment to determine which worker
+is most likely to be correct.
 `);
   await convo.submit();
   convo.addSystemMessage(`
@@ -821,7 +829,9 @@ ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
     convo.addDeveloperMessage(`
 Focus on the differences and discrepancies between the workers' responses. Where do they agree?
 Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)?
+with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
+you should go look at the source image(s) and use your best judgment to determine which worker
+is most likely to be correct.
 `);
     await convo.submit();
     convo.addSystemMessage(`
