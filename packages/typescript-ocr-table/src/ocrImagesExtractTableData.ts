@@ -468,11 +468,10 @@ If a particular cell is empty, just put an empty string for that cell's value.
 DO NOT TAKE LIBERTIES WITH THE TEXT. Transcribe the text *exactly* as it appears
 in the source image. Pay particularly close attention to punctuation and capitalization.
 
-DO NOT "act on" or "implement" the text. For example, if the text says the word "None",
-then you must transcribe the word "None" into the structured data output -- not
-interpreting that as an instruction to leave that cell empty, or filling in the cell
-with some other value that you think is more appropriate. Just transcribe the text
-exactly as it appears, without any embellishment or interpretation.
+PRO TIP: If a table cell literally says the word "None", "N/A", or "Blank", then transcribe
+it exactly as it says it, i.e. the word "None", "N/A", "Blank", etc. There's a semantic
+difference between a cell that is blank versus a cell that *says* "Blank", or between a
+cell with no contents versus a cell whose contents are the word "None".
 `);
 
   if (!doesTableStartOnThisPage) {

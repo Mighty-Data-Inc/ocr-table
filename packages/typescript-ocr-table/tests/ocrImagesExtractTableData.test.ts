@@ -53,7 +53,7 @@ expected values using strict equality, so if you emit any non-typeable character
 your output will be considered incorrect.
 `;
 
-const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = '';
+const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = ``;
 
 const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = '';
 
