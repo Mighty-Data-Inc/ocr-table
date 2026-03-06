@@ -81,9 +81,19 @@ table.
     const nextPageImgDataUrl = `data:image/png;base64,${nextPagePngBuffer.toString('base64')}`;
     convo.addImage(
       'user',
-      'Here is the next page of the document.',
+      `Here is the *next* page of the document. Remember, this isn't the *current* page. ` +
+        `This is the page that appears *after* the current page. We're not directly interested` +
+        `in this next page. We're only showing it to you because, sometimes, under certain ` +
+        `circumstances, seeing the next page will help you recontextualize some of the table ` +
+        `data that appears at the bottom of the current page.`,
       nextPageImgDataUrl
     );
+
+    convo.addDeveloperMessage(`
+The user has shown you the next page of the document for the sake of contextualization.
+You've seen it, and that's great. But now, however, let's not get distracted.
+Let's turn our attention back to the *current* page.
+`);
   }
 
   if (additionalInstructions) {
@@ -162,7 +172,11 @@ Don't worry about actually parsing the data in the tables yet.
 **DO** pay attention to tables that *start* on this page, even if they continue
 onto later pages. This includes tables that might have their title or header on this page
 (perhaps at the bottom of the page, for example), but their data continues onto later pages.
+
+Let's start with a general discussion of what you see on this page. Describe its
+layout and the tables (or table fragments) that you see on it.
 `);
+  await convo.submit();
 
   if (didPreviousPageEndWithTable) {
     convo.addUserMessage(`

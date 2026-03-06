@@ -159,6 +159,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     expect(tables).toHaveLength(2);
 
     const tableNames = tables.map((table) => table.name);
+    console.log(tableNames);
     expect(tableNames).toContain(
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
     );
