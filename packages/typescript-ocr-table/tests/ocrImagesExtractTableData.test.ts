@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ocrIdentifyTablesOnPage,
   ocrImagesExtractTableColumnHeaders,
-  ocrImagesPopulateTableContents,
+  ocrTranscribeTableFromPages,
   ocrTranscribeTableRowsFromCurrentPage,
 } from '../src/ocrImagesExtractTableData.js';
 import { OcrExtractedTable } from '../src/records.js';
@@ -28,7 +28,7 @@ const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY?.trim();
 if (!OPENAI_API_KEY) {
   throw new Error(
-    'OPENAI_API_KEY is required for ocrIdentifyTablesOnPage live API tests. Configure your test environment to provide it.'
+    'OPENAI_API_KEY is required for live API tests. Configure your test environment to provide it.'
   );
 }
 
@@ -40,7 +40,7 @@ const createClient = (): OpenAI =>
 // Live OCR can occasionally confuse visually similar characters (for example, "5" vs "S")
 // in room labels. We provide this hint so strict exact-name assertions test table-identification
 // behavior rather than avoidable room-code transcription ambiguity.
-const ADDITIONAL_INSTRUCTIONS = `
+const ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES = `
 Classroom numbers are in <number><letter> format, e.g. A3, D9, etc.
 When performing OCR, sometimes a "5" will look like an "S" or a "2" like a "Z",
 and vice versa. However, when you see a classroom number, e.g. "Room 2D",
@@ -52,6 +52,10 @@ if a human were typing on a standard keyboard. Your output is being matched agai
 expected values using strict equality, so if you emit any non-typeable characters,
 your output will be considered incorrect.
 `;
+
+const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = '';
+
+const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = '';
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('can detect two tables on a page when that is all that is on the page', async () => {
@@ -68,7 +72,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toHaveLength(2);
@@ -94,7 +98,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toHaveLength(2);
@@ -152,7 +156,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       pageFourBuffer
     );
 
@@ -186,7 +190,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       pageTwoBuffer
     );
 
@@ -210,7 +214,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       true,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toHaveLength(1);
@@ -233,7 +237,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       false,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toHaveLength(2);
@@ -270,7 +274,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       false,
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)',
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toHaveLength(1);
@@ -316,7 +320,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toEqual([]);
@@ -336,7 +340,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toEqual([]);
@@ -353,7 +357,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       undefined,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
 
     expect(tables).toEqual([]);
@@ -480,7 +484,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       createClient(),
       'Classroom Purchases - Ms. Tessa Monroe (Room 2D)',
       pageThreeBuffer,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       undefined,
       pageFourBuffer
     );
@@ -583,7 +587,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       true,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
     expect(result.rows).toEqual(wildernessProvisionsTable8);
@@ -616,7 +620,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       true,
       undefined,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
     expect(result.rows).toEqual(wildernessProvisionsTable9Partial);
@@ -651,7 +655,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       true,
       undefined,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS,
       nextPagePng
     );
 
@@ -687,7 +691,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       true,
       undefined,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL,
       nextPagePng
     );
 
@@ -725,7 +729,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       false,
       lastRowOfPg1,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL,
       nextPagePng
     );
 
@@ -772,7 +776,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       pagePng,
       false,
       undefined,
-      ADDITIONAL_INSTRUCTIONS,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       nextPagePng
     );
 
@@ -782,41 +786,27 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 });
 
-describe.skip('ocrImagesPopulateTableContents (live API)', () => {
-  it('populates data rows for a small, simple table', async () => {
+describe('ocrTranscribeTableFromPages (live API)', () => {
+  it('transcribes a small, simple table from a single page', async () => {
     const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
-    const wildernessProvisionsPngPath = path.join(
-      FIXTURES_DIR,
-      'wildprov3pg-pg1.png'
-    );
-    const wildernessProvisionsBuffer = readFileSync(
-      wildernessProvisionsPngPath
+    const pngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
+    const pagePng = readFileSync(pngPath);
+
+    const table = await ocrTranscribeTableFromPages(
+      createClient(),
+      'Table 8: March Rate by Load Class',
+      '',
+      1,
+      [pagePng],
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
-    const table: OcrExtractedTable = {
-      name: 'Table 8: March Rate by Load Class',
-      description: 'Daily march distance and fatigue penalty by load class.',
-      columns: [
-        'Load Class',
-        'Typical Carried Weight (lb)',
-        'Daily March Distance (miles)',
-        'Fatigue Penalty',
-      ],
-      page_start: 1,
-      page_end: 1,
-      data: [],
-      aggregations: '',
-      notes: '',
-    };
-
-    await ocrImagesPopulateTableContents(createClient(), table, [
-      wildernessProvisionsBuffer,
-    ]);
+    console.log(JSON.stringify(table, null, 2));
 
     expect(table.data).toEqual(wildernessProvisionsTable8);
   }, 180000);
 
-  it('populates data rows for a table that reaches the bottom of the only page', async () => {
+  it.skip('populates data rows for a table that reaches the bottom of the only page', async () => {
     const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       FIXTURES_DIR,
@@ -842,15 +832,17 @@ describe.skip('ocrImagesPopulateTableContents (live API)', () => {
       notes: '',
     };
 
+    /*
     await ocrImagesPopulateTableContents(createClient(), table, [
       wildernessProvisionsBuffer,
     ]);
+    */
 
     expect(table.page_end).toBe(1);
     expect(table.data).toEqual(wildernessProvisionsTable7);
   }, 180000);
 
-  it('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
+  it.skip('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
     const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const page1Buffer = readFileSync(
       path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png')
@@ -875,16 +867,18 @@ describe.skip('ocrImagesPopulateTableContents (live API)', () => {
       notes: '',
     };
 
+    /*
     await ocrImagesPopulateTableContents(createClient(), table, [
       page1Buffer,
       page2Buffer,
     ]);
+    */
 
     expect(table.page_end).toBe(1);
     expect(table.data).toEqual(wildernessProvisionsTable7);
   }, 180000);
 
-  it('reads a table that starts and ends on a middle page', async () => {
+  it.skip('reads a table that starts and ends on a middle page', async () => {
     const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
       readFileSync(
@@ -909,12 +903,14 @@ describe.skip('ocrImagesPopulateTableContents (live API)', () => {
       notes: '',
     };
 
+    /*
     await ocrImagesPopulateTableContents(
       createClient(),
       table,
       pageBuffers,
-      ADDITIONAL_INSTRUCTIONS
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    */
 
     expect(table.page_end).toBe(2);
     expect(table.data).toEqual(schoolSuppliesJonahReed);
