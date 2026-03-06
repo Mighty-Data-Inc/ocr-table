@@ -21,6 +21,7 @@ import candidateEvalFullTable from './fixtures/candidate-eval-full-table.json' w
 import candidateEvalPg1 from './fixtures/candidate-eval-pg1.json' with { type: 'json' };
 import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: 'json' };
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
+import summerReadingFullTable from './fixtures/summer-reading.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -59,6 +60,14 @@ const createClient = (): OpenAI =>
     apiKey: OPENAI_API_KEY,
   });
 
+const ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS = `
+Emit absolutely NO non-typeable characters -- this includes em-dashes, pretty quotes,
+fancy apostrophes, non-breaking spaces, or any other characters that would not be produced 
+if a human were typing on a standard keyboard. Your output is being matched against
+expected values using strict equality, so if you emit any non-typeable characters,
+your output will be considered incorrect.
+`;
+
 // Live OCR can occasionally confuse visually similar characters (for example, "5" vs "S")
 // in room labels. We provide this hint so strict exact-name assertions test table-identification
 // behavior rather than avoidable room-code transcription ambiguity.
@@ -67,17 +76,19 @@ Classroom numbers are in <number><letter> format, e.g. A3, D9, etc.
 When performing OCR, sometimes a "5" will look like an "S" or a "2" like a "Z",
 and vice versa. However, when you see a classroom number, e.g. "Room 2D",
 you must transcribe it as <number><letter>.
-
-Emit absolutely NO non-typeable characters -- this includes em-dashes, pretty quotes,
-fancy apostrophes, non-breaking spaces, or any other characters that would not be produced 
-if a human were typing on a standard keyboard. Your output is being matched against
-expected values using strict equality, so if you emit any non-typeable characters,
-your output will be considered incorrect.
+${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 `;
 
 const ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS = ``;
 
-const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = '';
+const ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL = ``;
+
+const ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST = `
+When you list the column headers, write them in ALL CAPS.
+That's the way the column headers appear in the source document, 
+and we want to preserve that formatting in the structured data output.
+${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
+`;
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('can detect two tables on a page when that is all that is on the page', async () => {
@@ -830,50 +841,31 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL
     );
 
-    console.log(JSON.stringify(table.data, null, 2));
-
     expect(table.page_end).toBe(4);
     expect(table.data).toEqual(candidateEvalFullTable);
 
     // This one might take an exceptionally long time.
-    // 180s is known to be inadequate for this test,
-    // so we're giving it a full 6 minutes just to be safe.
-  }, 360000);
+    // 180s is known to be inadequate for this test.
+    // 360s occasionally fails.
+    // We're giving it a full 9 minutes just to be safe.
+  }, 540000);
 
-  it.skip('reads a table that starts and ends on a middle page', async () => {
-    const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
-      readFileSync(
-        path.join(FIXTURES_DIR, `school-supplies-BOS-14pt-page-${n}.png`)
-      )
-    );
+  it('reads a multi-page table that starts and ends on a middle page', async () => {
+    const pagePngs = loadFixturePngs('summer-reading-pg#');
 
-    const table: OcrExtractedTable = {
-      name: 'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
-      description: "School supply purchases for Mr. Jonah Reed's classroom.",
-      columns: [
-        'Item Name',
-        'Item Description',
-        'Quantity',
-        'Unit Price (USD)',
-        'Line Total (USD)',
-      ],
-      page_start: 2,
-      page_end: 2,
-      data: [],
-      aggregations: '',
-      notes: '',
-    };
-
-    /*
-    await ocrImagesPopulateTableContents(
+    const table = await ocrTranscribeTableFromPages(
       createClient(),
-      table,
-      pageBuffers,
-      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+      'Hardboiled Detective Fiction',
+      '',
+      3,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST
     );
-    */
 
-    expect(table.page_end).toBe(2);
-    expect(table.data).toEqual(schoolSuppliesJonahReed);
+    expect(table.page_end).toBe(4);
+    expect(table.data).toEqual(summerReadingFullTable);
+
+    // This one might need extra time on occasion,
+    // but doesn't take as long as the candidate eval test.
   }, 360000);
 });
