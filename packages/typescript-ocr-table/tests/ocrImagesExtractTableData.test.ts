@@ -123,7 +123,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       fixturesDir,
-      'wilderness-provisions-2table.png'
+      'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
@@ -506,7 +506,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       fixturesDir,
-      'wilderness-provisions-2table.png'
+      'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
@@ -564,10 +564,7 @@ applied as appropriate based on the content of each column:
 describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes data rows for a small, simple table in the middle of the page', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(
-      fixturesDir,
-      'wilderness-provisions-2table.png'
-    );
+    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
     const table: OcrExtractedTable = {
@@ -750,12 +747,12 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 });
 
-describe.skip('ocrImagesPopulateTableContents (live API)', () => {
+describe('ocrImagesPopulateTableContents (live API)', () => {
   it('populates data rows for a small, simple table', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       fixturesDir,
-      'wilderness-provisions-2table.png'
+      'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
@@ -788,7 +785,7 @@ describe.skip('ocrImagesPopulateTableContents (live API)', () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
       fixturesDir,
-      'wilderness-provisions-2table.png'
+      'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
       wildernessProvisionsPngPath
@@ -821,10 +818,10 @@ describe.skip('ocrImagesPopulateTableContents (live API)', () => {
   it('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
     const fixturesDir = path.resolve(__dirname, 'fixtures');
     const page1Buffer = readFileSync(
-      path.join(fixturesDir, 'wilderness-provisions-2table.png')
+      path.join(fixturesDir, 'wildprov3pg-pg1.png')
     );
     const page2Buffer = readFileSync(
-      path.join(fixturesDir, 'wilderness-provisions-2table-pg2.png')
+      path.join(fixturesDir, 'wildprov3pg-pg1-pg2.png')
     );
 
     const table: OcrExtractedTable = {
