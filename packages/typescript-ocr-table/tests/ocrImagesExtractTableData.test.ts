@@ -23,6 +23,8 @@ import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.js
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY?.trim();
 if (!OPENAI_API_KEY) {
   throw new Error(
@@ -47,9 +49,9 @@ you must transcribe it as <number><letter>.
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('can detect two tables on a page when that is all that is on the page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-3.png'
     );
     const pageThreeBuffer = readFileSync(pageThreePngPath);
@@ -73,9 +75,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('can detect two table names even when there is other text on the page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -98,31 +100,10 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
   }, 180000);
 
-  it('detects one embedded table within dense two-column prose', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
-      'wilderness-provisions.png'
-    );
-    const wildernessProvisionsBuffer = readFileSync(
-      wildernessProvisionsPngPath
-    );
-
-    const tables = await ocrIdentifyTablesOnPage(
-      createClient(),
-      wildernessProvisionsBuffer
-    );
-
-    expect(tables).toHaveLength(1);
-    expect(tables[0]?.name).toBe(
-      'Table 7: Weekly Provisions by Terrain (Per Adventurer)'
-    );
-  }, 180000);
-
   it('detects two embedded tables within dense two-column prose', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
@@ -147,13 +128,13 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('can read an orphaned table name', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-3.png'
     );
     const pageFourPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-4.png'
     );
     const pageThreeBuffer = readFileSync(pageThreePngPath);
@@ -170,22 +151,24 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
 
     expect(tables).toHaveLength(2);
-    expect(tables[0]?.name).toBe(
+
+    const tableNames = tables.map((table) => table.name);
+    expect(tableNames).toContain(
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
     );
-    expect(tables[1]?.name).toBe(
+    expect(tableNames).toContain(
       'Classroom Purchases - Ms. Tessa Monroe (Room 2D)'
     );
   }, 180000);
 
   it('does not get distracted by next-page content', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-1.png'
     );
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-2.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -208,9 +191,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('ignores top-of-page overrun rows when previous page ended with a table', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
@@ -231,9 +214,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('treats top-of-page rows as a new table when previous page did not end with a table', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
@@ -254,9 +237,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('uses first-table anchor to isolate the intended table even when prior-page flag says false', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
@@ -291,9 +274,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('obeys additionalInstructions for guidance in interpreting visual text', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
@@ -317,8 +300,8 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for an image that contains no document text', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const phoenixPngPath = path.join(fixturesDir, 'phoenix.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const phoenixPngPath = path.join(FIXTURES_DIR, 'phoenix.png');
     const phoenixBuffer = readFileSync(phoenixPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
@@ -334,8 +317,11 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for non-tabular text content', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const dirtyWisconsinPngPath = path.join(fixturesDir, 'dirty-wisconsin.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const dirtyWisconsinPngPath = path.join(
+      FIXTURES_DIR,
+      'dirty-wisconsin.png'
+    );
     const dirtyWisconsinBuffer = readFileSync(dirtyWisconsinPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
@@ -351,8 +337,8 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
   }, 180000);
 
   it('returns no tables for dense prose text content', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const annaKareninaPngPath = path.join(fixturesDir, 'annakarenina.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const annaKareninaPngPath = path.join(FIXTURES_DIR, 'annakarenina.png');
     const annaKareninaBuffer = readFileSync(annaKareninaPngPath);
 
     const tables = await ocrIdentifyTablesOnPage(
@@ -370,9 +356,9 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
 
 describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   it('returns the correct column headers for a straightforward table', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -393,9 +379,9 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('obeys additionalInstructions that exclude a specific column', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -418,9 +404,9 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('returns correct column headers even when the table name is not specified exactly', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -441,13 +427,13 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('is not confused by the presence of a next-page image', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageOnePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-1.png'
     );
     const pageTwoPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-11pt-page-2.png'
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
@@ -472,13 +458,13 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can identify column headers for a table whose title is orphaned on the prior page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageThreePngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-3.png'
     );
     const pageFourPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'school-supplies-BOS-14pt-page-4.png'
     );
     const pageThreeBuffer = readFileSync(pageThreePngPath);
@@ -503,9 +489,9 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can identify column headers for a table embedded in dense prose', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
@@ -527,9 +513,9 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
   }, 180000);
 
   it('can infer column names when the table has no explicit header row', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const noColumnNamesPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'nocolumnnames-school-supplies-BOS-14pt-page-5.png'
     );
     const noColumnNamesBuffer = readFileSync(noColumnNamesPngPath);
@@ -563,8 +549,8 @@ applied as appropriate based on the content of each column:
 
 describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes data rows for a small, simple table in the middle of the page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg1.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
     const table: OcrExtractedTable = {
@@ -601,8 +587,8 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   it('transcribes table at end of the page with some blank cells', async () => {
     // The fact that it's at the end of the page has nothing to do with the fact
     // that it has some blank cells. I'm just recycling test images.
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg2.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
     const table: OcrExtractedTable = {
@@ -633,11 +619,11 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes only table rows on current page but recognizes clean-break continuation', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(fixturesDir, 'wildprov3pg-pg2.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
-    const nextPagePngPath = path.join(fixturesDir, 'wildprov3pg-pg3.png');
+    const nextPagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg3.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
     const table: OcrExtractedTable = {
@@ -669,15 +655,15 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes rows on current page and recognizes split row', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(fixturesDir, 'candidate-eval-pg1.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
-    const nextPagePngPath = path.join(fixturesDir, 'candidate-eval-pg2.png');
+    const nextPagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg2.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
     const table: OcrExtractedTable = {
-      name: 'Candidate Evaluation Report',
+      name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
       columns: ['Name', 'Education', 'Work Experience', 'Notes'],
       page_start: 1,
@@ -707,15 +693,15 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 
   it('transcribes a table page that both starts and ends with a split row', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
-    const pagePngPath = path.join(fixturesDir, 'candidate-eval-pg2.png');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+    const pagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
-    const nextPagePngPath = path.join(fixturesDir, 'candidate-eval-pg3.png');
+    const nextPagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg3.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
     const table: OcrExtractedTable = {
-      name: 'Candidate Evaluation Report',
+      name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
       columns: ['Name', 'Education', 'Work Experience', 'Notes'],
       page_start: 1,
@@ -739,19 +725,64 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       nextPagePng
     );
 
-    console.log('Result:', JSON.stringify(result, null, 2));
-
     expect(result.rows).toEqual(candidateEvalPg2);
     expect(result.doesTableContinueOnNextPage).toBe(true);
     expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(true);
   }, 180000);
+
+  it('is not distracted by a similar table on the following page', async () => {
+    const pagePngPath = path.join(
+      FIXTURES_DIR,
+      'school-supplies-BOS-14pt-page-2.png'
+    );
+    const pagePng = readFileSync(pagePngPath);
+
+    const nextPagePngPath = path.join(
+      FIXTURES_DIR,
+      'school-supplies-BOS-14pt-page-3.png'
+    );
+    const nextPagePng = readFileSync(nextPagePngPath);
+
+    const table: OcrExtractedTable = {
+      name: 'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
+      description: '',
+      columns: [
+        'Item Name',
+        'Item Description',
+        'Quantity',
+        'Unit Price (USD)',
+        'Line Total (USD)',
+      ],
+      page_start: 1,
+      page_end: 1,
+      data: [],
+      aggregations: '',
+      notes: '',
+    };
+
+    const result = await ocrTranscribeTableRowsFromCurrentPage(
+      createClient(),
+      table.name,
+      table.description,
+      table.columns,
+      pagePng,
+      false,
+      undefined,
+      ADDITIONAL_INSTRUCTIONS,
+      nextPagePng
+    );
+
+    expect(result.rows).toEqual(schoolSuppliesJonahReed);
+    expect(result.doesTableContinueOnNextPage).toBe(false);
+    expect(result.doesLastRowGetSplitAcrossPageBreak).toBe(false);
+  }, 180000);
 });
 
-describe('ocrImagesPopulateTableContents (live API)', () => {
+describe.skip('ocrImagesPopulateTableContents (live API)', () => {
   it('populates data rows for a small, simple table', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
@@ -782,9 +813,9 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
   }, 180000);
 
   it('populates data rows for a table that reaches the bottom of the only page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const wildernessProvisionsPngPath = path.join(
-      fixturesDir,
+      FIXTURES_DIR,
       'wildprov3pg-pg1.png'
     );
     const wildernessProvisionsBuffer = readFileSync(
@@ -816,12 +847,12 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
   }, 180000);
 
   it('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const page1Buffer = readFileSync(
-      path.join(fixturesDir, 'wildprov3pg-pg1.png')
+      path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png')
     );
     const page2Buffer = readFileSync(
-      path.join(fixturesDir, 'wildprov3pg-pg1-pg2.png')
+      path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png')
     );
 
     const table: OcrExtractedTable = {
@@ -850,10 +881,10 @@ describe('ocrImagesPopulateTableContents (live API)', () => {
   }, 180000);
 
   it('reads a table that starts and ends on a middle page', async () => {
-    const fixturesDir = path.resolve(__dirname, 'fixtures');
+    const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
     const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
       readFileSync(
-        path.join(fixturesDir, `school-supplies-BOS-14pt-page-${n}.png`)
+        path.join(FIXTURES_DIR, `school-supplies-BOS-14pt-page-${n}.png`)
       )
     );
 

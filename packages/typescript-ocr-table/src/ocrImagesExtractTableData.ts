@@ -557,9 +557,6 @@ RESPONSE FROM WORKER #${index + 1}
 ---
 ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 `);
-    console.log(
-      `Response from worker #${index + 1}: ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}`
-    );
   });
   convo.addDeveloperMessage(`
 Focus on the differences and discrepancies between the workers' responses. Where do they agree?
@@ -569,7 +566,6 @@ you should go look at the source image(s) and use your best judgment to determin
 is most likely to be correct.
 `);
   await convo.submit();
-  console.log(convo.getLastReplyStr());
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses.
 In the places where they agree, great. In the places where they disagree, side with
@@ -666,6 +662,16 @@ Your job now is to determine the following:
       determination, it helps to go cell by cell in the last row and ask yourself whether
       or not it looks like the content of that cell got cut off or otherwise looks
       suspiciously empty.)
+
+PRO TIP: One very strong indicator that a row has been split across a page break is if the
+last row has some cells that are truncated, incomplete, or empty -- and then you see a partial
+row or errant text at the top of the next page that happens to be in exactly the same
+columns or positions as those truncated, incomplete, or empty cells. When this happens, you
+should try and write out the concatenations of these two pieces of text (the truncated cell
+on this page, plus the potential continuation on the next page) on a cell-by-cell basis to 
+see if they look like a plausible full cell of data that got split across the page break.
+If they do look like a plausible concatenation, then that's a very strong signal that the
+row got split across the page break, with part of it on this page and part of it on the next page.
 `);
   // Let it discuss this with itself.
   // Naturally, we're shotgunning this.
@@ -701,25 +707,22 @@ Your job now is to determine the following:
           `Discuss your reasoning and observations in coming to this conclusion.`,
       ],
       does_table_continue_on_next_page: Boolean,
+      try_out_potential_concatenations: [
+        [String],
+        `If the last row of the table on this page has some cells that look truncated, ` +
+          `incomplete, or empty, and there are pieces of text at the top of the next page ` +
+          `that look errant, misprinted, or out of place (or possibly a partial row at the ` +
+          `top of the next page that looks incomplete or incomprehensible), then it's very ` +
+          `likely that one "plugs into" the other. Try writing out the cell-by-cell ` +
+          `concatenations of these pieces of text to see if they look like a plausible ` +
+          `full cell of data that could have gotten split across the page break.`,
+      ],
       discuss_is_last_row_split_across_page_break: [
         String,
         `Using the telltale signs mentioned above, in combination with your own judgment, ` +
           `determine whether or not the last row of the table "${tableName}" on this page got ` +
           `split across the page break, with part of the row on this page and part of it on the ` +
           `next page. Discuss your reasoning and observations in coming to this conclusion.`,
-      ],
-      discuss_potential_concatenations: [
-        String,
-        `If any cell data in the last row is truncated or missing, and there is indeed some ` +
-          `errant text or a partially filled row at the top of the next page, then try seeing ` +
-          `what these two pieces of text would look like if you concatenated them together ` +
-          `(remembering, of course, that line breaks in a cell probably count as whitespace). ` +
-          `Does the concatenated text (or multiple concatenated texts, if there are multiple ` +
-          `potential concatenations to try) look like a plausible full cell of data that could ` +
-          `have gotten split across the page break? Does this change your opinion about whether ` +
-          `the last row of the table on this page got split across the page break? Try out ` +
-          `different potential concatenations and discuss what they look like and whether or not ` +
-          `they look like plausible reconstructions of the full cell data.`,
       ],
       does_last_row_get_split_across_page_break: Boolean,
     },
@@ -759,6 +762,7 @@ you should go look at the source image(s) and use your best judgment to determin
 is most likely to be correct.
 `);
   await convo.submit();
+  console.log(convo.getLastReplyStr());
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses regarding
 whether or not the table "${tableName}" continues onto the next page, and whether or not the last
@@ -769,7 +773,6 @@ with the data in the source image(s).
   await convo.submit(undefined, undefined, {
     jsonResponse: jsonFormatForPageBreakDiscussion,
   });
-  console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
 
   let doesTableContinueOnNextPage = convo.getLastReplyDictField(
     'does_table_continue_on_next_page',
