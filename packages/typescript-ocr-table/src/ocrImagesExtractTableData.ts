@@ -640,8 +640,8 @@ Your job now is to determine the following:
   of a row being split across a page break include:
     - The row has visual indicators of being split, such as a dashed line or a missing bottom 
       border.
-    - The next page starts with text that looks like it could be a continuation of the row.
-      This could appear as a row at the top of the page that has similar formatting but missing
+    - The next page starts with text that could be a continuation of the row. This could 
+      appear as a row at the top of the page that has similar formatting but missing
       or incomplete data, or it could appear as strangely errant or isolated text at the top
       of the next page. Look carefully for partial text, or a row with mostly empty cells, 
       or other signs of incomplete or truncated content that could indicate that the next page
@@ -692,6 +692,18 @@ Your job now is to determine the following:
           `split across the page break, with part of the row on this page and part of it on the ` +
           `next page. Discuss your reasoning and observations in coming to this conclusion.`,
       ],
+      discuss_potential_concatenations: [
+        String,
+        `If any cell data in the last row is truncated or missing, and there is indeed some ` +
+          `errant text or a partially filled row at the top of the next page, then try seeing ` +
+          `what these two pieces of text would look like if you concatenated them together. ` +
+          `Does the concatenated text (or multiple concatenated texts, if there are multiple ` +
+          `potential concatenations to try) look like a plausible full cell of data that could ` +
+          `have gotten split across the page break? Does this change your opinion about whether ` +
+          `the last row of the table on this page got split across the page break? Try out ` +
+          `different potential concatenations and discuss what they look like and whether or not ` +
+          `they look like plausible reconstructions of the full cell data.`,
+      ],
       does_last_row_get_split_across_page_break: Boolean,
     },
     'ocr_detect_table_continuation_and_split_rows',
@@ -727,11 +739,12 @@ Adjudicate and resolve any discrepancies between the different workers' response
 whether or not the table "${tableName}" continues onto the next page, and whether or not the last
 row of the table on this page got split across the page break. In the places where they agree,
 great. In the places where they disagree, side with the one whose argument is most consistent
-with the data in the source image(s), and with the reasoning that makes the most sense.
+with the data in the source image(s).
 `);
   await convo.submit(undefined, undefined, {
     jsonResponse: jsonFormatForPageBreakDiscussion,
   });
+  console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
 
   let doesTableContinueOnNextPage = convo.getLastReplyDictField(
     'does_table_continue_on_next_page',
@@ -800,10 +813,7 @@ ${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
 Adjudicate and resolve any discrepancies between the different workers' responses
 regarding the transcription of the split row. In the places where they agree, great.
 In the places where they disagree, side with the one whose argument is most consistent
-with the data in the source image(s), and with the reasoning that makes the most sense.
-Based on the workers' judgment as well as your own, come to a conclusion about the most likely
-transcription of the split row, combining the information from both pages, and populate the
-data structure accordingly.
+with the data in the source image(s).
 `);
 
     await convo.submit(undefined, undefined, {
