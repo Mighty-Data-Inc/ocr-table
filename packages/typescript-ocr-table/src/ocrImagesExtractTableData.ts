@@ -522,7 +522,7 @@ this can be an empty array.
   };
 
   // Run convo clones in parallel, and resolve discrepancies with a master run.
-  const NUM_SHOTGUN_BARRELS = 2;
+  const NUM_SHOTGUN_BARRELS = 4;
   const convoShotgun: GptConversation[] = [];
   for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
     const convoBarrel = convo.clone();
@@ -652,53 +652,85 @@ Your job now is to determine the following:
       suspiciously empty.)
 `);
   // Let it discuss this with itself.
-  // TODO: Shotgun this.
+  // Naturally, we're shotgunning this.
+  const jsonFormatForPageBreakDiscussion = JSONSchemaFormat(
+    {
+      description_of_bottom_of_current_page: [
+        String,
+        `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
+          `description of what you see at the bottom of the current page. Is there any ` +
+          `text or other content below the table we're examining (table "${tableName}")? ` +
+          `Typically, if there's more page content such as text or another table below ` +
+          `the table we're examining, then that's a strong signal that the table does not ` +
+          `continue onto the next page. If, however, there is no more page content below ` +
+          `the table (or simply metadata content such as a footer, page number, footnote, ` +
+          `etc.), then it's possible that the table continues onto the next page.`,
+      ],
+      description_of_top_of_next_page: [
+        String,
+        `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
+          `description of what you see at the top of the next page. `,
+      ],
+      discussion_overall: [
+        String,
+        `A thorough and detailed discussion about whether or not the table "${tableName}" ` +
+          `continues onto the next page, and whether or not the last row of the table on this ` +
+          `page got split across the page break. Use the telltale signs mentioned above to ` +
+          `guide your reasoning.`,
+      ],
+      discuss_does_table_continue_to_next_page: [
+        String,
+        `Using the telltale signs mentioned above, in combination with your own judgment, ` +
+          `determine whether or not the table "${tableName}" continues onto the next page. ` +
+          `Discuss your reasoning and observations in coming to this conclusion.`,
+      ],
+      does_table_continue_on_next_page: Boolean,
+      discuss_is_last_row_split_across_page_break: [
+        String,
+        `Using the telltale signs mentioned above, in combination with your own judgment, ` +
+          `determine whether or not the last row of the table "${tableName}" on this page got ` +
+          `split across the page break, with part of the row on this page and part of it on the ` +
+          `next page. Discuss your reasoning and observations in coming to this conclusion.`,
+      ],
+      does_last_row_get_split_across_page_break: Boolean,
+    },
+    'ocr_detect_table_continuation_and_split_rows',
+    `Determine whether or not the table "${tableName}" continues onto the next page, and ` +
+      `whether or not the last row of the table on this page got split across the page break.`
+  );
+  const convoShotgunPageBreakDiscussion: GptConversation[] = [];
+  for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
+    const convoBarrel = convo.clone();
+    convoShotgunPageBreakDiscussion.push(convoBarrel);
+  }
+  await Promise.all(
+    convoShotgunPageBreakDiscussion.map((convoBarrel) =>
+      convoBarrel.submit(undefined, undefined, {
+        jsonResponse: jsonFormatForPageBreakDiscussion,
+      })
+    )
+  );
+  convo.addSystemMessage(`
+We had ${NUM_SHOTGUN_BARRELS} independent workers analyze whether or not the table "${tableName}"
+continues onto the next page, and whether or not the last row of the table on this page got
+split across the page break. Here are their responses:
+`);
+  convoShotgunPageBreakDiscussion.forEach((convoBarrel, index) => {
+    convo.addSystemMessage(`
+RESPONSE FROM WORKER #${index + 1}
+---
+${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
+`);
+  });
+  convo.addSystemMessage(`
+Adjudicate and resolve any discrepancies between the different workers' responses regarding
+whether or not the table "${tableName}" continues onto the next page, and whether or not the last
+row of the table on this page got split across the page break. In the places where they agree,
+great. In the places where they disagree, side with the one whose argument is most consistent
+with the data in the source image(s), and with the reasoning that makes the most sense.
+`);
   await convo.submit(undefined, undefined, {
-    jsonResponse: JSONSchemaFormat(
-      {
-        description_of_bottom_of_current_page: [
-          String,
-          `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
-            `description of what you see at the bottom of the current page. Is there any ` +
-            `text or other content below the table we're examining (table "${tableName}")? ` +
-            `Typically, if there's more page content such as text or another table below ` +
-            `the table we're examining, then that's a strong signal that the table does not ` +
-            `continue onto the next page. If, however, there is no more page content below ` +
-            `the table (or simply metadata content such as a footer, page number, footnote, ` +
-            `etc.), then it's possible that the table continues onto the next page.`,
-        ],
-        description_of_top_of_next_page: [
-          String,
-          `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
-            `description of what you see at the top of the next page. `,
-        ],
-        discussion_overall: [
-          String,
-          `A thorough and detailed discussion about whether or not the table "${tableName}" ` +
-            `continues onto the next page, and whether or not the last row of the table on this ` +
-            `page got split across the page break. Use the telltale signs mentioned above to ` +
-            `guide your reasoning.`,
-        ],
-        discuss_does_table_continue_to_next_page: [
-          String,
-          `Using the telltale signs mentioned above, in combination with your own judgment, ` +
-            `determine whether or not the table "${tableName}" continues onto the next page. ` +
-            `Discuss your reasoning and observations in coming to this conclusion.`,
-        ],
-        does_table_continue_on_next_page: Boolean,
-        discuss_is_last_row_split_across_page_break: [
-          String,
-          `Using the telltale signs mentioned above, in combination with your own judgment, ` +
-            `determine whether or not the last row of the table "${tableName}" on this page got ` +
-            `split across the page break, with part of the row on this page and part of it on the ` +
-            `next page. Discuss your reasoning and observations in coming to this conclusion.`,
-        ],
-        does_last_row_get_split_across_page_break: Boolean,
-      },
-      'ocr_detect_table_continuation_and_split_rows',
-      `Determine whether or not the table "${tableName}" continues onto the next page, and ` +
-        `whether or not the last row of the table on this page got split across the page break.`
-    ),
+    jsonResponse: jsonFormatForPageBreakDiscussion,
   });
 
   let doesTableContinueOnNextPage = convo.getLastReplyDictField(
