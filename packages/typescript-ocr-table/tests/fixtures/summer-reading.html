@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Summer Reading List &mdash; Page Turner Magazine</title>
+    <style>
+      @page {
+        size: letter;
+        margin: 0.65in 0.7in;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+
+      body {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 10pt;
+        color: #1a1a1a;
+      }
+
+      .page {
+        width: 100%;
+        max-width: 7.5in;
+        margin: 0 auto;
+      }
+
+      /* ── Masthead ── */
+      .masthead {
+        text-align: center;
+        border-top: 3px solid #1a1a1a;
+        border-bottom: 1px solid #1a1a1a;
+        padding: 0.08in 0 0.1in;
+        margin-bottom: 0.25in;
+      }
+
+      .masthead .pub-name {
+        font-size: 26pt;
+        font-weight: bold;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: #1a1a1a;
+        line-height: 1;
+        margin: 0;
+      }
+
+      .masthead .pub-tagline {
+        font-size: 8pt;
+        font-style: italic;
+        letter-spacing: 1px;
+        color: #555;
+        margin: 0.04in 0 0;
+      }
+
+      /* ── Feature headline ── */
+      .feature-header {
+        text-align: center;
+        margin-bottom: 0.22in;
+      }
+
+      .feature-kicker {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 7.5pt;
+        font-weight: bold;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #8b0000;
+        margin: 0 0 0.06in;
+      }
+
+      .feature-title {
+        font-size: 28pt;
+        font-weight: bold;
+        line-height: 1.05;
+        margin: 0 0 0.08in;
+        font-style: italic;
+      }
+
+      .feature-subtitle {
+        font-size: 11pt;
+        font-style: italic;
+        color: #444;
+        margin: 0 0 0.12in;
+        line-height: 1.35;
+      }
+
+      .feature-byline {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 8pt;
+        letter-spacing: 1px;
+        color: #666;
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      .rule {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 0.18in 0;
+      }
+
+      .rule-heavy {
+        border: none;
+        border-top: 2px solid #1a1a1a;
+        margin: 0.18in 0 0.14in;
+      }
+
+      /* ── Intro text ── */
+      .intro {
+        column-count: 2;
+        column-gap: 0.3in;
+        font-size: 10.5pt;
+        line-height: 1.4;
+        text-align: justify;
+        margin-bottom: 0.22in;
+        color: #222;
+      }
+
+      .intro p {
+        margin: 0 0 0.1in;
+      }
+
+      /* ── Section headers ── */
+      .section-header {
+        margin: 0.2in 0 0.1in;
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      .section-number {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 7.5pt;
+        font-weight: bold;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #8b0000;
+        margin: 0 0 0.04in;
+      }
+
+      .section-title {
+        font-size: 16pt;
+        font-weight: bold;
+        font-style: italic;
+        margin: 0 0 0.04in;
+        line-height: 1.1;
+      }
+
+      .section-blurb {
+        font-size: 9.5pt;
+        font-style: italic;
+        color: #555;
+        margin: 0;
+        line-height: 1.35;
+      }
+
+      /* ── Book tables ── */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 9.5pt;
+        margin-bottom: 0.1in;
+      }
+
+      thead tr {
+        background-color: #1a1a1a;
+        color: #fff;
+      }
+
+      thead th {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 8pt;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        text-align: left;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #f5f3ee;
+      }
+
+      tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+      }
+
+      td {
+        padding: 6px 10px;
+        vertical-align: top;
+        border-bottom: 1px solid #ddd;
+        line-height: 1.35;
+      }
+
+      td.title {
+        font-weight: bold;
+        font-style: italic;
+        white-space: nowrap;
+        width: 1.6in;
+      }
+
+      td.author {
+        white-space: nowrap;
+        width: 1.3in;
+        color: #333;
+      }
+
+      td.synopsis {
+        text-align: justify;
+      }
+
+      /* ── Footer ── */
+      .footer {
+        margin-top: 0.25in;
+        border-top: 1px solid #ccc;
+        padding-top: 0.08in;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 7.5pt;
+        color: #888;
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Masthead -->
+      <div class="masthead">
+        <p class="pub-name">Page Turner</p>
+        <p class="pub-tagline">
+          The Magazine for Serious Readers &mdash; Summer Issue
+        </p>
+      </div>
+
+      <!-- Feature headline -->
+      <div class="feature-header">
+        <p class="feature-kicker">Annual Feature</p>
+        <h1 class="feature-title">The Summer Reading List</h1>
+        <p class="feature-subtitle">
+          Twenty-seven books across three immortal genres &mdash; chosen to
+          carry you<br />
+          from the first warm evening to the last long weekend of the season.
+        </p>
+        <p class="feature-byline">Curated by the Editors of Page Turner</p>
+      </div>
+
+      <hr class="rule-heavy" />
+
+      <!-- Intro copy -->
+      <div class="intro">
+        <p>
+          Every summer we ask ourselves the same question: what do we actually
+          want to read when the days are long and the stakes, for once, feel
+          low? The answer, year after year, is books that pull. Books that keep
+          you up past the time you meant to stop. Books dense enough to reward
+          slow afternoons and propulsive enough to survive the beach.
+        </p>
+        <p>
+          This year's list is organized around three genres we believe are
+          underrepresented on the usual summer tables: classic science fiction,
+          gothic and horror, and hardboiled detective fiction. Each has its own
+          pleasure, its own pace, and its own way of telling the truth slant.
+        </p>
+        <p>
+          We have included a brief synopsis for each title. These are not
+          spoiler-free plot summaries. They are arguments for why the book
+          deserves your next three days.
+        </p>
+        <p>
+          Start anywhere. There is no wrong order. There is only the next unread
+          page.
+        </p>
+      </div>
+
+      <hr class="rule" />
+
+      <!-- Table 1: Classic Science Fiction -->
+      <div class="section-header">
+        <p class="section-number">Part One</p>
+        <h2 class="section-title">Classic Science Fiction</h2>
+        <p class="section-blurb">
+          The canon that invented tomorrow &mdash; nine novels that asked the
+          questions civilization is still catching up to.
+        </p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="title">Title</th>
+            <th class="author">Author</th>
+            <th class="synopsis">Synopsis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="title">Dune</td>
+            <td class="author">Frank Herbert</td>
+            <td class="synopsis">
+              On the desert planet Arrakis, young Paul Atreides navigates
+              political intrigue, betrayal, and messianic destiny amid the
+              struggle to control the universe's most precious resource. As
+              layered and unforgiving as the sand it describes.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Foundation</td>
+            <td class="author">Isaac Asimov</td>
+            <td class="synopsis">
+              A mathematician foresees the collapse of a galactic empire and
+              races to preserve human knowledge through the dark age that will
+              follow. The first volume of a series that shaped every space opera
+              that came after it.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Left Hand of Darkness</td>
+            <td class="author">Ursula K. Le Guin</td>
+            <td class="synopsis">
+              A human envoy visits a world whose inhabitants have no fixed
+              gender, and the friendship he slowly forges with a disgraced
+              politician across a frozen waste is one of the most moving
+              relationships in all of science fiction.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Brave New World</td>
+            <td class="author">Aldous Huxley</td>
+            <td class="synopsis">
+              In a society engineered for happiness, where history is forbidden
+              and discomfort has been abolished, one man's desire for truth
+              becomes an act of radical defiance -- and a tragedy the world will
+              not pause to mourn.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The War of the Worlds</td>
+            <td class="author">H.G. Wells</td>
+            <td class="synopsis">
+              Martian war-machines reduce Victorian England to rubble in hours,
+              and one ordinary man chronicles humanity's panicked, helpless
+              retreat. Reads faster than it has any right to at 130 years old.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Fahrenheit 451</td>
+            <td class="author">Ray Bradbury</td>
+            <td class="synopsis">
+              In a future where firemen start fires rather than extinguish them,
+              a book-burner begins to wonder what's inside the things he
+              destroys. Bradbury's prose burns as hot as the pages it depicts.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Stars My Destination</td>
+            <td class="author">Alfred Bester</td>
+            <td class="synopsis">
+              Gully Foyle is a nobody stranded in space and left to die by a
+              passing ship. He survives on pure hatred, stages one of fiction's
+              great vendettas, and becomes something far more frightening than a
+              villain.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">More Than Human</td>
+            <td class="author">Theodore Sturgeon</td>
+            <td class="synopsis">
+              Six misfits -- each fragmentary, each broken -- discover that
+              together they form a gestalt organism with powers none of them
+              possesses alone. A novel about belonging that doubles as one of
+              the genre's strangest and most tender achievements.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">A Canticle for Leibowitz</td>
+            <td class="author">Walter M. Miller Jr.</td>
+            <td class="synopsis">
+              A desert monastery preserves the scattered relics of lost
+              knowledge across three thousand years of civilization's collapse
+              and painful recovery. Funny, bleak, and quietly devastating in
+              equal measure.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr class="rule" />
+
+      <!-- Table 2: Gothic & Horror -->
+      <div class="section-header">
+        <p class="section-number">Part Two</p>
+        <h2 class="section-title">Gothic &amp; Horror</h2>
+        <p class="section-blurb">
+          Fear as a lens &mdash; nine novels that use dread to illuminate what
+          sunlit fiction politely ignores.
+        </p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="title">Title</th>
+            <th class="author">Author</th>
+            <th class="synopsis">Synopsis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="title">Frankenstein</td>
+            <td class="author">Mary Shelley</td>
+            <td class="synopsis">
+              A scientist creates life and immediately abandons it. The
+              creature's anguished search for compassion -- and his turn toward
+              destruction when none is offered -- makes this one of literature's
+              most devastating arguments about responsibility.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Dracula</td>
+            <td class="author">Bram Stoker</td>
+            <td class="synopsis">
+              Told entirely through letters, diaries, and newspaper clippings,
+              the count's invasion of England unfolds as a breathless Victorian
+              thriller laced with genuine menace. The epistolary form makes you
+              feel like you're piecing together a catastrophe in real time.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Picture of Dorian Gray</td>
+            <td class="author">Oscar Wilde</td>
+            <td class="synopsis">
+              A beautiful young man trades his soul for eternal youth and
+              watches a hidden portrait absorb every sin while his face stays
+              pristine. Wilde's only novel, and it contains more aphorisms per
+              page than most writers manage in a career.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Turn of the Screw</td>
+            <td class="author">Henry James</td>
+            <td class="synopsis">
+              A governess in a remote English manor becomes convinced her two
+              angelic charges are haunted by the ghosts of former servants. Or
+              has she simply lost her mind? After a hundred and twenty-five
+              years, James still will not tell you.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Rebecca</td>
+            <td class="author">Daphne du Maurier</td>
+            <td class="synopsis">
+              The new wife of a wealthy widower moves into his magnificent
+              estate and discovers that the shadow of his first wife, the
+              dazzling Rebecca, has never left -- and never intends to. The
+              suspense is architectural; it builds in every room.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Haunting of Hill House</td>
+            <td class="author">Shirley Jackson</td>
+            <td class="synopsis">
+              Four strangers spend a summer in a house that was, Jackson tells
+              us in the first paragraph, born bad. One of them will not be the
+              same person who arrived. Opens with one of the finest first
+              paragraphs in American fiction.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">We Have Always Lived in the Castle</td>
+            <td class="author">Shirley Jackson</td>
+            <td class="synopsis">
+              Merricat Blackwood and her sister live peacefully in their
+              ancestral home, shunned by the village for reasons the novel
+              reveals slowly and devastatingly. Told from inside one of
+              fiction's most alarming and oddly lovable minds.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Something Wicked This Way Comes</td>
+            <td class="author">Ray Bradbury</td>
+            <td class="synopsis">
+              A sinister carnival arrives in a small Midwestern town one
+              October, and two thirteen-year-old boys discover that some rides
+              steal years from your life. A novel about fathers and sons as much
+              as it is about evil.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">House of Leaves</td>
+            <td class="author">Mark Z. Danielewski</td>
+            <td class="synopsis">
+              A scholarly apparatus -- footnotes, appendices, color-coded text
+              -- surrounds a documentary about a house that is larger on the
+              inside than the outside. Designed to be disorienting. Succeeds
+              completely. Do not begin it on a night you plan to sleep.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr class="rule" />
+
+      <!-- Table 3: Hardboiled Detective Fiction -->
+      <div class="section-header">
+        <p class="section-number">Part Three</p>
+        <h2 class="section-title">Hardboiled Detective Fiction</h2>
+        <p class="section-blurb">
+          The mean streets, the missing persons, the lies inside the lies
+          &mdash; nine novels that made cynicism into an art form.
+        </p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="title">Title</th>
+            <th class="author">Author</th>
+            <th class="synopsis">Synopsis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="title">The Big Sleep</td>
+            <td class="author">Raymond Chandler</td>
+            <td class="synopsis">
+              Philip Marlowe takes a case for a dying general and walks into a
+              Los Angeles underworld of blackmail and murder where every
+              solution uncovers two new problems. The plot famously doesn't
+              fully resolve, and it doesn't need to.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Maltese Falcon</td>
+            <td class="author">Dashiell Hammett</td>
+            <td class="synopsis">
+              When Sam Spade's partner is killed while tailing a client, the
+              trail leads to a priceless jeweled bird and every kind of liar.
+              The novel that established the private eye as a moral figure in an
+              immoral world.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Farewell, My Lovely</td>
+            <td class="author">Raymond Chandler</td>
+            <td class="synopsis">
+              Marlowe is pulled into a search for an ex-con's missing girlfriend
+              and ends up entangled in jewel theft, a corrupt cop, and a society
+              murder. Many critics consider it Chandler's finest construction,
+              and they are not wrong.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Long Goodbye</td>
+            <td class="author">Raymond Chandler</td>
+            <td class="synopsis">
+              A chance friendship with a charming drunk leads Marlowe into a
+              case that strips away every comfortable illusion about loyalty,
+              wealth, and love. Longer, slower, and more melancholy than the
+              earlier books -- the one where Chandler lets himself be sad.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Red Harvest</td>
+            <td class="author">Dashiell Hammett</td>
+            <td class="synopsis">
+              The Continental Op arrives in a company-owned mining town so
+              thoroughly corrupt that the only way to clean it out is to play
+              every faction against the others until they destroy each other.
+              Lean, violent, and morally uncomfortable.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">I, the Jury</td>
+            <td class="author">Mickey Spillane</td>
+            <td class="synopsis">
+              Mike Hammer's best friend is murdered and Hammer vows to deliver
+              the punishment himself, not through a courtroom but with his own
+              hand. Spillane wrote this in nine days. It feels like it, in the
+              best possible sense.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Moving Target</td>
+            <td class="author">Ross Macdonald</td>
+            <td class="synopsis">
+              Lew Archer is hired to find a missing millionaire and discovers a
+              California family rotting from the inside out. The first Archer
+              novel and an immediate argument that Macdonald deserved to stand
+              alongside Hammett and Chandler.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">The Chill</td>
+            <td class="author">Ross Macdonald</td>
+            <td class="synopsis">
+              A young husband hires Archer to find his runaway bride, and the
+              trail leads back through two decades of buried crimes toward a
+              secret someone will kill again to protect. The novel in which
+              Macdonald's method -- archaeology as detective work -- reaches its
+              fullest expression.
+            </td>
+          </tr>
+          <tr>
+            <td class="title">Devil in a Blue Dress</td>
+            <td class="author">Walter Mosley</td>
+            <td class="synopsis">
+              Easy Rawlins, an unemployed black veteran in 1948 Los Angeles, is
+              hired to find a white woman who likes jazz clubs on Central
+              Avenue, and stumbles into something far more dangerous -- and more
+              revealing about postwar America -- than anyone warned him.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Closing copy -->
+      <div class="intro">
+        <p>
+          Twenty-seven books. Twenty-seven arguments that fiction, at its best,
+          is not an escape from the world but a way of seeing it more clearly.
+          Science fiction imagines the consequences of ideas before the world
+          has to live them. Gothic and horror name the fears that polite
+          conversation refuses to acknowledge. Hardboiled detective fiction
+          insists that someone has to go looking for the truth even when
+          everyone else has agreed to stop.
+        </p>
+        <p>
+          These are not comfort reads, exactly. But they are the kind of books
+          you finish and immediately want to press into someone else's hands.
+          That impulse -- the need to make someone else read the thing you just
+          read -- is the closest thing to a definition of a great book that we
+          have ever been able to agree on here at Page Turner.
+        </p>
+        <p>
+          We hope at least one title on this list does that to you. We hope it
+          ruins your sleep, monopolizes your commute, and makes the end of
+          summer feel like a small loss. See you in the fall.
+        </p>
+      </div>
+
+      <hr class="rule" />
+
+      <!-- Footer -->
+      <div class="footer">
+        <span>Page Turner Magazine &mdash; Summer Issue</span>
+        <span>Books &bull; Culture &bull; Criticism</span>
+        <span>pagerturnermag.example.com</span>
+      </div>
+    </div>
+  </body>
+</html>

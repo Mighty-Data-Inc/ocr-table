@@ -1,0 +1,122 @@
+[
+  {
+    "Roll": "1",
+    "Encounter": "Wolf Pack (2d4)",
+    "Terrain": "Forest, Hills",
+    "Notes": "Follows party until driven off or fed"
+  },
+  {
+    "Roll": "2",
+    "Encounter": "Bandit Scouts (1d4)",
+    "Terrain": "Roads, Plains",
+    "Notes": "Signal main band if not stopped"
+  },
+  {
+    "Roll": "3",
+    "Encounter": "Flash Flood",
+    "Terrain": "Ravine, Desert",
+    "Notes": "Lose 1d4 hours; roll for pack loss"
+  },
+  {
+    "Roll": "4",
+    "Encounter": "Merchant Caravan",
+    "Terrain": "Any Road",
+    "Notes": ""
+  },
+  {
+    "Roll": "5",
+    "Encounter": "Diseased Livestock",
+    "Terrain": "Plains, Farmland",
+    "Notes": "Exposes rations to contamination risk"
+  },
+  {
+    "Roll": "6",
+    "Encounter": "Giant Spider (1d2)",
+    "Terrain": "Forest, Cave",
+    "Notes": ""
+  },
+  {
+    "Roll": "7",
+    "Encounter": "Unmarked Grave Site",
+    "Terrain": "Any",
+    "Notes": "May indicate plague or recent battle"
+  },
+  {
+    "Roll": "8",
+    "Encounter": "Toll Collectors (Dubious)",
+    "Terrain": "Bridge, Ford",
+    "Notes": "Negotiation or combat; record outcome"
+  },
+  {
+    "Roll": "9",
+    "Encounter": "Wild Boar (1d3)",
+    "Terrain": "Forest, Scrub",
+    "Notes": ""
+  },
+  {
+    "Roll": "10",
+    "Encounter": "Lost Pilgrim",
+    "Terrain": "Any",
+    "Notes": "May carry useful local knowledge"
+  },
+  {
+    "Roll": "11",
+    "Encounter": "Dense Fog",
+    "Terrain": "Moor, Coast",
+    "Notes": "Navigation checks required; halved pace"
+  },
+  {
+    "Roll": "12",
+    "Encounter": "Brigand Ambush (2d6)",
+    "Terrain": "Roads, Forest",
+    "Notes": "Leader flees if half force is downed"
+  },
+  {
+    "Encounter": "Unstable Ground",
+    "Notes": "Mounts and carts at risk of injury",
+    "Roll": "13",
+    "Terrain": "Swamp, Hills"
+  },
+  {
+    "Encounter": "Refugee Column",
+    "Notes": "",
+    "Roll": "14",
+    "Terrain": "Plains, Roads"
+  },
+  {
+    "Encounter": "Venomous Serpent",
+    "Notes": "Antidote required within 6 hours",
+    "Roll": "15",
+    "Terrain": "Desert, Scrub"
+  },
+  {
+    "Encounter": "Bear, Brown (1)",
+    "Notes": "",
+    "Roll": "16",
+    "Terrain": "Forest, Mountain"
+  },
+  {
+    "Encounter": "Broken Bridge",
+    "Notes": "Add 1d6+2 hours for alternate crossing",
+    "Roll": "17",
+    "Terrain": "River, Road"
+  },
+  {
+    "Encounter": "Deserters (1d6)",
+    "Notes": "Armed; may bargain or attack",
+    "Roll": "18",
+    "Terrain": "Any"
+  },
+  {
+    "Encounter": "Wildfire Scar",
+    "Notes": "Forage yields halved for next 2 days",
+    "Roll": "19",
+    "Terrain": "Plains, Forest"
+  },
+  {
+    "Encounter": "No Encounter",
+    "Notes": "",
+    "Roll": "20",
+    "Terrain": "Any"
+  }
+]

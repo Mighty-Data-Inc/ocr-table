@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,7 +15,9 @@ import { OcrExtractedTable } from '../src/records.js';
 
 import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
 import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
+import wildernessProvisionsTable9 from './fixtures/wildprov-tbl9.json' with { type: 'json' };
 import wildernessProvisionsTable9Partial from './fixtures/wildprov-tbl9-partial.json' with { type: 'json' };
+import candidateEvalFullTable from './fixtures/candidate-eval-full-table.json' with { type: 'json' };
 import candidateEvalPg1 from './fixtures/candidate-eval-pg1.json' with { type: 'json' };
 import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: 'json' };
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
@@ -24,6 +26,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+
+/**
+ * Loads PNG buffers for a numbered sequence of fixture files.
+ *
+ * Pass a pattern containing a single `#` character as the page-number
+ * placeholder, e.g. `"candidate-eval-pg#"`. The function substitutes `#`
+ * with 1, 2, 3, … in order, loading each file as long as
+ * `<FIXTURES_DIR>/<pattern-with-number>.png` exists, then stops at the
+ * first missing file and returns the collected buffers.
+ */
+function loadFixturePngs(pattern: string): Buffer[] {
+  const buffers: Buffer[] = [];
+  for (let i = 1; ; i++) {
+    const filename = pattern.replace('#', String(i)) + '.png';
+    const filePath = path.join(FIXTURES_DIR, filename);
+    if (!existsSync(filePath)) break;
+    buffers.push(readFileSync(filePath));
+  }
+  return buffers;
+}
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY?.trim();
 if (!OPENAI_API_KEY) {
@@ -777,80 +799,46 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
-    console.log(JSON.stringify(table, null, 2));
-
     expect(table.data).toEqual(wildernessProvisionsTable8);
   }, 180000);
 
   it('transcribes a table that spans a page boundary', async () => {
-    const wildernessProvisionsPngPath = path.join(
-      FIXTURES_DIR,
-      'wildprov3pg-pg1.png'
+    const pagePngs = loadFixturePngs('wildprov3pg-pg#');
+
+    const table = await ocrTranscribeTableFromPages(
+      createClient(),
+      'Table 9: Wilderness Random Encounters (d20)',
+      '',
+      2,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
-    const wildernessProvisionsBuffer = readFileSync(
-      wildernessProvisionsPngPath
-    );
 
-    const table: OcrExtractedTable = {
-      name: 'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
-      description: 'Weekly provisions required per adventurer by terrain type.',
-      columns: [
-        'Terrain',
-        'Water (gal/day)',
-        'Rations (lb/day)',
-        'Weekly Cost (gp)',
-      ],
-      page_start: 1,
-      page_end: 1,
-      data: [],
-      aggregations: '',
-      notes: '',
-    };
-
-    /*
-    await ocrImagesPopulateTableContents(createClient(), table, [
-      wildernessProvisionsBuffer,
-    ]);
-    */
-
-    expect(table.page_end).toBe(1);
-    expect(table.data).toEqual(wildernessProvisionsTable7);
+    expect(table.page_end).toBe(3);
+    expect(table.data).toEqual(wildernessProvisionsTable9);
   }, 180000);
 
-  it.skip('stops transcribing a bottom-touching table if it does not continue on the next page', async () => {
-    const page1Buffer = readFileSync(
-      path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png')
+  it('transcribes a long table that spans multiple pages', async () => {
+    const pagePngs = loadFixturePngs('candidate-eval-pg#');
+
+    const table = await ocrTranscribeTableFromPages(
+      createClient(),
+      'Candidate Evaluation Report: Elementary School Principal Position',
+      '',
+      1,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_CANDIDATE_EVAL
     );
-    const page2Buffer = readFileSync(
-      path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png')
-    );
 
-    const table: OcrExtractedTable = {
-      name: 'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
-      description: 'Weekly provisions required per adventurer by terrain type.',
-      columns: [
-        'Terrain',
-        'Water (gal/day)',
-        'Rations (lb/day)',
-        'Weekly Cost (gp)',
-      ],
-      page_start: 1,
-      page_end: 1,
-      data: [],
-      aggregations: '',
-      notes: '',
-    };
+    console.log(JSON.stringify(table.data, null, 2));
 
-    /*
-    await ocrImagesPopulateTableContents(createClient(), table, [
-      page1Buffer,
-      page2Buffer,
-    ]);
-    */
+    expect(table.page_end).toBe(4);
+    expect(table.data).toEqual(candidateEvalFullTable);
 
-    expect(table.page_end).toBe(1);
-    expect(table.data).toEqual(wildernessProvisionsTable7);
-  }, 180000);
+    // This one might take an exceptionally long time.
+    // 180s is known to be inadequate for this test,
+    // so we're giving it a full 6 minutes just to be safe.
+  }, 360000);
 
   it.skip('reads a table that starts and ends on a middle page', async () => {
     const pageBuffers = [1, 2, 3, 4, 5, 6].map((n) =>
@@ -887,5 +875,5 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
 
     expect(table.page_end).toBe(2);
     expect(table.data).toEqual(schoolSuppliesJonahReed);
-  }, 180000);
+  }, 360000);
 });
