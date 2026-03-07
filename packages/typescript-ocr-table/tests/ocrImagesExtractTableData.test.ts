@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ocrIdentifyTablesOnPage,
   ocrImagesExtractTableColumnHeaders,
+  ocrTablesFromPngPages,
   ocrTranscribeTableFromPages,
   ocrTranscribeTableRowsFromCurrentPage,
 } from '../src/ocrImagesExtractTableData.js';
@@ -21,7 +22,8 @@ import candidateEvalFullTable from './fixtures/candidate-eval-full-table.json' w
 import candidateEvalPg1 from './fixtures/candidate-eval-pg1.json' with { type: 'json' };
 import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: 'json' };
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
-import summerReadingFullTable from './fixtures/summer-reading.json' with { type: 'json' };
+import summerReadingHardboiled from './fixtures/summer-reading-hardboiled.json' with { type: 'json' };
+import summerReadingAllTables from './fixtures/summer-reading.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,6 +90,12 @@ ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 `;
 
 const ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST = `
+The table names are the names of genres. They do not include the words
+"Table" or "Part" or "Section" or anything like that. That may be how
+they're shown in the source document, but that verbiage is just for organizing
+the content visually for human readers. The structured data output should
+just have the genre names as the table names.
+
 When you list the column headers, write them in ALL CAPS.
 That's the way the column headers appear in the source document, 
 and we want to preserve that formatting in the structured data output.
@@ -868,9 +876,33 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
     );
 
     expect(table.page_end).toBe(4);
-    expect(table.data).toEqual(summerReadingFullTable);
+    expect(table.data).toEqual(summerReadingHardboiled);
 
     // This one might need extra time on occasion,
     // but doesn't take as long as the candidate eval test.
   }, 360000);
+});
+
+describe('ocrTablesFromPngPages (live API)', () => {
+  it('extracts multiple tables from a multi-page document', async () => {
+    const pagePngs = loadFixturePngs('summer-reading-pg#');
+
+    const tables = await ocrTablesFromPngPages(
+      createClient(),
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST
+    );
+
+    console.log(JSON.stringify(tables, null, 2));
+
+    expect(tables).toHaveLength(3);
+
+    // Iterate over each of the tables and set their descriptions to empty strings before comparison,
+    // since descriptions are not the focus of this test and may contain minor OCR inconsistencies.
+    tables.forEach((table) => (table.description = ''));
+
+    expect(tables).toEqual(summerReadingAllTables);
+
+    // This one will take a while.
+  }, 720000);
 });

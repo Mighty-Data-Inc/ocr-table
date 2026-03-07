@@ -1,47 +1,170 @@
 [
   {
-    "TITLE": "The Big Sleep",
-    "AUTHOR": "Raymond Chandler",
-    "SYNOPSIS": "Philip Marlowe takes a case for a dying general and walks into a Los Angeles underworld of blackmail and murder"
+    "name": "Classic Science Fiction",
+    "description": "A table listing classic science fiction novels, with columns for TITLE, AUTHOR, and SYNOPSIS.",
+    "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+    "data": [
+      {
+        "TITLE": "Dune",
+        "AUTHOR": "Frank Herbert",
+        "SYNOPSIS": "On the desert planet Arrakis, young Paul Atreides navigates political intrigue, betrayal, and messianic destiny amid the struggle to control the universe's most precious resource. As layered and unforgiving as the sand it describes."
+      },
+      {
+        "TITLE": "Foundation",
+        "AUTHOR": "Isaac Asimov",
+        "SYNOPSIS": "A mathematician foresees the collapse of a galactic empire and races to preserve human knowledge through the dark age that will follow. The first volume of a series that shaped every space opera that came after it."
+      },
+      {
+        "TITLE": "The Left Hand of Darkness",
+        "AUTHOR": "Ursula K. Le Guin",
+        "SYNOPSIS": "A human envoy visits a world whose inhabitants have no fixed gender, and the friendship he slowly forges with a disgraced politician across a frozen waste is one of the most moving relationships in all of science fiction."
+      },
+      {
+        "TITLE": "Brave New World",
+        "AUTHOR": "Aldous Huxley",
+        "SYNOPSIS": "In a society engineered for happiness, where history is forbidden and discomfort has been abolished, one man's"
+      },
+      {
+        "TITLE": "The War of the Worlds",
+        "AUTHOR": "H.G. Wells",
+        "SYNOPSIS": "Martian war-machines reduce Victorian England to rubble in hours, and one ordinary man chronicles humanity's panicked, helpless retreat. Reads faster than it has any right to at 130 years old."
+      },
+      {
+        "TITLE": "Fahrenheit 451",
+        "AUTHOR": "Ray Bradbury",
+        "SYNOPSIS": "In a future where firemen start fires rather than extinguish them, a book-burner begins to wonder what's inside the things he destroys. Bradbury's prose burns as hot as the pages it depicts."
+      },
+      {
+        "TITLE": "The Stars My Destination",
+        "AUTHOR": "Alfred Bester",
+        "SYNOPSIS": "Gully Foyle is a nobody stranded in space and left to die by a passing ship. He survives on pure hatred, stages one of fiction's great vendettas, and becomes something far more frightening than a villain."
+      },
+      {
+        "TITLE": "More Than Human",
+        "AUTHOR": "Theodore Sturgeon",
+        "SYNOPSIS": "Six misfits -- each fragmentary, each broken -- discover that together they form a gestalt organism with powers none of them possesses alone. A novel about belonging that doubles as one of the genre's strangest and most tender achievements."
+      },
+      {
+        "TITLE": "A Canticle for Leibowitz",
+        "AUTHOR": "Walter M. Miller Jr.",
+        "SYNOPSIS": "A desert monastery preserves the scattered relics of lost knowledge across three thousand years of civilization's collapse and painful recovery. Funny, bleak, and quietly devastating in equal measure."
+      }
+    ],
+    "page_start": 1,
+    "page_end": 2,
+    "notes": "",
+    "aggregations": ""
   },
   {
-    "TITLE": "The Maltese Falcon",
-    "AUTHOR": "Dashiell Hammett",
-    "SYNOPSIS": "When Sam Spade's partner is killed while tailing a client, the trail leads to a priceless jeweled bird and every kind of liar. The novel that established the private eye as a moral figure in an immoral world."
+    "name": "Gothic & Horror",
+    "description": "A table listing nine novels that use dread to illuminate what sunlit fiction politely ignores. This table contains columns for TITLE, AUTHOR, and SYNOPSIS, and starts on this page with entries for 'Frankenstein,' 'Dracula,' and 'The Picture of Dorian Gray.'",
+    "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+    "data": [
+      {
+        "TITLE": "Frankenstein",
+        "AUTHOR": "Mary Shelley",
+        "SYNOPSIS": "A scientist creates life and immediately abandons it. The creature's anguished search for compassion -- and his turn toward destruction when none is offered -- makes this one of literature's most devastating arguments about responsibility."
+      },
+      {
+        "TITLE": "Dracula",
+        "AUTHOR": "Bram Stoker",
+        "SYNOPSIS": "Told entirely through letters, diaries, and newspaper clippings, the count's invasion of England unfolds as a breathless Victorian thriller laced with genuine menace. The epistolary form makes you feel like you're piecing together a catastrophe in real time."
+      },
+      {
+        "TITLE": "The Picture of Dorian Gray",
+        "AUTHOR": "Oscar Wilde",
+        "SYNOPSIS": "A beautiful young man trades his soul for eternal youth and watches a hidden portrait absorb every sin while his face stays pristine. Wilde's only novel, and it contains more"
+      },
+      {
+        "TITLE": "The Turn of the Screw",
+        "AUTHOR": "Henry James",
+        "SYNOPSIS": "A governess in a remote English manor becomes convinced her two angelic charges are haunted by the ghosts of former servants. Or has she simply lost her mind? After a hundred and twenty-five years, James still will not tell you."
+      },
+      {
+        "TITLE": "Rebecca",
+        "AUTHOR": "Daphne du Maurier",
+        "SYNOPSIS": "The new wife of a wealthy widower moves into his magnificent estate and discovers that the shadow of his first wife, the dazzling Rebecca, has never left -- and never intends to. The suspense is architectural; it builds in every room."
+      },
+      {
+        "TITLE": "The Haunting of Hill House",
+        "AUTHOR": "Shirley Jackson",
+        "SYNOPSIS": "Four strangers spend a summer in a house that was, Jackson tells us in the first paragraph, born bad. One of them will not be the same person who arrived. Opens with one of the finest first paragraphs in American fiction."
+      },
+      {
+        "TITLE": "We Have Always Lived in the Castle",
+        "AUTHOR": "Shirley Jackson",
+        "SYNOPSIS": "Merricat Blackwood and her sister live peacefully in their ancestral home, shunned by the village for reasons the novel reveals slowly and devastatingly. Told from inside one of fiction's most alarming and oddly lovable minds."
+      },
+      {
+        "TITLE": "Something Wicked This Way Comes",
+        "AUTHOR": "Ray Bradbury",
+        "SYNOPSIS": "A sinister carnival arrives in a small Midwestern town one October, and two thirteen-year-old boys discover that some rides steal years from your life. A novel about fathers and sons as much as it is about evil."
+      },
+      {
+        "TITLE": "House of Leaves",
+        "AUTHOR": "Mark Z. Danielewski",
+        "SYNOPSIS": "A scholarly apparatus -- footnotes, appendices, color-coded text -- surrounds a documentary about a house that is larger on the inside than the outside. Designed to be disorienting. Succeeds completely. Do not begin it on a night you plan to sleep."
+      }
+    ],
+    "page_start": 2,
+    "page_end": 3,
+    "notes": "",
+    "aggregations": ""
   },
   {
-    "TITLE": "Farewell, My Lovely",
-    "AUTHOR": "Raymond Chandler",
-    "SYNOPSIS": "Marlowe is pulled into a search for an ex-con's missing girlfriend and ends up entangled in jewel theft, a corrupt cop, and a society murder. Many critics consider it Chandler's finest construction, and they are not wrong."
-  },
-  {
-    "TITLE": "The Long Goodbye",
-    "AUTHOR": "Raymond Chandler",
-    "SYNOPSIS": "A chance friendship with a charming drunk leads Marlowe into a case that strips away every comfortable illusion about loyalty, wealth, and love. Longer, slower, and more melancholy than the earlier books -- the one where Chandler lets himself be sad."
-  },
-  {
-    "TITLE": "Red Harvest",
-    "AUTHOR": "Dashiell Hammett",
-    "SYNOPSIS": "The Continental Op arrives in a company-owned mining town so thoroughly corrupt that the only way to clean it out is to play every faction against the others until they destroy each other. Lean, violent, and morally uncomfortable."
-  },
-  {
-    "TITLE": "I, the Jury",
-    "AUTHOR": "Mickey Spillane",
-    "SYNOPSIS": "Mike Hammer's best friend is murdered and Hammer vows to deliver the punishment himself, not through a courtroom but with his own hand. Spillane wrote this in nine days. It feels like it, in the best possible sense."
-  },
-  {
-    "TITLE": "The Moving Target",
-    "AUTHOR": "Ross Macdonald",
-    "SYNOPSIS": "Lew Archer is hired to find a missing millionaire and discovers a California family rotting from the inside out. The first Archer novel and an immediate argument that Macdonald deserved to stand alongside Hammett and Chandler."
-  },
-  {
-    "TITLE": "The Chill",
-    "AUTHOR": "Ross Macdonald",
-    "SYNOPSIS": "A young husband hires Archer to find his runaway bride, and the trail leads back through two decades of buried crimes toward a secret someone will kill again to protect. The novel in which Macdonald's method -- archaeology as detective work -- reaches its fullest expression."
-  },
-  {
-    "TITLE": "Devil in a Blue Dress",
-    "AUTHOR": "Walter Mosley",
-    "SYNOPSIS": "Easy Rawlins, an unemployed black veteran in 1948 Los Angeles, is hired to find a white woman who likes jazz clubs on Central Avenue, and stumbles into something far more dangerous -- and more revealing about postwar America -- than anyone warned him."
+    "name": "Hardboiled Detective Fiction",
+    "description": "A table listing hardboiled detective fiction novels, including their titles, authors, and synopses, starting with 'The Big Sleep' by Raymond Chandler.",
+    "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+    "data": [
+      {
+        "TITLE": "The Big Sleep",
+        "AUTHOR": "Raymond Chandler",
+        "SYNOPSIS": "Philip Marlowe takes a case for a dying general and walks into a Los Angeles underworld of blackmail and murder"
+      },
+      {
+        "TITLE": "The Maltese Falcon",
+        "AUTHOR": "Dashiell Hammett",
+        "SYNOPSIS": "When Sam Spade's partner is killed while tailing a client, the trail leads to a priceless jeweled bird and every kind of liar. The novel that established the private eye as a moral figure in an immoral world."
+      },
+      {
+        "TITLE": "Farewell, My Lovely",
+        "AUTHOR": "Raymond Chandler",
+        "SYNOPSIS": "Marlowe is pulled into a search for an ex-con's missing girlfriend and ends up entangled in jewel theft, a corrupt cop, and a society murder. Many critics consider it Chandler's finest construction, and they are not wrong."
+      },
+      {
+        "TITLE": "The Long Goodbye",
+        "AUTHOR": "Raymond Chandler",
+        "SYNOPSIS": "A chance friendship with a charming drunk leads Marlowe into a case that strips away every comfortable illusion about loyalty, wealth, and love. Longer, slower, and more melancholy than the earlier books -- the one where Chandler lets himself be sad."
+      },
+      {
+        "TITLE": "Red Harvest",
+        "AUTHOR": "Dashiell Hammett",
+        "SYNOPSIS": "The Continental Op arrives in a company-owned mining town so thoroughly corrupt that the only way to clean it out is to play every faction against the others until they destroy each other. Lean, violent, and morally uncomfortable."
+      },
+      {
+        "TITLE": "I, the Jury",
+        "AUTHOR": "Mickey Spillane",
+        "SYNOPSIS": "Mike Hammer's best friend is murdered and Hammer vows to deliver the punishment himself, not through a courtroom but with his own hand. Spillane wrote this in nine days. It feels like it, in the best possible sense."
+      },
+      {
+        "TITLE": "The Moving Target",
+        "AUTHOR": "Ross Macdonald",
+        "SYNOPSIS": "Lew Archer is hired to find a missing millionaire and discovers a California family rotting from the inside out. The first Archer novel and an immediate argument that Macdonald deserved to stand alongside Hammett and Chandler."
+      },
+      {
+        "TITLE": "The Chill",
+        "AUTHOR": "Ross Macdonald",
+        "SYNOPSIS": "A young husband hires Archer to find his runaway bride, and the trail leads back through two decades of buried crimes toward a secret someone will kill again to protect. The novel in which Macdonald's method -- archaeology as detective work -- reaches its fullest expression."
+      },
+      {
+        "TITLE": "Devil in a Blue Dress",
+        "AUTHOR": "Walter Mosley",
+        "SYNOPSIS": "Easy Rawlins, an unemployed black veteran in 1948 Los Angeles, is hired to find a white woman who likes jazz clubs on Central Avenue, and stumbles into something far more dangerous -- and more revealing about postwar America -- than anyone warned him."
+      }
+    ],
+    "page_start": 3,
+    "page_end": 4,
+    "notes": "",
+    "aggregations": ""
   }
 ]

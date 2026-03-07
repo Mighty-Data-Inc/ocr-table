@@ -423,6 +423,27 @@ then the value for that column should be an empty string.
   return schema;
 };
 
+/**
+ * Transcribes the body rows of a named table from a single page image.
+ *
+ * Uses a shotgun approach — running multiple parallel OCR workers and then
+ * adjudicating their responses — to faithfully extract each cell value from
+ * the table. If a next-page image is provided, also determines whether the
+ * table continues onto that page and whether the last visible row was split
+ * across the page break; when a split row is detected, the row is re-transcribed
+ * by combining text from both pages before being returned.
+ *
+ * @param openaiClient OpenAI client used to drive the OCR conversation.
+ * @param tableName Name or identifier of the table to transcribe.
+ * @param tableDescription A brief description of the table's purpose, used to help the model locate it.
+ * @param columns Ordered list of column names for the table.
+ * @param pagePngBuffer PNG bytes of the current document page.
+ * @param doesTableStartOnThisPage `true` if the table's first row begins on this page; `false` if this page shows a continuation from a prior page.
+ * @param splitRowToIgnore Optional row (from the previous page) that was split across the page break and should be ignored at the top of this page.
+ * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
+ * @param nextPagePngBuffer Optional PNG bytes of the following page, used to detect table continuation and split rows.
+ * @returns An object containing the extracted body rows, a flag indicating whether the table continues onto the next page, and a flag indicating whether the last row was split across the page break.
+ */
 export const ocrTranscribeTableRowsFromCurrentPage = async (
   openaiClient: OpenAI,
   tableName: string,
@@ -887,6 +908,22 @@ with the data in the source image(s).
   };
 };
 
+/**
+ * Extracts all rows of a named table from a multi-page document, starting at a given page.
+ *
+ * First determines the table's column headers from the starting page, then iterates
+ * page-by-page calling `ocrTranscribeTableRowsFromCurrentPage` until the table no longer
+ * continues. Split rows that straddle a page break are detected and their corrected
+ * transcription is carried forward as the `splitRowToIgnore` hint on the next page.
+ *
+ * @param openaiClient OpenAI client used for all OCR conversations.
+ * @param tableName Name or identifier of the table to extract.
+ * @param tableDescription A brief description of the table's purpose.
+ * @param numPageStart 1-based index of the page on which the table starts.
+ * @param pagePngBuffers Array of PNG buffers for all pages in the document (1-based page numbers map to 0-based array indices).
+ * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
+ * @returns A fully populated `OcrExtractedTable` containing the table's name, description, columns, data rows, and the page range it was found on.
+ */
 export const ocrTranscribeTableFromPages = async (
   openaiClient: OpenAI,
   tableName: string,
@@ -964,6 +1001,86 @@ export const ocrTranscribeTableFromPages = async (
   return retval;
 };
 
+export const ocrTablesFromPngPages = async (
+  openaiClient: OpenAI,
+  pagesAsPngBuffers: Buffer[],
+  additionalInstructions?: string
+): Promise<OcrExtractedTable[]> => {
+  const tables: OcrExtractedTable[] = [];
+
+  let numPageCurrent = 1;
+  let didPreviousPageEndWithTable = false;
+  let nameOfFirstTableOnPage = ''; // Not actually used.
+
+  while (numPageCurrent <= pagesAsPngBuffers.length) {
+    const pagePngBufferCurrent = pagesAsPngBuffers[numPageCurrent - 1];
+
+    let pagePngBufferNext: Buffer | undefined = undefined;
+    if (numPageCurrent < pagesAsPngBuffers.length) {
+      pagePngBufferNext = pagesAsPngBuffers[numPageCurrent];
+    }
+
+    const pagePositionInDocument: 'first' | 'middle' | 'last' =
+      numPageCurrent == 1
+        ? 'first'
+        : numPageCurrent == pagesAsPngBuffers.length
+          ? 'last'
+          : 'middle';
+
+    const tablesOnThisPage = await ocrIdentifyTablesOnPage(
+      openaiClient,
+      pagePngBufferCurrent,
+      pagePositionInDocument,
+      didPreviousPageEndWithTable,
+      nameOfFirstTableOnPage,
+      additionalInstructions,
+      pagePngBufferNext
+    );
+
+    // Okay, soooo... We can't take for granted that the tables
+    // will necessarily be listed in the order that they appear on the page.
+    // However, we *can* take for granted that only one table will bleed off
+    // of the page; all the other tables will be fully contained on the page.
+    // So we'll iterate over each of the tables that we found on the page,
+    // and we'll look at each of their page_end fields, and the highest
+    // page_end field will be the one that we set as maxPageEnd -- which
+    // will become numPageCurrent in the next loop iteration.
+
+    let maxPageEnd = numPageCurrent;
+    for (const tableNameDesc of tablesOnThisPage) {
+      const tableObj = await ocrTranscribeTableFromPages(
+        openaiClient,
+        tableNameDesc.name,
+        tableNameDesc.description,
+        numPageCurrent,
+        pagesAsPngBuffers,
+        additionalInstructions
+      );
+      tables.push(tableObj);
+      if (tableObj.page_end > maxPageEnd) {
+        maxPageEnd = tableObj.page_end;
+      }
+    }
+
+    if (maxPageEnd === numPageCurrent) {
+      // All of the tables that we found on this page were fully contained on
+      // this page; none of them bled onto the next page.
+      // We advance the page counter manually.
+      didPreviousPageEndWithTable = false;
+      numPageCurrent++;
+    } else {
+      // At least one of the tables that we found on this page overran the page.
+      // It might have continued for multiple pages for all we know.
+      // We need to advance the page counter to the page that that table
+      // left off on.
+      didPreviousPageEndWithTable = true;
+      numPageCurrent = maxPageEnd;
+    }
+  }
+
+  return tables;
+};
+
 /**
  * Extracts tabular data from PNG image buffers using AI-powered OCR.
  * Processes multiple pages, detects tables, handles tables spanning multiple pages,
@@ -987,6 +1104,10 @@ export const ocrImagesExtractTableData = async (
   pagesAsPngBuffers: Buffer[],
   additionalInstructions?: string
 ): Promise<OcrExtractedTable[]> => {
+  throw new Error(
+    'Deprecated. This is only included here for reference while writing new code.'
+  );
+
   additionalInstructions = additionalInstructions || '';
 
   let retvalTables = [] as OcrExtractedTable[];
