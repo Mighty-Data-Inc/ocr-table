@@ -581,7 +581,7 @@ this can be an empty array.
   };
 
   // Run convo clones in parallel, and resolve discrepancies with a master run.
-  const NUM_SHOTGUN_BARRELS = 4;
+  const NUM_SHOTGUN_BARRELS = 3;
   const convoShotgun: GptConversation[] = [];
   for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
     const convoBarrel = convo.clone();
