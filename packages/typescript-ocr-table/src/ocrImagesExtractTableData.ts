@@ -206,6 +206,9 @@ ${ignoreEverythingAbove}
     convo.addDeveloperMessage(`
 Start from the very top of the page, and work your way down. Identify the first table
 on this page, and start your analysis from there.
+Remember: A table in a document will *usually* have a name and headers, but not always.
+If you see data right at the top of the page that is clearly arranged in a tabular format,
+but it doesn't have a title or headers, then you might have to think of a title for it.
 `);
   }
 
