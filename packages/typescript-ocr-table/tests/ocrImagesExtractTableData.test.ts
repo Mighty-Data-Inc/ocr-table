@@ -74,11 +74,26 @@ your output will be considered incorrect.
 // Live OCR can occasionally confuse visually similar characters (for example, "5" vs "S")
 // in room labels. We provide this hint so strict exact-name assertions test table-identification
 // behavior rather than avoidable room-code transcription ambiguity.
+// This is giving the AI a bit more hints than it should really have, but the tests are already
+// fragile enough without also having to deal with random OCR character confusions and name
+// misspellings.
 const ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES = `
+CLASSROOMS:
 Classroom numbers are in <number><letter> format, e.g. A3, D9, etc.
 When performing OCR, sometimes a "5" will look like an "S" or a "2" like a "Z",
 and vice versa. However, when you see a classroom number, e.g. "Room 2D",
 you must transcribe it as <number><letter>.
+
+TEACHERS:
+The teachers' names are as follows:
+- Ms. Elena Alvarez
+- Mr. Jonah Reed
+- Ms. Tessa Monroe
+- Ms. Priya Nandakumar
+- Ms. Claire Donnelly
+- Mr. Omar Whitfield
+They're provided for you here so you don't misspell them.
+
 ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 `;
 

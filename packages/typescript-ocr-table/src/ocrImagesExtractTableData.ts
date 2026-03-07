@@ -202,6 +202,11 @@ on the page. Don't repeat that work.
 Disregard everything on the page above the following position (including the position itself):
 ${ignoreEverythingAbove}
     `);
+  } else {
+    convo.addDeveloperMessage(`
+Start from the very top of the page, and work your way down. Identify the first table
+on this page, and start your analysis from there.
+`);
   }
 
   if (nameOfFirstTableOnPage) {
@@ -982,8 +987,17 @@ I'll show them to you one at a time, starting with page ${numPageStart}
 
   if (numPageEnd < pagePngBuffers.length) {
     convo.addUserMessage(`
-I'll also show you the page immediately *after* the end of the table, just in case
-there's anything on that page that looks like it could be associated with the table "${tableName}"
+To handle a potential edge case in which footnotes, captions, aggregations, etc.,
+associated with the table happen to fall on the page *after* the table, 
+I'll now also show you the page immediately *after* the end of the table, just in case
+there's anything on that page that looks like it could be associated with 
+the table "${tableName}". Be particularly mindful of any captions, annotations, 
+footnotes, endnotes, sidebars, or summary/aggregation data that might be associated
+with the table and could be located on that next page, even if the main body of the
+table doesn't continue onto that page.
+Hopefully, in the best-case scenario, you don't need to worry about this,
+and there isn't any relevant content on that next page. But just in case there is,
+it's better that you have it available should you need it.
 `);
     convo.addImage(
       'user',
