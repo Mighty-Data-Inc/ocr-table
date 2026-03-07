@@ -182,14 +182,7 @@ export const ocrIdentifyTablesOnPage = async (
 Does this page contain any tables? Does it have just one table, or multiple tables?
 What are the tables called? What fields do they contain? Discuss.
 
-We are specifically only interested in tables that *start* on this page. If a table is a
-continuation of a previous table that started on a previous page, we don't care about it.
-
 Don't worry about actually parsing the data in the tables yet. 
-
-**DO** pay attention to tables that *start* on this page, even if they continue
-onto later pages. This includes tables that might have their title or header on this page
-(perhaps at the bottom of the page, for example), but their data continues onto later pages.
 
 Let's start with a general discussion of what you see on this page. Describe its
 layout and the tables (or table fragments) that you see on it.
