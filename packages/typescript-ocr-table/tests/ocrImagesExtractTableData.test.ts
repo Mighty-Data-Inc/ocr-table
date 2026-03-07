@@ -251,7 +251,14 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       createClient(),
       pageTwoBuffer,
       undefined,
-      true,
+      `
+The page starts with a table (or part of a table) that overran from a previous page.
+Its last row is:
+{
+  "Item Name": "Pocket Chart",
+  "Description": "Small classroom pocket chart with extra sentence strips..."
+}
+`,
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
@@ -273,7 +280,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       createClient(),
       pageTwoBuffer,
       undefined,
-      false,
+      undefined,
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
@@ -309,7 +316,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       createClient(),
       pageTwoBuffer,
       undefined,
-      false,
+      undefined,
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)',
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
@@ -334,7 +341,14 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       createClient(),
       pageTwoBuffer,
       undefined,
-      true,
+      `
+The page starts with a table (or part of a table) that overran from a previous page.
+Its last row is:
+{
+  "Item Name": "Pocket Chart",
+  "Description": "Small classroom pocket chart with extra sentence strips..."
+}
+`,
       undefined,
       lettersOnlyRoomInstructions
     );

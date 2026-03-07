@@ -162,7 +162,7 @@ export const ocrIdentifyTablesOnPage = async (
   openaiClient: OpenAI,
   pagePngBuffer: Buffer,
   pagePositionInDocument?: 'first' | 'last' | 'middle',
-  didPreviousPageEndWithTable?: boolean,
+  ignoreEverythingAbove?: string,
   nameOfFirstTableOnPage?: string,
   additionalInstructions?: string,
   nextPagePngBuffer?: Buffer
@@ -193,18 +193,14 @@ layout and the tables (or table fragments) that you see on it.
 `);
   await _ponder(convo);
 
-  if (didPreviousPageEndWithTable) {
-    convo.addUserMessage(`
-NOTE: The previous page ended with a table. It's possible that this table continues onto this page.
-If you see some table data at the top of this page that doesn't have a table name, it might
-be from the previous page. We only care about tables that *start* on this page, so you should
-ignore any table that looks like it's continued from the previous page.
-    `);
-  } else {
-    convo.addUserMessage(`
-NOTE: As far as we know, the previous page (if there was one) did *not* end with a table. That
-means that, if you see some table data at the top of this page, then it must be from a *new*
-table that starts on this page. You should include it in your results.
+  if (ignoreEverythingAbove) {
+    convo.addDeveloperMessage(`
+NOTE: We're actually continuing an OCR process that's already in progress. We're going top
+down from the top of the page. We've already done some of the work above a certain point
+on the page. Don't repeat that work.
+
+Disregard everything on the page above the following position (including the position itself):
+${ignoreEverythingAbove}
     `);
   }
 
@@ -1009,7 +1005,7 @@ export const ocrTablesFromPngPages = async (
   const tables: OcrExtractedTable[] = [];
 
   let numPageCurrent = 1;
-  let didPreviousPageEndWithTable = false;
+  let didPageAdvanceBecauseOfTableOverrun = false;
   let nameOfFirstTableOnPage = ''; // Not actually used.
 
   while (numPageCurrent <= pagesAsPngBuffers.length) {
@@ -1027,11 +1023,28 @@ export const ocrTablesFromPngPages = async (
           ? 'last'
           : 'middle';
 
+    let ignoreEverythingAbove = '';
+    if (
+      didPageAdvanceBecauseOfTableOverrun &&
+      tables.length > 0 &&
+      tables[tables.length - 1].data.length > 0
+    ) {
+      const lastTable = tables[tables.length - 1];
+      const lastTableLastRow = lastTable.data[lastTable.data.length - 1];
+
+      ignoreEverythingAbove = `
+The page starts with a table (or part of a table) that overran from a previous page.
+Its last row on this page has the following data. Disregard everything on the page
+above this row (including this row itself):
+${JSON.stringify(lastTableLastRow, null, 2)}
+`;
+    }
+
     const tablesOnThisPage = await ocrIdentifyTablesOnPage(
       openaiClient,
       pagePngBufferCurrent,
       pagePositionInDocument,
-      didPreviousPageEndWithTable,
+      ignoreEverythingAbove,
       nameOfFirstTableOnPage,
       additionalInstructions,
       pagePngBufferNext
@@ -1066,14 +1079,14 @@ export const ocrTablesFromPngPages = async (
       // All of the tables that we found on this page were fully contained on
       // this page; none of them bled onto the next page.
       // We advance the page counter manually.
-      didPreviousPageEndWithTable = false;
+      didPageAdvanceBecauseOfTableOverrun = false;
       numPageCurrent++;
     } else {
       // At least one of the tables that we found on this page overran the page.
       // It might have continued for multiple pages for all we know.
       // We need to advance the page counter to the page that that table
       // left off on.
-      didPreviousPageEndWithTable = true;
+      didPageAdvanceBecauseOfTableOverrun = true;
       numPageCurrent = maxPageEnd;
     }
   }
