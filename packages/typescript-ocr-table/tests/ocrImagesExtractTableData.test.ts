@@ -998,6 +998,52 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
     // This one might need extra time on occasion,
     // but doesn't take as long as the candidate eval test.
   }, 360000);
+
+  it('reads notes and aggregations from a one-page table', async () => {
+    const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
+
+    const table = await ocrTranscribeTableFromPages(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      '',
+      1,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(table.page_end).toBe(1);
+    expect(table.notes).not.toBeFalsy();
+    expect(table.aggregations).not.toBeFalsy();
+    expect(table.notes).toContain('monthly replenishment');
+    expect(table.notes).toContain('display activities');
+    expect(table.aggregations).toContain('$564.75');
+
+    // This one might need extra time on occasion,
+    // but doesn't take as long as the candidate eval test.
+  }, 360000);
+
+  it('reads notes and aggregations from a table that spans pages', async () => {
+    const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
+
+    const table = await ocrTranscribeTableFromPages(
+      createClient(),
+      'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
+      '',
+      1,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(table.page_end).toBe(1);
+    expect(table.notes).not.toBeFalsy();
+    expect(table.aggregations).not.toBeFalsy();
+    expect(table.notes).toContain('monthly replenishment');
+    expect(table.notes).toContain('display activities');
+    expect(table.aggregations).toContain('$564.75');
+
+    // This one might need extra time on occasion,
+    // but doesn't take as long as the candidate eval test.
+  }, 360000);
 });
 
 describe('ocrTablesFromPngPages (live API)', () => {

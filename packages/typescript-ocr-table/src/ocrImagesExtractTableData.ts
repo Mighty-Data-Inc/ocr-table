@@ -1143,7 +1143,18 @@ export const ocrTranscribeTableFromPages = async (
     }
   }
 
-  // TODO: Read table notes and aggregations.
+  // Last step: extract any notes or aggregations that are associated with this table,
+  // which will be attached to the table object that we return.
+  const { notes, aggregations } = await ocrExtractTableAggregationsAndNotes(
+    openaiClient,
+    tableName,
+    tableDescription,
+    numPageStart,
+    numPageEnd,
+    pagePngBuffers,
+    additionalInstructions
+  );
+
   const retval: OcrExtractedTable = {
     name: tableName,
     description: tableDescription,
@@ -1151,8 +1162,8 @@ export const ocrTranscribeTableFromPages = async (
     data: tableRowsAll,
     page_start: numPageStart,
     page_end: numPageEnd,
-    notes: '',
-    aggregations: '',
+    notes,
+    aggregations,
   };
   return retval;
 };
