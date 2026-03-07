@@ -6,6 +6,7 @@ import { OpenAI } from 'openai';
 import { describe, expect, it } from 'vitest';
 
 import {
+  ocrExtractTableAggregationsAndNotes,
   ocrIdentifyTablesOnPage,
   ocrImagesExtractTableColumnHeaders,
   ocrTablesFromPngPages,
@@ -408,6 +409,26 @@ Its last row is:
     );
 
     expect(tables).toEqual([]);
+  }, 180000);
+
+  it('reads table description when the document shows it', async () => {
+    const pagePngPath = path.join(FIXTURES_DIR, 'summer-reading-pg1.png');
+    const pageBuffer = readFileSync(pagePngPath);
+
+    const tables = await ocrIdentifyTablesOnPage(
+      createClient(),
+      pageBuffer,
+      undefined,
+      undefined,
+      undefined,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0]?.name).toBe('Classic Science Fiction');
+    expect(tables[0]?.description).toBe(
+      'The canon that invented tomorrow -- nine novels that asked the questions civilization is still catching up to.'
+    );
   }, 180000);
 });
 
@@ -823,6 +844,88 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 });
 
+describe('ocrExtractTableAggregationsAndNotes (live API)', () => {
+  it('extracts aggregations and notes for a one-page table with both', async () => {
+    const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
+
+    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      '',
+      1,
+      1,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(notesAndAggs).toHaveProperty('aggregations');
+    expect(notesAndAggs).toHaveProperty('notes');
+
+    expect(notesAndAggs.aggregations).toContain('$564.75');
+    expect(notesAndAggs.notes).toContain('monthly replenishment');
+    expect(notesAndAggs.notes).toContain('display activities');
+  }, 180000);
+
+  it('extracts aggregations and notes for a multi-page table with both', async () => {
+    const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
+
+    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+      createClient(),
+      'Classroom Purchases - Mr. Omar Whitfield (Room 1A)',
+      '',
+      3,
+      4,
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(notesAndAggs).toHaveProperty('aggregations');
+    expect(notesAndAggs).toHaveProperty('notes');
+
+    expect(notesAndAggs.aggregations).toContain('$564.75');
+    expect(notesAndAggs.notes).toContain('monthly replenishment');
+    expect(notesAndAggs.notes).toContain('display activities');
+  }, 180000);
+
+  it('extracts aggregations and notes that land on the next page after the table', async () => {
+    const pagePngs = loadFixturePngs('school-supplies-BOS-14pt-page-#');
+
+    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+      createClient(),
+      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
+      '',
+      1,
+      1, // Actually, her table ends on page 2, but let's test to make sure it can get it anyway.
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+    );
+
+    expect(notesAndAggs).toHaveProperty('aggregations');
+    expect(notesAndAggs).toHaveProperty('notes');
+
+    expect(notesAndAggs.aggregations).toContain('$564.75');
+    expect(notesAndAggs.notes).toContain('monthly replenishment');
+    expect(notesAndAggs.notes).toContain('display activities');
+  }, 180000);
+
+  it("extracts no aggregations or notes for tables that don't have any", async () => {
+    const pagePngs = loadFixturePngs('wildprov3pg-pg#');
+
+    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+      createClient(),
+      'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
+      '',
+      1,
+      1, // Actually, her table ends on page 2, but let's test to make sure it can get it anyway.
+      pagePngs,
+      ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
+    );
+
+    expect(notesAndAggs.aggregations).toBeFalsy();
+    expect(notesAndAggs.notes).toBeFalsy();
+  }, 180000);
+});
+
 describe('ocrTranscribeTableFromPages (live API)', () => {
   it('transcribes a small, simple table from a single page', async () => {
     const pngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
@@ -907,14 +1010,7 @@ describe('ocrTablesFromPngPages (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST
     );
 
-    console.log(JSON.stringify(tables, null, 2));
-
     expect(tables).toHaveLength(3);
-
-    // Iterate over each of the tables and set their descriptions to empty strings before comparison,
-    // since descriptions are not the focus of this test and may contain minor OCR inconsistencies.
-    tables.forEach((table) => (table.description = ''));
-
     expect(tables).toEqual(summerReadingAllTables);
 
     // This one will take a while.

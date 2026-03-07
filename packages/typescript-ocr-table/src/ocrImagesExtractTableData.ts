@@ -257,6 +257,13 @@ that started on the previous page.
               String,
               `A brief description of the table's purpose.`,
             ],
+            subtitle_or_tagline: [
+              String,
+              `Some tables have a subtitle or tagline that provides additional context about ` +
+                `the table. This usually (but not always) appears directly below the table's ` +
+                `main title, and is often in smaller or italicized font. If this table has a ` +
+                `subtitle or tagline, provide it here. If not, leave this field empty.`,
+            ],
           },
         ],
         orphaned_table_title: [
@@ -272,10 +279,27 @@ that started on the previous page.
     ),
   });
 
-  const tablesOnThisPage = convo.getLastReplyDictField('tables', []) as Array<{
+  const tablesDataScanned = convo.getLastReplyDictField('tables', []) as Array<{
     name: string;
     description: string;
+    subtitle_or_tagline: string;
   }>;
+
+  const tablesOnThisPage: Array<{
+    name: string;
+    description: string;
+  }> = [];
+  for (const table of tablesDataScanned) {
+    const tableName = table.name.trim();
+    let tableDescription = table.description.trim();
+    if (table.subtitle_or_tagline) {
+      tableDescription = table.subtitle_or_tagline.trim();
+    }
+    tablesOnThisPage.push({
+      name: tableName,
+      description: tableDescription,
+    });
+  }
 
   const orphanedTableTitle = convo.getLastReplyDictField(
     'orphaned_table_title',
@@ -905,6 +929,142 @@ with the data in the source image(s).
 };
 
 /**
+ * Extracts any aggregation data and free-text notes associated with a named table.
+ *
+ * Starts an OCR conversation seeded with the table's starting page, then feeds in
+ * every additional page the table spans so the model has full visual context. The
+ * model is asked to locate footnotes, annotations, sidebars, and any numerical
+ * summary rows (totals, averages, counts, etc.) that appear in or immediately
+ * around the table, and to return them as plain text strings.
+ *
+ * @param openaiClient OpenAI client used to drive the OCR conversation.
+ * @param tableName Name or identifier of the table to examine.
+ * @param tableDescription A brief description of the table's purpose, used to help the model locate it.
+ * @param numPageStart 1-based index of the first page the table appears on.
+ * @param numPageEnd 1-based index of the last page the table appears on (same as `numPageStart` for single-page tables).
+ * @param pagePngBuffers Array of PNG buffers for all pages in the document (1-based page numbers map to 0-based array indices).
+ * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
+ * @returns An object with a `notes` string (any textual annotations found) and an `aggregations` string (any summary/aggregation data found); either may be an empty string if nothing was found.
+ */
+export const ocrExtractTableAggregationsAndNotes = async (
+  openaiClient: OpenAI,
+  tableName: string,
+  tableDescription: string,
+  numPageStart: number,
+  numPageEnd: number,
+  pagePngBuffers: Buffer[],
+  additionalInstructions?: string
+): Promise<{ notes: string; aggregations: string }> => {
+  const convo = _startOcrTableConversation(
+    openaiClient,
+    pagePngBuffers[numPageStart - 1],
+    undefined,
+    additionalInstructions,
+    undefined,
+    tableName,
+    tableDescription
+  );
+
+  if (numPageEnd > numPageStart) {
+    convo.addUserMessage(`
+The table "${tableName}" that we're examining runs for several pages.
+I'll show them to you one at a time, starting with page ${numPageStart}
+(which you've already seen) and ending with page ${numPageEnd}.
+`);
+    for (let iPage = numPageStart + 1; iPage <= numPageEnd; iPage++) {
+      convo.addImage(
+        'user',
+        `Here is page ${iPage} of the document.`,
+        `data:image/png;base64,${pagePngBuffers[iPage - 1].toString('base64')}`
+      );
+    }
+  }
+
+  if (numPageEnd < pagePngBuffers.length) {
+    convo.addUserMessage(`
+I'll also show you the page immediately *after* the end of the table, just in case
+there's anything on that page that looks like it could be associated with the table "${tableName}"
+`);
+    convo.addImage(
+      'user',
+      `Here is page ${numPageEnd + 1} of the document, which comes immediately after the end of the table.`,
+      `data:image/png;base64,${pagePngBuffers[numPageEnd].toString('base64')}`
+    );
+  }
+
+  convo.addUserMessage(`
+We're looking for the following pieces of information about the table "${tableName}":
+
+1. Table notes: Are there any notes associated with this table? These could be any of the following:
+    - Footnotes
+    - Endnotes
+    - Annotations
+    - Sidebars
+    - Any other kind of textual commentary that provides additional context or 
+        information about the table.
+
+2. Aggregations: Are there any aggregations associated with this table? These tend to be numerical, e.g.:
+    - Sums
+    - Averages
+    - Counts
+    - Or any other kind of summary or aggregation of the table's data.
+
+Discuss whatever notes or aggregations you might see in or around the table.
+`);
+  await _ponder(convo);
+
+  await convo.submit(undefined, undefined, {
+    jsonResponse: JSONSchemaFormat(
+      {
+        discuss_notes: [
+          String,
+          `A discussion of any notes that are associated with the table "${tableName}". ` +
+            `Describe what the notes say, where they are located, and any other ` +
+            `relevant observations about them. ` +
+            `This is for your own benefit to help you understand the table and its context; ` +
+            `it won't be included in the final output.`,
+        ],
+        discuss_aggregations: [
+          String,
+          `A discussion of any aggregations that are associated with the table "${tableName}". ` +
+            `Describe what the aggregations are, what values they contain, where they are located, ` +
+            `and any other relevant observations about them.` +
+            `This is for your own benefit to help you understand the table and its context; ` +
+            `it won't be included in the final output.`,
+        ],
+        notes: [
+          String,
+          `The text of any notes that are associated with the table "${tableName}". ` +
+            `If there are no notes, this can be an empty string. ` +
+            `This will be included in the final output, so be sure to capture it accurately. ` +
+            `If necessary, you may add explanatory text for clarification purposes. ` +
+            `(But if there are no notes, just return an empty string instead of saying ` +
+            `"No notes" or something like that.)`,
+        ],
+        aggregations: [
+          String,
+          `The text of any aggregations that are associated with the table "${tableName}". ` +
+            `If there are no aggregations, this can be an empty string. ` +
+            `This will be included in the final output, so be sure to capture it accurately.` +
+            `If necessary, you may add explanatory text for clarification purposes. ` +
+            `(But if there are no aggregations, just return an empty string instead of saying ` +
+            `"No aggregations" or something like that.)`,
+        ],
+      },
+      'ocr_extract_table_notes_and_aggregations',
+      `Extract any notes or aggregations associated with the table "${tableName}".`
+    ),
+  });
+
+  const notes = convo.getLastReplyDictField('notes', '') as string;
+  const aggregations = convo.getLastReplyDictField(
+    'aggregations',
+    ''
+  ) as string;
+  return { notes, aggregations };
+};
+
+/**
  * Extracts all rows of a named table from a multi-page document, starting at a given page.
  *
  * First determines the table's column headers from the starting page, then iterates
@@ -997,6 +1157,23 @@ export const ocrTranscribeTableFromPages = async (
   return retval;
 };
 
+/**
+ * Extracts all tables from a multi-page document represented as PNG buffers.
+ *
+ * Iterates through the pages of the document, calling `ocrIdentifyTablesOnPage`
+ * on each page to discover which tables start there, then calling
+ * `ocrTranscribeTableFromPages` for each discovered table to extract its full
+ * data across however many pages it spans. Page advancement is handled
+ * automatically: if a table overruns onto subsequent pages the loop resumes
+ * from the page where that table ended, passing context about the last
+ * extracted row so the next call to `ocrIdentifyTablesOnPage` can correctly
+ * ignore the already-processed portion at the top of that page.
+ *
+ * @param openaiClient OpenAI client used for all OCR conversations.
+ * @param pagesAsPngBuffers Array of PNG buffers representing every page of the document, in order.
+ * @param additionalInstructions Optional caller-provided instructions to guide the OCR process across all pages and tables.
+ * @returns Array of fully populated `OcrExtractedTable` objects for every table found in the document.
+ */
 export const ocrTablesFromPngPages = async (
   openaiClient: OpenAI,
   pagesAsPngBuffers: Buffer[],

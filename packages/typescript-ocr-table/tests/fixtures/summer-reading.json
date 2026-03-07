@@ -1,7 +1,7 @@
 [
   {
     "name": "Classic Science Fiction",
-    "description": "A table listing classic science fiction novels, with columns for TITLE, AUTHOR, and SYNOPSIS.",
+    "description": "The canon that invented tomorrow -- nine novels that asked the questions civilization is still catching up to.",
     "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
     "data": [
       {
@@ -57,7 +57,7 @@
   },
   {
     "name": "Gothic & Horror",
-    "description": "A table listing nine novels that use dread to illuminate what sunlit fiction politely ignores. This table contains columns for TITLE, AUTHOR, and SYNOPSIS, and starts on this page with entries for 'Frankenstein,' 'Dracula,' and 'The Picture of Dorian Gray.'",
+    "description": "Fear as a lens -- nine novels that use dread to illuminate what sunlit fiction politely ignores.",
     "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
     "data": [
       {
@@ -113,7 +113,7 @@
   },
   {
     "name": "Hardboiled Detective Fiction",
-    "description": "A table listing hardboiled detective fiction novels, including their titles, authors, and synopses, starting with 'The Big Sleep' by Raymond Chandler.",
+    "description": "The mean streets, the missing persons, the lies inside the lies -- nine novels that made cynicism into an art form.",
     "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
     "data": [
       {
