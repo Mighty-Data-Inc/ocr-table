@@ -15,11 +15,14 @@ import { OpenAI } from 'openai';
  * time and tokens. Use judiciously!
  * @param convo
  */
-const _ponder = async (convo: GptConversation) => {
-  // Noop for performance eval.
-  // true = noop; false = actually ponder.
-  const noop = () => true;
-  noop() || (await convo.submit());
+const _ponder = async (convo: GptConversation, forcePonder?: boolean) => {
+  let shouldPonder = false;
+  if (forcePonder) {
+    shouldPonder = true;
+  }
+  if (shouldPonder) {
+    await convo.submit();
+  }
 };
 
 /**
@@ -451,6 +454,80 @@ then the value for that column should be an empty string.
   return schema;
 };
 
+const _isAnyPageContentBelowLastRow = async (
+  openaiClient: OpenAI,
+  pagePngBuffer: Buffer,
+  tableName: string,
+  tableDescription: string,
+  rowsExtractedSoFar: Array<Record<string, string>>,
+  additionalInstructions?: string
+): Promise<boolean> => {
+  if (!rowsExtractedSoFar || rowsExtractedSoFar.length === 0) {
+    throw new Error(
+      `Invalid invocation of _isAnyPageContentBelowLastRow: rowsExtractedSoFar is empty.`
+    );
+  }
+
+  const convo = _startOcrTableConversation(
+    openaiClient,
+    pagePngBuffer,
+    undefined,
+    additionalInstructions,
+    undefined,
+    tableName,
+    tableDescription
+  );
+
+  convo.addUserMessage(`
+We just finished performing OCR on this page to extract the data from the rows of 
+table "${tableName}".
+
+Here are the rows we've scanned:
+
+${JSON.stringify(rowsExtractedSoFar, null, 2)}
+`);
+
+  const lastRow = rowsExtractedSoFar[rowsExtractedSoFar.length - 1];
+  convo.addUserMessage(`
+To reiterate, here is the last row of this table, as far as we can tell:
+
+${JSON.stringify(lastRow, null, 2)}
+`);
+
+  convo.addUserMessage(`
+My question for you now is:
+
+Is there any *page content* below this last row?
+
+Page content is typically either
+text (in paragraph form), a section title/header, or another table -- basically, anything
+that is intended to be read "in the flow" of the page. What is *not* page content
+is things like footers, page numbers, footnotes, illustrations, decorative elements,
+etc. So, what do you think? Is there any page content below this last row of the table? 
+Or is this last row basically at the bottom of the page with no more page content below it?
+`);
+  await convo.submit(undefined, undefined, {
+    jsonResponse: JSONSchemaFormat(
+      {
+        discussion: [
+          String,
+          `A discussion of whether or not there is any page content below the last ` +
+            `row of the table. Include observations about the type of content (if any), ` +
+            `its position, and any other relevant details.`,
+        ],
+        is_there_page_content_below_last_row: Boolean,
+      },
+      'ocr_is_any_page_content_below_last_row',
+      `Determine whether there is any page content below the last row of the table.`
+    ),
+  });
+  const isTherePageContentBelowLastRow = convo.getLastReplyDictField(
+    'is_there_page_content_below_last_row',
+    false
+  ) as boolean;
+  return isTherePageContentBelowLastRow;
+};
+
 /**
  * Transcribes the body rows of a named table from a single page image.
  *
@@ -514,8 +591,8 @@ Just focus on transcribing the rows of this one table.
 
 If a particular cell is empty, just put an empty string for that cell's value.
 
-DO NOT TAKE LIBERTIES WITH THE TEXT. Transcribe the text *exactly* as it appears
-in the source image. Pay particularly close attention to punctuation and capitalization.
+Transcribe the text *exactly* as it appears in the source image. 
+Pay particularly close attention to punctuation and capitalization.
 
 PRO TIP: If a table cell literally says the word "None", "N/A", or "Blank", then transcribe
 it exactly as it says it, i.e. the word "None", "N/A", "Blank", etc. There's a semantic
@@ -527,20 +604,24 @@ cell with no contents versus a cell whose contents are the word "None".
     convo.addUserMessage(`
 This table, ${tableName}, doesn't actually start on this page. What you see at the top of this
 page is a continuation of the table that started on a previous page. As such, I know you can't
-see the table's title or column headers and other metadata. But you can see its column list
-and its rows, so that should be enough for you to be able to transcribe its contents.
+see the table's title or column headers and other metadata. But I've described its column list
+and its rows, so that should be enough for you to be able to transcribe its contents from the image.
 `);
   }
 
   if (splitRowToIgnore) {
     convo.addUserMessage(`
-You've probably noticed that there's only a partial row at the top of the page --
+You've probably noticed that, at the top of the page, there's only a partial row --
 either errant text, or a row that looks messy, incomplete, or incoherent.
 This is because that row got split across a page break, with part of
 the row on the previous page and part of it on this page.
 
 You should ignore this row and not include it in the structured data output.
 We'll handle this row separately in a different step; don't worry about it for now.
+
+(If this row, the one that I'm asking you to ignore, is actually the last row of the table,
+then I guess you'll have to return an empty array of rows for this page. If this really
+is the situation we face, then returning an empty array of rows is the correct answer.)
 
 Here is the full row at the top of the page that we're talking about. This is the row
 that you should ignore in your output. I know you can only see part of it on this page,
@@ -590,7 +671,7 @@ this can be an empty array.
 
   // Run convo clones in parallel, and resolve discrepancies with a master run.
   const NUM_SHOTGUN_BARRELS = 3;
-  const convoShotgun: GptConversation[] = [];
+  let convoShotgun: GptConversation[] = [];
   for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
     const convoBarrel = convo.clone();
     convoShotgun.push(convoBarrel);
@@ -623,7 +704,6 @@ with the data in the source image(s)? Remember, this is an adjudication, not a d
 you should go look at the source image(s) and use your best judgment to determine which worker
 is most likely to be correct.
 `);
-  await _ponder(convo);
   convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses.
 In the places where they agree, great. In the places where they disagree, side with
@@ -679,14 +759,75 @@ LAST ROW OF TABLE "${tableName}" ON THIS PAGE:
 ${JSON.stringify(rows[rows.length - 1], null, 2)}
 `);
 
-  convo.addUserMessage(`
-I'll now also show you the *next* page of the document.
-Sometimes, a table's body continues onto the next page. Hopefully, that isn't the case for
-our current table of interest: table "${tableName}". But just in case it is -- that is,
-if the table does indeed run down to the end of the current page and resume on the next page
--- then we want to be able to recognize that and handle it properly.
-`);
+  // Check to see if the table is at the bottom of the page, with no page content below it.
+  // If there's more page content below the table, then we can be pretty confident that
+  // the table doesn't continue onto the next page.
+  const isTherePageContentBelowLastRow = await _isAnyPageContentBelowLastRow(
+    openaiClient,
+    pagePngBuffer,
+    tableName,
+    tableDescription,
+    rows,
+    additionalInstructions
+  );
+  if (isTherePageContentBelowLastRow) {
+    return {
+      rows,
+      doesTableContinueOnNextPage: false,
+      doesLastRowGetSplitAcrossPageBreak: false,
+    };
+  }
 
+  // At this point, we know that there's no page content below the
+  // last row of the table, so it's possible that the table continues onto the next page.
+  // But we need to look at the next page to see if it does.
+
+  // Let's gather an important clue that will help us determine whether the table continues
+  // onto the next page, which is: Does the last row of the table on this page look like it
+  // got split across a page break?
+  convo.addUserMessage(`
+Examine that last row very carefully on a cell-by-cell basis. Do any of the cells look like
+they got cut off, truncated, or otherwise messed up in a way that could indicate that the row
+got split across a page break, with part of the row on this page and part of it on the next page?
+
+Telltale signs of a row being split across a page break include:
+
+  - The row has visual indicators of being split, such as a dashed line or a missing bottom 
+    border.
+
+  - The row is missing critical fields, such as a key identifier or a value that should be 
+    present in every row, which could indicate that those fields got cut off by the page break
+    and are waiting for you on the next page.
+
+  - Some of the data in the row's cells looks incomplete, messy, or truncated. (For this
+    determination, it helps to go cell by cell in the last row and ask yourself whether
+    or not it looks like the content of that cell got cut off or otherwise looks
+    suspiciously empty.)
+    
+Look for any such indicators of the last row being split across a page break, and discuss
+your observations.
+`);
+  await convo.submit(undefined, undefined, {
+    jsonResponse: JSONSchemaFormat(
+      {
+        discussion: [
+          String,
+          `A detailed discussion of whether or not the last row has any telltale signs of ` +
+            `being split across a page break, including any relevant observations about the ` +
+            `content and formatting of the row's cells.`,
+        ],
+        does_last_row_look_split_across_page_break: Boolean,
+      },
+      'ocr_does_last_row_look_split_across_page_break',
+      `Determine whether the last row of the table on this page looks like it got split across a page break.`
+    ),
+  });
+  const doesLastRowLookSplitAcrossPageBreak = convo.getLastReplyDictField(
+    'does_last_row_look_split_across_page_break',
+    false
+  ) as boolean;
+
+  convo.addUserMessage(`I'll now show you the *next* page of the document.`);
   convo.addImage(
     'user',
     'Here is the next page of the document.',
@@ -694,118 +835,199 @@ if the table does indeed run down to the end of the current page and resume on t
   );
 
   convo.addUserMessage(`
-Your job now is to determine the following:
+Now that we're looking at this new page, let's first answer an important question:
 
-- Does the table "${tableName}" continue onto the next page, or does it end on this page?
-  Telltale indicators that a table continues onto the next page include:
-    - The table runs all the way down to the bottom of the page, with no other text or 
-      tables after it.
-    - The next page starts with what looks like a continuation of the table, with similar 
-      formatting and structure.
-    - Visual indicators of a page break interrupting the table, such as a dashed line or
-      an open border.
+Does the table "${tableName}" continue onto this next page? Does the page start
+with additional rows of this same table, recognizable by similar formatting and structure, 
+and by the presence of similar column names?
 
-- Does the last row of the table that we see on this page get split across the page break,
-  with part of the row on this page and part of it on the next page? Telltale indicators
-  of a row being split across a page break include:
-    - The row has visual indicators of being split, such as a dashed line or a missing bottom 
-      border.
-    - The next page starts with text that could be a continuation of the row. This could 
-      appear as a row at the top of the page that has similar formatting but missing
-      or incomplete data, or it could appear as strangely errant or isolated text at the top
-      of the next page. Look carefully for partial text, or a row with mostly empty cells, 
-      or other signs of incomplete or truncated content that could indicate that the next page
-      contains a continuation of the last row from this page.
-    - Some of the data in the row's cells looks incomplete, messy, or truncated. (For this
-      determination, it helps to go cell by cell in the last row and ask yourself whether
-      or not it looks like the content of that cell got cut off or otherwise looks
-      suspiciously empty.)
-
-PRO TIP: One very strong indicator that a row has been split across a page break is if the
-last row has some cells that are truncated, incomplete, or empty -- and then you see a partial
-row or errant text at the top of the next page that happens to be in exactly the same
-columns or positions as those truncated, incomplete, or empty cells. When this happens, you
-should try and write out the concatenations of these two pieces of text (the truncated cell
-on this page, plus the potential continuation on the next page) on a cell-by-cell basis to 
-see if they look like a plausible full cell of data that got split across the page break.
-If they do look like a plausible concatenation, then that's a very strong signal that the
-row got split across the page break, with part of it on this page and part of it on the next page.
+Or does it instead start with something else -- like a new section title, a block of
+paragraph text, or a new table?
 `);
-  // Let it discuss this with itself.
-  // Naturally, we're shotgunning this.
-  const jsonFormatForPageBreakDiscussion = JSONSchemaFormat(
+  await convo.submit(undefined, undefined, {
+    jsonResponse: JSONSchemaFormat(
+      {
+        discussion: [
+          String,
+          `A detailed discussion of whether or not the table "${tableName}" continues onto the next page, ` +
+            `including any relevant observations about the content and formatting of the top of the new page.`,
+        ],
+        does_table_continue_on_next_page: Boolean,
+      },
+      'ocr_does_table_continue_on_next_page',
+      `Determine whether the table "${tableName}" continues onto the next page.`
+    ),
+  });
+  const doesTableContinueOnNextPage = convo.getLastReplyDictField(
+    'does_table_continue_on_next_page',
+    false
+  ) as boolean;
+
+  if (doesLastRowLookSplitAcrossPageBreak) {
+    convo.addUserMessage(`
+Now then. Let's circle back to the question of whether the last row got split across a
+page break.
+
+You had said that the last row looks like it might have gotten split across a page break,
+with part of the row on the page before the break and part of it on the page after.
+Now that you can see the next page, do you see any evidence that confirms or disconfirms
+this hypothesis?
+
+Does the next page start with text that looks like it could be a continuation of that
+last row? It might be a row with similar formatting but missing or incomplete data, or it
+might look like strangely errant or isolated text or words at the top of the next page.
+Look carefully at the top of this new page. Do you see any text that looks like it could be 
+a continuation of the last row from the previous page?
+`);
+  } else {
+    convo.addUserMessage(`
+You had said that the last row doesn't look like it got split across a page break, so you
+probably think that the table doesn't continue onto the next page. But even so, it's possible
+that there's some text at the top of this new page that could actually be a continuation of 
+the last row from the previous page. Look carefully at the top of this new page. Do you see 
+any text that looks like it could be a continuation of something that got cut off? Are there
+any partial rows, errant text, or other telltale signs that could indicate that the top of the
+new page is actually a continuation of the last row from the previous page?
+`);
+  }
+
+  const jsonFormatFindTopPageFragment = JSONSchemaFormat(
     {
-      description_of_bottom_of_current_page: [
-        String,
-        `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
-          `description of what you see at the bottom of the current page. Is there any ` +
-          `text or other content below the table we're examining (table "${tableName}")? ` +
-          `Typically, if there's more page content such as text or another table below ` +
-          `the table we're examining, then that's a strong signal that the table does not ` +
-          `continue onto the next page. If, however, there is no more page content below ` +
-          `the table (or simply metadata content such as a footer, page number, footnote, ` +
-          `etc.), then it's possible that the table continues onto the next page.`,
-      ],
-      description_of_top_of_next_page: [
-        String,
-        `To help organize your thoughts and to guide your reasoning, provide a detailed ` +
-          `description of what you see at the top of the next page. `,
-      ],
       discussion_overall: [
         String,
-        `A thorough and detailed discussion about whether or not the table "${tableName}" ` +
-          `continues onto the next page, and whether or not the last row of the table on this ` +
-          `page got split across the page break. Use the telltale signs mentioned above to ` +
-          `guide your reasoning.`,
+        `A detailed discussion of whether or not there's anything at the top of this new page ` +
+          `that looks like it could be a continuation of the last row from the previous page, ` +
+          `including any relevant observations about the content and formatting of the text at ` +
+          `the top of this new page.`,
       ],
-      discuss_does_table_continue_to_next_page: [
+      discuss_partial_row: [
         String,
-        `Using the telltale signs mentioned above, in combination with your own judgment, ` +
-          `determine whether or not the table "${tableName}" continues onto the next page. ` +
-          `Discuss your reasoning and observations in coming to this conclusion.`,
+        `One strong indicator of a row being split across a page break is the presence of a ` +
+          `partial row at the top of the new page. A partial row is one whose cells look ` +
+          `incomplete, messy, or truncated, suggesting that the content of the row got cut off ` +
+          `or otherwise looks suspiciously empty. Discuss whether or not the top of the ` +
+          `new page contains any such partial row that could be a continuation of the last row ` +
+          `from the previous page.`,
       ],
-      does_table_continue_on_next_page: Boolean,
-      try_out_potential_concatenations: [
-        [String],
-        `If the last row of the table on this page has some cells that look truncated, ` +
-          `incomplete, or empty, and there are pieces of text at the top of the next page ` +
-          `that look errant, misprinted, or out of place (or possibly a partial row at the ` +
-          `top of the next page that looks incomplete or incomprehensible), then it's very ` +
-          `likely that one "plugs into" the other. Try writing out the cell-by-cell ` +
-          `concatenations of these pieces of text to see if they look like a plausible ` +
-          `full cell of data that could have gotten split across the page break.`,
-      ],
-      discuss_is_last_row_split_across_page_break: [
+      discuss_visually_orphaned_text_fragments: [
         String,
-        `Using the telltale signs mentioned above, in combination with your own judgment, ` +
-          `determine whether or not the last row of the table "${tableName}" on this page got ` +
-          `split across the page break, with part of the row on this page and part of it on the ` +
-          `next page. Discuss your reasoning and observations in coming to this conclusion.`,
+        `The continuation of the last row from the previous page might not always be in ` +
+          `the form of a neatly formatted partial row. Sometimes it might look like errant, ` +
+          `disconnected, or visually orphaned text at the top of the new page. Do you see any ` +
+          `such "floating" text at the top of this new page? It might look like some kind of ` +
+          `header or title at first glance, but upon closer inspection, it could actually be ` +
+          `a continuation of the last row from the previous page. Do you see any such thing here? ` +
+          `Any fragments of text at the top of the page that don't otherwise look connected ` +
+          `to anything? Discuss.`,
       ],
-      does_last_row_get_split_across_page_break: Boolean,
+      discussion_conclusion: [
+        String,
+        `Based on the above observations and discussions, do you think that the top of this new page ` +
+          `looks like it could be a continuation of the last row from the previous page? Why or why not? ` +
+          `Make a final determination and explain your reasoning.`,
+      ],
+      does_top_of_new_page_look_like_continuation_of_last_row: Boolean,
     },
-    'ocr_detect_table_continuation_and_split_rows',
-    `Determine whether or not the table "${tableName}" continues onto the next page, and ` +
-      `whether or not the last row of the table on this page got split across the page break.`
+    'ocr_does_top_of_new_page_look_like_continuation_of_last_row',
+    `Determine whether the top of the new page looks like it could be a continuation of the last row from the previous page.`
   );
-  const convoShotgunPageBreakDiscussion: GptConversation[] = [];
+
+  await convo.submit(undefined, undefined, {
+    jsonResponse: jsonFormatFindTopPageFragment,
+  });
+  let doesTopOfNewPageLookLikeContinuationOfLastRow =
+    convo.getLastReplyDictField(
+      'does_top_of_new_page_look_like_continuation_of_last_row',
+      false
+    ) as boolean;
+
+  if (!doesTopOfNewPageLookLikeContinuationOfLastRow) {
+    if (!doesLastRowLookSplitAcrossPageBreak) {
+      return {
+        rows,
+        doesTableContinueOnNextPage,
+        doesLastRowGetSplitAcrossPageBreak: false,
+      };
+    }
+
+    convo.addUserMessage(`
+Earlier you had said that the last row looks like it got split across a page break.
+But now that you can see the next page, you claim you don't see any fragmented text
+or partial rows at the top of the next page that look like they could be a continuation
+of that row. ARE YOU ABSOLUTELY, 100% SURE?? Look VERY CAREFULLY at the top of this new
+page again. Do you see ANYTHING at all? ANY tiny fragment of text, ANY tiny piece of a
+cell, ANYTHING? It is EXTREMELY UNLIKELY that the last row would simply get cut off without
+ANYTHING at all bleeding over onto the next page. Upon closer examination, 
+what do you see?
+`);
+    await convo.submit(undefined, undefined, {
+      jsonResponse: jsonFormatFindTopPageFragment,
+    });
+    doesTopOfNewPageLookLikeContinuationOfLastRow = convo.getLastReplyDictField(
+      'does_top_of_new_page_look_like_continuation_of_last_row',
+      false
+    ) as boolean;
+
+    if (!doesTopOfNewPageLookLikeContinuationOfLastRow) {
+      // Okay, well, we tried.
+      return {
+        rows,
+        doesTableContinueOnNextPage,
+        doesLastRowGetSplitAcrossPageBreak: false,
+      };
+    }
+  }
+
+  // If we're continuing in this function, then it must be because we've determined
+  // that the last row got split, so we have to reconstruct it.
+
+  convo.addUserMessage(`
+Since you've determined that the last row of the table on this page got split across the page break,
+let's re-transcribe that last row, taking into account the information both the part of the row on
+this page and the part of the row that bled over onto the next page. Please provide a transcription
+of the full row, combining the information from both pages on a cell-by-cell basis, thus enabling
+us to know what the row would have looked like if it hadn't been split across the page break in the
+first place.
+`);
+
+  const jsonSchemaForSplitRowTranscription = {
+    name: 'ocr_repair_transcription_of_row_split_across_page_break',
+    description: `
+A transcription of the full row that got split across the page break, 
+combining the information from both pages.
+`,
+    type: 'json_schema',
+    strict: true,
+    schema: {
+      type: 'object',
+      properties: {
+        the_split_row: _jsonSchemaForExtractingOneRowOfTableData(columns),
+      } as any,
+      required: ['the_split_row'],
+      additionalProperties: false,
+    },
+  };
+
+  // Shotgun!
+  // Because we're performing OCR, we once again need to shotgun this to get multiple independent
+  // takes and resolve discrepancies.
+  convoShotgun = [] as GptConversation[];
   for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
     const convoBarrel = convo.clone();
-    convoShotgunPageBreakDiscussion.push(convoBarrel);
+    convoShotgun.push(convoBarrel);
   }
   await Promise.all(
-    convoShotgunPageBreakDiscussion.map((convoBarrel) =>
+    convoShotgun.map((convoBarrel) =>
       convoBarrel.submit(undefined, undefined, {
-        jsonResponse: jsonFormatForPageBreakDiscussion,
+        jsonResponse: { format: jsonSchemaForSplitRowTranscription },
       })
     )
   );
-  convo.addSystemMessage(`
-We had ${NUM_SHOTGUN_BARRELS} independent workers analyze whether or not the table "${tableName}"
-continues onto the next page, and whether or not the last row of the table on this page got
-split across the page break. Here are their responses:
-`);
-  convoShotgunPageBreakDiscussion.forEach((convoBarrel, index) => {
+  convo.addSystemMessage(
+    `We had ${NUM_SHOTGUN_BARRELS} independent workers re-transcribe the ` +
+      `split row. Here are their responses:`
+  );
+  convoShotgun.forEach((convoBarrel, index) => {
     convo.addSystemMessage(`
 RESPONSE FROM WORKER #${index + 1}
 ---
@@ -821,118 +1043,34 @@ is most likely to be correct.
 `);
   await _ponder(convo);
   convo.addSystemMessage(`
-Adjudicate and resolve any discrepancies between the different workers' responses regarding
-whether or not the table "${tableName}" continues onto the next page, and whether or not the last
-row of the table on this page got split across the page break. In the places where they agree,
-great. In the places where they disagree, side with the one whose argument is most consistent
-with the data in the source image(s).
-`);
-  await convo.submit(undefined, undefined, {
-    jsonResponse: jsonFormatForPageBreakDiscussion,
-  });
-
-  let doesTableContinueOnNextPage = convo.getLastReplyDictField(
-    'does_table_continue_on_next_page',
-    false
-  ) as boolean;
-
-  let doesLastRowGetSplitAcrossPageBreak = convo.getLastReplyDictField(
-    'does_last_row_get_split_across_page_break',
-    false
-  ) as boolean;
-
-  if (doesLastRowGetSplitAcrossPageBreak) {
-    convo.addUserMessage(`
-Since you've determined that the last row of the table on this page got split across the page break,
-let's re-transcribe that last row, taking into account the information both the part of the row on
-this page and the part of the row that bled over onto the next page. Please provide a transcription
-of the full row, combining the information from both pages on a cell-by-cell basis, thus enabling
-us to know what the row would have looked like if it hadn't been split across the page break in the
-first place.
-`);
-
-    const jsonSchemaForSplitRowTranscription = {
-      name: 'ocr_repair_transcription_of_row_split_across_page_break',
-      description: `
-A transcription of the full row that got split across the page break, 
-combining the information from both pages.
-`,
-      type: 'json_schema',
-      strict: true,
-      schema: {
-        type: 'object',
-        properties: {
-          the_split_row: _jsonSchemaForExtractingOneRowOfTableData(columns),
-        } as any,
-        required: ['the_split_row'],
-        additionalProperties: false,
-      },
-    };
-
-    // Shotgun!
-    // Because we're performing OCR, we once again need to shotgun this to get multiple independent
-    // takes and resolve discrepancies.
-    const convoShotgun: GptConversation[] = [];
-    for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
-      const convoBarrel = convo.clone();
-      convoShotgun.push(convoBarrel);
-    }
-    await Promise.all(
-      convoShotgun.map((convoBarrel) =>
-        convoBarrel.submit(undefined, undefined, {
-          jsonResponse: { format: jsonSchemaForSplitRowTranscription },
-        })
-      )
-    );
-    convo.addSystemMessage(
-      `We had ${NUM_SHOTGUN_BARRELS} independent workers re-transcribe the ` +
-        `split row. Here are their responses:`
-    );
-    convoShotgun.forEach((convoBarrel, index) => {
-      convo.addSystemMessage(`
-RESPONSE FROM WORKER #${index + 1}
----
-${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
-`);
-    });
-    convo.addDeveloperMessage(`
-Focus on the differences and discrepancies between the workers' responses. Where do they agree?
-Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
-you should go look at the source image(s) and use your best judgment to determine which worker
-is most likely to be correct.
-`);
-    await _ponder(convo);
-    convo.addSystemMessage(`
 Adjudicate and resolve any discrepancies between the different workers' responses
 regarding the transcription of the split row. In the places where they agree, great.
 In the places where they disagree, side with the one whose argument is most consistent
 with the data in the source image(s).
 `);
 
-    await convo.submit(undefined, undefined, {
-      jsonResponse: { format: jsonSchemaForSplitRowTranscription },
-    });
-    const splitRowTranscription = convo.getLastReplyDictField(
-      'the_split_row',
-      null
-    ) as any | null;
-    if (splitRowTranscription) {
-      // Set the last row of the rows array to be the split row transcription that we just got,
-      // which should be a more complete and accurate transcription of that row, since it takes
-      // into account the information from both pages.
-      const splitRowData = splitRowTranscription.row_data as Record<
-        string,
-        string
-      >;
-      rows[rows.length - 1] = splitRowData;
-    }
+  await convo.submit(undefined, undefined, {
+    jsonResponse: { format: jsonSchemaForSplitRowTranscription },
+  });
+  const splitRowTranscription = convo.getLastReplyDictField(
+    'the_split_row',
+    null
+  ) as any | null;
+  if (splitRowTranscription) {
+    // Set the last row of the rows array to be the split row transcription that we just got,
+    // which should be a more complete and accurate transcription of that row, since it takes
+    // into account the information from both pages.
+    const splitRowData = splitRowTranscription.row_data as Record<
+      string,
+      string
+    >;
+    rows[rows.length - 1] = splitRowData;
   }
 
   return {
     rows,
     doesTableContinueOnNextPage,
-    doesLastRowGetSplitAcrossPageBreak,
+    doesLastRowGetSplitAcrossPageBreak: true,
   };
 };
 
