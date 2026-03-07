@@ -327,7 +327,7 @@ that started on the previous page.
  * @param nextPagePngBuffer Optional PNG bytes of the following page, used when the table spans pages.
  * @returns Ordered array of column name strings extracted from the table.
  */
-export const ocrImagesExtractTableColumnHeaders = async (
+export const ocrExtractTableColumnHeaders = async (
   openaiClient: OpenAI,
   tableName: string,
   pagePngBuffer: Buffer,
@@ -1148,7 +1148,7 @@ export const ocrTranscribeTableFromPages = async (
   let numPageEnd = numPageStart;
   let splitRowToIgnore: Record<string, string> | undefined = undefined;
 
-  const columns = await ocrImagesExtractTableColumnHeaders(
+  const columns = await ocrExtractTableColumnHeaders(
     openaiClient,
     tableName,
     pagePngBufferCurrent,

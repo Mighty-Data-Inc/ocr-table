@@ -8,11 +8,11 @@ import { describe, expect, it } from 'vitest';
 import {
   ocrExtractTableAggregationsAndNotes,
   ocrIdentifyTablesOnPage,
-  ocrImagesExtractTableColumnHeaders,
+  ocrExtractTableColumnHeaders,
   ocrTablesFromPngPages,
   ocrTranscribeTableFromPages,
   ocrTranscribeTableRowsFromCurrentPage,
-} from '../src/ocrImagesExtractTableData.js';
+} from '../src/ocrExtractTableData.js';
 import { OcrExtractedTable } from '../src/records.js';
 
 import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
@@ -463,7 +463,7 @@ Its last row is:
   }, 180000);
 });
 
-describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
+describe('ocrExtractTableColumnHeaders (live API)', () => {
   it('returns the correct column headers for a straightforward table', async () => {
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
@@ -471,7 +471,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer
@@ -493,7 +493,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer,
@@ -517,7 +517,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Ms. Alvarez (Room 3A) Classroom Purchases',
       pageOneBuffer
@@ -544,7 +544,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     const pageOneBuffer = readFileSync(pageOnePngPath);
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer,
@@ -574,7 +574,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
     const pageThreeBuffer = readFileSync(pageThreePngPath);
     const pageFourBuffer = readFileSync(pageFourPngPath);
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Tessa Monroe (Room 2D)',
       pageThreeBuffer,
@@ -601,7 +601,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
       wildernessProvisionsPngPath
     );
 
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Table 8: March Rate by Load Class',
       wildernessProvisionsBuffer
@@ -624,7 +624,7 @@ describe('ocrImagesExtractTableColumnHeaders (live API)', () => {
 
     // This has the added benefit of also testing that additionalInstructions are
     // passed and followed.
-    const columns = await ocrImagesExtractTableColumnHeaders(
+    const columns = await ocrExtractTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Claire Donnelly (Room Kindergarten B)',
       noColumnNamesBuffer,
