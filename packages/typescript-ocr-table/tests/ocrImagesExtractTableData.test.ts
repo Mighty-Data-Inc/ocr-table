@@ -64,11 +64,16 @@ const createClient = (): OpenAI =>
   });
 
 const ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS = `
+FORMATTING INSTRUCTIONS:
 Emit absolutely NO non-typeable characters -- this includes em-dashes, pretty quotes,
 fancy apostrophes, non-breaking spaces, or any other characters that would not be produced 
 if a human were typing on a standard keyboard. Your output is being matched against
 expected values using strict equality, so if you emit any non-typeable characters,
 your output will be considered incorrect.
+
+WHITE SPACE INSTRUCTIONS:
+When you use a double-dash separator in your output, always put a space on both sides of it, like this: " -- ".
+EXAMPLE: YES: "I have a cat -- his name is Whiskers." NO: "I have a cat--his name is Whiskers."
 `;
 
 // Live OCR can occasionally confuse visually similar characters (for example, "5" vs "S")
@@ -83,6 +88,12 @@ Classroom numbers are in <number><letter> format, e.g. A3, D9, etc.
 When performing OCR, sometimes a "5" will look like an "S" or a "2" like a "Z",
 and vice versa. However, when you see a classroom number, e.g. "Room 2D",
 you must transcribe it as <number><letter>.
+
+The tables for classrooms only have a single dash in them, not a double dash.
+And that dash is always surrounded by spaces. In other words, the table names
+always look something like this:
+"Classroom Purchases - Mr. John Doe (Room 1A)"
+Write them using exactly this format.
 
 TEACHERS:
 The teachers' names are as follows:

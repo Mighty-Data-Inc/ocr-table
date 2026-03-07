@@ -592,7 +592,9 @@ Just focus on transcribing the rows of this one table.
 If a particular cell is empty, just put an empty string for that cell's value.
 
 Transcribe the text *exactly* as it appears in the source image. 
-Pay particularly close attention to punctuation and capitalization.
+Pay particularly close attention to punctuation and capitalization --
+transcribe it when it's there, but don't invent any new characters that aren't
+present in the image.
 
 PRO TIP: If a table cell literally says the word "None", "N/A", or "Blank", then transcribe
 it exactly as it says it, i.e. the word "None", "N/A", "Blank", etc. There's a semantic
