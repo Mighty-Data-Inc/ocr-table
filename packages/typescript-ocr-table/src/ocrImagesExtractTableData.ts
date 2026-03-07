@@ -524,13 +524,6 @@ Or is this last row basically at the bottom of the page with no more page conten
 /**
  * Transcribes the body rows of a named table from a single page image.
  *
- * Uses a shotgun approach — running multiple parallel OCR workers and then
- * adjudicating their responses — to faithfully extract each cell value from
- * the table. If a next-page image is provided, also determines whether the
- * table continues onto that page and whether the last visible row was split
- * across the page break; when a split row is detected, the row is re-transcribed
- * by combining text from both pages before being returned.
- *
  * @param openaiClient OpenAI client used to drive the OCR conversation.
  * @param tableName Name or identifier of the table to transcribe.
  * @param tableDescription A brief description of the table's purpose, used to help the model locate it.
@@ -664,49 +657,9 @@ this can be an empty array.
     },
   };
 
-  // Run convo clones in parallel, and resolve discrepancies with a master run.
-  const NUM_SHOTGUN_BARRELS = 3;
-  let convoShotgun: GptConversation[] = [];
-  for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
-    const convoBarrel = convo.clone();
-    convoShotgun.push(convoBarrel);
-  }
-  // Use Promise.all to run the barrels in parallel.
-  await Promise.all(
-    convoShotgun.map((convoBarrel) =>
-      convoBarrel.submit(undefined, undefined, {
-        jsonResponse: { format: jsonSchemaForTablePage },
-      })
-    )
-  );
-
-  convo.addSystemMessage(`
-We are running these extractions via ${NUM_SHOTGUN_BARRELS} parallel workers 
-to get multiple independent takes on the data, which will help us resolve any
-uncertainties or discrepancies.
-`);
-  convoShotgun.forEach((convoBarrel, index) => {
-    convo.addSystemMessage(`
-RESPONSE FROM WORKER #${index + 1}
----
-${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
-`);
-  });
-  convo.addDeveloperMessage(`
-Focus on the differences and discrepancies between the workers' responses. Where do they agree?
-Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
-you should go look at the source image(s) and use your best judgment to determine which worker
-is most likely to be correct.
-`);
-  convo.addSystemMessage(`
-Adjudicate and resolve any discrepancies between the different workers' responses.
-In the places where they agree, great. In the places where they disagree, side with
-the one whose argument is most consistent with the data in the source image(s), 
-and with the reasoning that makes the most sense.
-`);
   await convo.submit(undefined, undefined, {
     jsonResponse: { format: jsonSchemaForTablePage },
+    shotgun: 3,
   });
 
   let hasRowsOnThisPage = convo.getLastReplyDictField(
@@ -929,7 +882,9 @@ new page is actually a continuation of the last row from the previous page?
 
   await convo.submit(undefined, undefined, {
     jsonResponse: jsonFormatFindTopPageFragment,
+    shotgun: 3,
   });
+  console.log(JSON.stringify(convo.getLastReplyDict(), null, 2));
   let doesTopOfNewPageLookLikeContinuationOfLastRow =
     convo.getLastReplyDictField(
       'does_top_of_new_page_look_like_continuation_of_last_row',
@@ -955,49 +910,9 @@ cell, ANYTHING? It is EXTREMELY UNLIKELY that the last row would simply get cut 
 ANYTHING at all bleeding over onto the next page. Upon closer examination, 
 what do you see?
 `);
-
-    convoShotgun = [] as GptConversation[];
-    for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
-      const convoBarrel = convo.clone();
-      convoShotgun.push(convoBarrel);
-    }
-    await Promise.all(
-      convoShotgun.map((convoBarrel) =>
-        convoBarrel.submit(undefined, undefined, {
-          jsonResponse: jsonFormatFindTopPageFragment,
-        })
-      )
-    );
-    convo.addSystemMessage(
-      `We had ${NUM_SHOTGUN_BARRELS} independent workers take another look at the top of the ` +
-        `new page to see if they can find any evidence of it being a continuation of the last row ` +
-        `from the previous page. Here are their responses:`
-    );
-    convoShotgun.forEach((convoBarrel, index) => {
-      convo.addSystemMessage(`RESPONSE FROM WORKER #${index + 1}
----
-${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
-`);
-    });
-    convo.addDeveloperMessage(`
-Focus on the differences and discrepancies between the workers' responses. Where do they agree?
-Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
-you should go look at the source image(s) and use your best judgment to determine which worker
-is most likely to be correct.
-`);
-    await _ponder(convo, true);
-
-    convo.addSystemMessage(`
-Adjudicate and resolve any discrepancies between the different workers' responses regarding whether
-the top of the new page looks like it could be a continuation of the last row from the previous page.
-In the places where they agree, great. In the places where they disagree, side with the one whose
-argument is most consistent with the data in the source image(s), and with the reasoning that makes
-the most sense.
-`);
-
     await convo.submit(undefined, undefined, {
       jsonResponse: jsonFormatFindTopPageFragment,
+      shotgun: 3,
     });
     doesTopOfNewPageLookLikeContinuationOfLastRow = convo.getLastReplyDictField(
       'does_top_of_new_page_look_like_continuation_of_last_row',
@@ -1044,49 +959,9 @@ combining the information from both pages.
     },
   };
 
-  // Shotgun!
-  // Because we're performing OCR, we once again need to shotgun this to get multiple independent
-  // takes and resolve discrepancies.
-  convoShotgun = [] as GptConversation[];
-  for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
-    const convoBarrel = convo.clone();
-    convoShotgun.push(convoBarrel);
-  }
-  await Promise.all(
-    convoShotgun.map((convoBarrel) =>
-      convoBarrel.submit(undefined, undefined, {
-        jsonResponse: { format: jsonSchemaForSplitRowTranscription },
-      })
-    )
-  );
-  convo.addSystemMessage(
-    `We had ${NUM_SHOTGUN_BARRELS} independent workers re-transcribe the ` +
-      `split row. Here are their responses:`
-  );
-  convoShotgun.forEach((convoBarrel, index) => {
-    convo.addSystemMessage(`
-RESPONSE FROM WORKER #${index + 1}
----
-${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
-`);
-  });
-  convo.addDeveloperMessage(`
-Focus on the differences and discrepancies between the workers' responses. Where do they agree?
-Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
-you should go look at the source image(s) and use your best judgment to determine which worker
-is most likely to be correct.
-`);
-  await _ponder(convo);
-  convo.addSystemMessage(`
-Adjudicate and resolve any discrepancies between the different workers' responses
-regarding the transcription of the split row. In the places where they agree, great.
-In the places where they disagree, side with the one whose argument is most consistent
-with the data in the source image(s).
-`);
-
   await convo.submit(undefined, undefined, {
     jsonResponse: { format: jsonSchemaForSplitRowTranscription },
+    shotgun: 3,
   });
   const splitRowTranscription = convo.getLastReplyDictField(
     'the_split_row',
@@ -1245,48 +1120,9 @@ Discuss whatever notes or aggregations you might see in or around the table.
     `Extract any notes or aggregations associated with the table "${tableName}".`
   );
 
-  const NUM_SHOTGUN_BARRELS = 3;
-  let convoShotgun = [] as GptConversation[];
-  for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
-    const convoBarrel = convo.clone();
-    convoShotgun.push(convoBarrel);
-  }
-  await Promise.all(
-    convoShotgun.map((convoBarrel) =>
-      convoBarrel.submit(undefined, undefined, {
-        jsonResponse: jsonFormatNotesAndAggregations,
-      })
-    )
-  );
-  convo.addSystemMessage(
-    `We had ${NUM_SHOTGUN_BARRELS} independent workers extract notes and aggregations for the ` +
-      `table "${tableName}". Here are their responses:`
-  );
-  convoShotgun.forEach((convoBarrel, index) => {
-    convo.addSystemMessage(`
-RESPONSE FROM WORKER #${index + 1}
----
-${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
-`);
-  });
-  convo.addDeveloperMessage(`
-Focus on the differences and discrepancies between the workers' responses. Where do they agree?
-Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
-with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
-you should go look at the source image(s) and use your best judgment to determine which worker
-is most likely to be correct.
-`);
-  await _ponder(convo, true);
-
-  convo.addSystemMessage(`
-Adjudicate and resolve any discrepancies between the different workers' responses
-regarding the notes and aggregations for the table "${tableName}". In the places where they agree, great.
-In the places where they disagree, side with the one whose argument is most consistent
-with the data in the source image(s).
-`);
-
   await convo.submit(undefined, undefined, {
     jsonResponse: jsonFormatNotesAndAggregations,
+    shotgun: 3,
   });
 
   const notes = convo.getLastReplyDictField('notes', '') as string;
