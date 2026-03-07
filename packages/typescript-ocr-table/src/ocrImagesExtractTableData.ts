@@ -955,6 +955,47 @@ cell, ANYTHING? It is EXTREMELY UNLIKELY that the last row would simply get cut 
 ANYTHING at all bleeding over onto the next page. Upon closer examination, 
 what do you see?
 `);
+
+    convoShotgun = [] as GptConversation[];
+    for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
+      const convoBarrel = convo.clone();
+      convoShotgun.push(convoBarrel);
+    }
+    await Promise.all(
+      convoShotgun.map((convoBarrel) =>
+        convoBarrel.submit(undefined, undefined, {
+          jsonResponse: jsonFormatFindTopPageFragment,
+        })
+      )
+    );
+    convo.addSystemMessage(
+      `We had ${NUM_SHOTGUN_BARRELS} independent workers take another look at the top of the ` +
+        `new page to see if they can find any evidence of it being a continuation of the last row ` +
+        `from the previous page. Here are their responses:`
+    );
+    convoShotgun.forEach((convoBarrel, index) => {
+      convo.addSystemMessage(`RESPONSE FROM WORKER #${index + 1}
+---
+${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
+`);
+    });
+    convo.addDeveloperMessage(`
+Focus on the differences and discrepancies between the workers' responses. Where do they agree?
+Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
+with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
+you should go look at the source image(s) and use your best judgment to determine which worker
+is most likely to be correct.
+`);
+    await _ponder(convo, true);
+
+    convo.addSystemMessage(`
+Adjudicate and resolve any discrepancies between the different workers' responses regarding whether
+the top of the new page looks like it could be a continuation of the last row from the previous page.
+In the places where they agree, great. In the places where they disagree, side with the one whose
+argument is most consistent with the data in the source image(s), and with the reasoning that makes
+the most sense.
+`);
+
     await convo.submit(undefined, undefined, {
       jsonResponse: jsonFormatFindTopPageFragment,
     });
