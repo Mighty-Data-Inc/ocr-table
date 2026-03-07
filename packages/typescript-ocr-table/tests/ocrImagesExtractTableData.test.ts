@@ -115,6 +115,7 @@ just have the genre names as the table names.
 When you list the column headers, write them in ALL CAPS.
 That's the way the column headers appear in the source document, 
 and we want to preserve that formatting in the structured data output.
+
 ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 `;
 
@@ -1073,12 +1074,14 @@ describe('ocrTablesFromPngPages (live API)', () => {
 
     expect(tables).toHaveLength(3);
 
-    // Go through each of the tables and clean out its notes.
+    // Go through each of the tables and clean out its notes and aggregations.
     // The OCR AI might have scanned the subtitles or page text as table notes.
+    // And I've seen it count the number of books in the table and include that as an aggregation.
     // That's not what we're testing for here, so we don't want our tests
     // to be too brittle.
     tables.forEach((table) => {
       table.notes = '';
+      table.aggregations = '';
     });
 
     expect(tables).toEqual(summerReadingAllTables);
