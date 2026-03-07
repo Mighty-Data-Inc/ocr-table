@@ -4,7 +4,7 @@ import {
   GptConversation,
 } from '@mightydatainc/gpt-conversation';
 import { JSONSchemaFormat } from '@mightydatainc/gpt-conversation';
-import { OcrExtractedTable } from './records.js';
+import { OcrTable } from './records.js';
 import { OpenAI } from 'openai';
 
 /**
@@ -327,7 +327,7 @@ that started on the previous page.
  * @param nextPagePngBuffer Optional PNG bytes of the following page, used when the table spans pages.
  * @returns Ordered array of column name strings extracted from the table.
  */
-export const ocrExtractTableColumnHeaders = async (
+export const ocrTableColumnHeaders = async (
   openaiClient: OpenAI,
   tableName: string,
   pagePngBuffer: Buffer,
@@ -984,7 +984,7 @@ combining the information from both pages.
  * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
  * @returns An object with a `notes` string (any textual annotations found) and an `aggregations` string (any summary/aggregation data found); either may be an empty string if nothing was found.
  */
-export const ocrExtractTableAggregationsAndNotes = async (
+export const ocrTableAggregationsAndNotes = async (
   openaiClient: OpenAI,
   tableName: string,
   tableDescription: string,
@@ -1128,7 +1128,7 @@ Discuss whatever notes or aggregations you might see in or around the table.
  * @param numPageStart 1-based index of the page on which the table starts.
  * @param pagePngBuffers Array of PNG buffers for all pages in the document (1-based page numbers map to 0-based array indices).
  * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
- * @returns A fully populated `OcrExtractedTable` containing the table's name, description, columns, data rows, and the page range it was found on.
+ * @returns A fully populated `OcrTable` containing the table's name, description, columns, data rows, and the page range it was found on.
  */
 export const ocrTranscribeTableFromPages = async (
   openaiClient: OpenAI,
@@ -1137,7 +1137,7 @@ export const ocrTranscribeTableFromPages = async (
   numPageStart: number,
   pagePngBuffers: Buffer[],
   additionalInstructions?: string
-): Promise<OcrExtractedTable> => {
+): Promise<OcrTable> => {
   let pagePngBufferCurrent = pagePngBuffers[numPageStart - 1];
 
   let pagePngBufferNext: Buffer | undefined = undefined;
@@ -1148,7 +1148,7 @@ export const ocrTranscribeTableFromPages = async (
   let numPageEnd = numPageStart;
   let splitRowToIgnore: Record<string, string> | undefined = undefined;
 
-  const columns = await ocrExtractTableColumnHeaders(
+  const columns = await ocrTableColumnHeaders(
     openaiClient,
     tableName,
     pagePngBufferCurrent,
@@ -1195,7 +1195,7 @@ export const ocrTranscribeTableFromPages = async (
 
   // Last step: extract any notes or aggregations that are associated with this table,
   // which will be attached to the table object that we return.
-  const { notes, aggregations } = await ocrExtractTableAggregationsAndNotes(
+  const { notes, aggregations } = await ocrTableAggregationsAndNotes(
     openaiClient,
     tableName,
     tableDescription,
@@ -1205,7 +1205,7 @@ export const ocrTranscribeTableFromPages = async (
     additionalInstructions
   );
 
-  const retval: OcrExtractedTable = {
+  const retval: OcrTable = {
     name: tableName,
     description: tableDescription,
     columns,
@@ -1233,14 +1233,14 @@ export const ocrTranscribeTableFromPages = async (
  * @param openaiClient OpenAI client used for all OCR conversations.
  * @param pagesAsPngBuffers Array of PNG buffers representing every page of the document, in order.
  * @param additionalInstructions Optional caller-provided instructions to guide the OCR process across all pages and tables.
- * @returns Array of fully populated `OcrExtractedTable` objects for every table found in the document.
+ * @returns Array of fully populated `OcrTable` objects for every table found in the document.
  */
 export const ocrTablesFromPngPages = async (
   openaiClient: OpenAI,
   pagesAsPngBuffers: Buffer[],
   additionalInstructions?: string
-): Promise<OcrExtractedTable[]> => {
-  const tables: OcrExtractedTable[] = [];
+): Promise<OcrTable[]> => {
+  const tables: OcrTable[] = [];
 
   let numPageCurrent = 1;
   let didPageAdvanceBecauseOfTableOverrun = false;

@@ -2,7 +2,7 @@
  * Represents a table extracted from a document via OCR.
  * Contains metadata about the table along with its structured data.
  */
-export interface OcrExtractedTable {
+export interface OcrTable {
   name: string;
   description: string;
   columns: string[];
@@ -20,7 +20,7 @@ export interface OcrExtractedTable {
 export interface OcrTablesFromFile {
   file: string;
   metadata?: Record<string, string>;
-  tables: OcrExtractedTable[];
+  tables: OcrTable[];
 }
 
 /**
@@ -37,13 +37,16 @@ export interface OcrMultiFilesTableExtraction {
  * @param includeEmpty - Whether to include files with empty metadata
  * @returns A mapping of file paths to their corresponding metadata records
  */
-export const getAllOcrExtractedMetadatas = (
+export const getAllOcrMetadatas = (
   extractedData: OcrMultiFilesTableExtraction,
   includeEmpty: boolean = false
 ): Record<string, Record<string, string>> => {
   const retval: Record<string, Record<string, string>> = {};
   for (const [filePath, ocrData] of Object.entries(extractedData)) {
-    if (!includeEmpty && (!ocrData.metadata || Object.keys(ocrData.metadata).length === 0)) {
+    if (
+      !includeEmpty &&
+      (!ocrData.metadata || Object.keys(ocrData.metadata).length === 0)
+    ) {
       continue;
     }
     retval[filePath] = ocrData.metadata || {};

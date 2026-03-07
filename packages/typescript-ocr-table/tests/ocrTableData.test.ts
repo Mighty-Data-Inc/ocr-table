@@ -6,14 +6,14 @@ import { OpenAI } from 'openai';
 import { describe, expect, it } from 'vitest';
 
 import {
-  ocrExtractTableAggregationsAndNotes,
+  ocrTableAggregationsAndNotes,
   ocrIdentifyTablesOnPage,
-  ocrExtractTableColumnHeaders,
+  ocrTableColumnHeaders,
   ocrTablesFromPngPages,
   ocrTranscribeTableFromPages,
   ocrTranscribeTableRowsFromCurrentPage,
-} from '../src/ocrExtractTableData.js';
-import { OcrExtractedTable } from '../src/records.js';
+} from '../src/ocrTableData.js';
+import { OcrTable } from '../src/records.js';
 
 import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
 import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
@@ -463,7 +463,7 @@ Its last row is:
   }, 180000);
 });
 
-describe('ocrExtractTableColumnHeaders (live API)', () => {
+describe('ocrTableColumnHeaders (live API)', () => {
   it('returns the correct column headers for a straightforward table', async () => {
     const pageOnePngPath = path.join(
       FIXTURES_DIR,
@@ -471,7 +471,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer
@@ -493,7 +493,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer,
@@ -517,7 +517,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Ms. Alvarez (Room 3A) Classroom Purchases',
       pageOneBuffer
@@ -544,7 +544,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
     const pageOneBuffer = readFileSync(pageOnePngPath);
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       pageOneBuffer,
@@ -574,7 +574,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
     const pageThreeBuffer = readFileSync(pageThreePngPath);
     const pageFourBuffer = readFileSync(pageFourPngPath);
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Tessa Monroe (Room 2D)',
       pageThreeBuffer,
@@ -601,7 +601,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
       wildernessProvisionsPngPath
     );
 
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Table 8: March Rate by Load Class',
       wildernessProvisionsBuffer
@@ -624,7 +624,7 @@ describe('ocrExtractTableColumnHeaders (live API)', () => {
 
     // This has the added benefit of also testing that additionalInstructions are
     // passed and followed.
-    const columns = await ocrExtractTableColumnHeaders(
+    const columns = await ocrTableColumnHeaders(
       createClient(),
       'Classroom Purchases - Ms. Claire Donnelly (Room Kindergarten B)',
       noColumnNamesBuffer,
@@ -655,7 +655,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg1.png');
     const pagePng = readFileSync(pagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Table 8: March Rate by Load Class',
       description: '',
       columns: [
@@ -693,7 +693,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const pagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg2.png');
     const pagePng = readFileSync(pagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Table 9: Wilderness Random Encounters (d20)',
       description: '',
       columns: ['Roll', 'Encounter', 'Terrain', 'Notes'],
@@ -727,7 +727,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const nextPagePngPath = path.join(FIXTURES_DIR, 'wildprov3pg-pg3.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Table 9: Wilderness Random Encounters (d20)',
       description: '',
       columns: ['Roll', 'Encounter', 'Terrain', 'Notes'],
@@ -762,7 +762,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const nextPagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg2.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
       columns: ['Name', 'Bio', 'Personal Statement', 'Panel Evaluation'],
@@ -797,7 +797,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     const nextPagePngPath = path.join(FIXTURES_DIR, 'candidate-eval-pg3.png');
     const nextPagePng = readFileSync(nextPagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Candidate Evaluation Report: Elementary School Principal Position',
       description: '',
       columns: ['Name', 'Bio', 'Personal Statement', 'Panel Evaluation'],
@@ -840,7 +840,7 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
     );
     const nextPagePng = readFileSync(nextPagePngPath);
 
-    const table: OcrExtractedTable = {
+    const table: OcrTable = {
       name: 'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
       description: '',
       columns: [
@@ -875,11 +875,11 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
   }, 180000);
 });
 
-describe('ocrExtractTableAggregationsAndNotes (live API)', () => {
+describe('ocrTableAggregationsAndNotes (live API)', () => {
   it('extracts aggregations and notes for a one-page table with both', async () => {
     const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
 
-    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+    const notesAndAggs = await ocrTableAggregationsAndNotes(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       '',
@@ -900,7 +900,7 @@ describe('ocrExtractTableAggregationsAndNotes (live API)', () => {
   it('extracts aggregations and notes for a multi-page table with both', async () => {
     const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
 
-    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+    const notesAndAggs = await ocrTableAggregationsAndNotes(
       createClient(),
       'Classroom Purchases - Mr. Omar Whitfield (Room 1A)',
       '',
@@ -921,7 +921,7 @@ describe('ocrExtractTableAggregationsAndNotes (live API)', () => {
   it('extracts aggregations and notes that land on the next page after the table', async () => {
     const pagePngs = loadFixturePngs('school-supplies-BOS-14pt-page-#');
 
-    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+    const notesAndAggs = await ocrTableAggregationsAndNotes(
       createClient(),
       'Classroom Purchases - Ms. Elena Alvarez (Room 3A)',
       '',
@@ -942,7 +942,7 @@ describe('ocrExtractTableAggregationsAndNotes (live API)', () => {
   it("extracts no aggregations or notes for tables that don't have any", async () => {
     const pagePngs = loadFixturePngs('wildprov3pg-pg#');
 
-    const notesAndAggs = await ocrExtractTableAggregationsAndNotes(
+    const notesAndAggs = await ocrTableAggregationsAndNotes(
       createClient(),
       'Table 7: Weekly Provisions by Terrain (Per Adventurer)',
       '',

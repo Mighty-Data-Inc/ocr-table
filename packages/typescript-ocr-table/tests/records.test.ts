@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  getAllOcrExtractedMetadatas,
+  getAllOcrMetadatas,
   type OcrMultiFilesTableExtraction,
 } from '../src/records.js';
 
-describe('getAllOcrExtractedMetadatas', () => {
+describe('getAllOcrMetadatas', () => {
   it('returns only files with non-empty metadata by default', () => {
     const extractedData: OcrMultiFilesTableExtraction = {
       '/docs/has-metadata.pdf': {
@@ -24,7 +24,7 @@ describe('getAllOcrExtractedMetadatas', () => {
       },
     };
 
-    const result = getAllOcrExtractedMetadatas(extractedData);
+    const result = getAllOcrMetadatas(extractedData);
 
     expect(result).toEqual({
       '/docs/has-metadata.pdf': { invoiceId: 'INV-1001', vendor: 'ACME' },
@@ -49,7 +49,7 @@ describe('getAllOcrExtractedMetadatas', () => {
       },
     };
 
-    const result = getAllOcrExtractedMetadatas(extractedData, true);
+    const result = getAllOcrMetadatas(extractedData, true);
 
     expect(result).toEqual({
       '/docs/has-metadata.pdf': { region: 'US' },
@@ -61,7 +61,7 @@ describe('getAllOcrExtractedMetadatas', () => {
   it('returns an empty object when input is empty', () => {
     const extractedData: OcrMultiFilesTableExtraction = {};
 
-    const result = getAllOcrExtractedMetadatas(extractedData);
+    const result = getAllOcrMetadatas(extractedData);
 
     expect(result).toEqual({});
   });
