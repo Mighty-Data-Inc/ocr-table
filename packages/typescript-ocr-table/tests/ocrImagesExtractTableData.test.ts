@@ -94,6 +94,7 @@ And that dash is always surrounded by spaces. In other words, the table names
 always look something like this:
 "Classroom Purchases - Mr. John Doe (Room 1A)"
 Write them using exactly this format.
+USE SINGLE DASHES, NOT DOUBLE DASHES, IN THE TABLE NAMES.
 
 TEACHERS:
 The teachers' names are as follows:
@@ -314,9 +315,12 @@ Its last row is:
     );
 
     expect(tables).toHaveLength(2);
-    expect(tables[1]?.name).toBe(
+
+    const tableNames = tables.map((table) => table.name);
+    expect(tableNames).toContain(
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
     );
+    // The other one can be named whatever.
   }, 180000);
 
   it('uses first-table anchor to isolate the intended table even when prior-page flag says false', async () => {

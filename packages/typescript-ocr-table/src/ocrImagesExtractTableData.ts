@@ -1163,47 +1163,89 @@ Discuss whatever notes or aggregations you might see in or around the table.
 `);
   await _ponder(convo);
 
+  const jsonFormatNotesAndAggregations = JSONSchemaFormat(
+    {
+      discuss_notes: [
+        String,
+        `A discussion of any notes that are associated with the table "${tableName}". ` +
+          `Describe what the notes say, where they are located, and any other ` +
+          `relevant observations about them. ` +
+          `This is for your own benefit to help you understand the table and its context; ` +
+          `it won't be included in the final output.`,
+      ],
+      discuss_aggregations: [
+        String,
+        `A discussion of any aggregations that are associated with the table "${tableName}". ` +
+          `Describe what the aggregations are, what values they contain, where they are located, ` +
+          `and any other relevant observations about them.` +
+          `This is for your own benefit to help you understand the table and its context; ` +
+          `it won't be included in the final output.`,
+      ],
+      notes: [
+        String,
+        `The text of any notes that are associated with the table "${tableName}". ` +
+          `If there are no notes, this can be an empty string. ` +
+          `This will be included in the final output, so be sure to capture it accurately. ` +
+          `If necessary, you may add explanatory text for clarification purposes. ` +
+          `(But if there are no notes, just return an empty string instead of saying ` +
+          `"No notes" or something like that.)`,
+      ],
+      aggregations: [
+        String,
+        `The text of any aggregations that are associated with the table "${tableName}". ` +
+          `If there are no aggregations, this can be an empty string. ` +
+          `This will be included in the final output, so be sure to capture it accurately.` +
+          `If necessary, you may add explanatory text for clarification purposes. ` +
+          `(But if there are no aggregations, just return an empty string instead of saying ` +
+          `"No aggregations" or something like that.)`,
+      ],
+    },
+    'ocr_extract_table_notes_and_aggregations',
+    `Extract any notes or aggregations associated with the table "${tableName}".`
+  );
+
+  const NUM_SHOTGUN_BARRELS = 3;
+  let convoShotgun = [] as GptConversation[];
+  for (let i = 0; i < NUM_SHOTGUN_BARRELS; i++) {
+    const convoBarrel = convo.clone();
+    convoShotgun.push(convoBarrel);
+  }
+  await Promise.all(
+    convoShotgun.map((convoBarrel) =>
+      convoBarrel.submit(undefined, undefined, {
+        jsonResponse: jsonFormatNotesAndAggregations,
+      })
+    )
+  );
+  convo.addSystemMessage(
+    `We had ${NUM_SHOTGUN_BARRELS} independent workers extract notes and aggregations for the ` +
+      `table "${tableName}". Here are their responses:`
+  );
+  convoShotgun.forEach((convoBarrel, index) => {
+    convo.addSystemMessage(`
+RESPONSE FROM WORKER #${index + 1}
+---
+${JSON.stringify(convoBarrel.getLastReplyDict(), null, 2)}
+`);
+  });
+  convo.addDeveloperMessage(`
+Focus on the differences and discrepancies between the workers' responses. Where do they agree?
+Where do they disagree? In the areas where they disagree, which worker's argument is most consistent
+with the data in the source image(s)? Remember, this is an adjudication, not a democracy -- 
+you should go look at the source image(s) and use your best judgment to determine which worker
+is most likely to be correct.
+`);
+  await _ponder(convo, true);
+
+  convo.addSystemMessage(`
+Adjudicate and resolve any discrepancies between the different workers' responses
+regarding the notes and aggregations for the table "${tableName}". In the places where they agree, great.
+In the places where they disagree, side with the one whose argument is most consistent
+with the data in the source image(s).
+`);
+
   await convo.submit(undefined, undefined, {
-    jsonResponse: JSONSchemaFormat(
-      {
-        discuss_notes: [
-          String,
-          `A discussion of any notes that are associated with the table "${tableName}". ` +
-            `Describe what the notes say, where they are located, and any other ` +
-            `relevant observations about them. ` +
-            `This is for your own benefit to help you understand the table and its context; ` +
-            `it won't be included in the final output.`,
-        ],
-        discuss_aggregations: [
-          String,
-          `A discussion of any aggregations that are associated with the table "${tableName}". ` +
-            `Describe what the aggregations are, what values they contain, where they are located, ` +
-            `and any other relevant observations about them.` +
-            `This is for your own benefit to help you understand the table and its context; ` +
-            `it won't be included in the final output.`,
-        ],
-        notes: [
-          String,
-          `The text of any notes that are associated with the table "${tableName}". ` +
-            `If there are no notes, this can be an empty string. ` +
-            `This will be included in the final output, so be sure to capture it accurately. ` +
-            `If necessary, you may add explanatory text for clarification purposes. ` +
-            `(But if there are no notes, just return an empty string instead of saying ` +
-            `"No notes" or something like that.)`,
-        ],
-        aggregations: [
-          String,
-          `The text of any aggregations that are associated with the table "${tableName}". ` +
-            `If there are no aggregations, this can be an empty string. ` +
-            `This will be included in the final output, so be sure to capture it accurately.` +
-            `If necessary, you may add explanatory text for clarification purposes. ` +
-            `(But if there are no aggregations, just return an empty string instead of saying ` +
-            `"No aggregations" or something like that.)`,
-        ],
-      },
-      'ocr_extract_table_notes_and_aggregations',
-      `Extract any notes or aggregations associated with the table "${tableName}".`
-    ),
+    jsonResponse: jsonFormatNotesAndAggregations,
   });
 
   const notes = convo.getLastReplyDictField('notes', '') as string;
