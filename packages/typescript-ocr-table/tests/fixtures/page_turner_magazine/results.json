@@ -1,9 +1,9 @@
 {
-  "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\autumn_reading-Page_Turner.pdf": {
-    "file": "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\autumn_reading-Page_Turner.pdf",
+  "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf": {
+    "file": "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf",
     "tables": [
       {
-        "name": "PART ONE Literary Fantasy",
+        "name": "Literary Fantasy",
         "description": "Wonder with consequence -- nine novels where myth and imagination sharpen, rather than soften, the truths of ordinary life.",
         "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
         "data": [
@@ -176,8 +176,8 @@
       "Season": "Fall"
     }
   },
-  "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\summer_reading-Page_Turner.pdf": {
-    "file": "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\summer_reading-Page_Turner.pdf",
+  "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf": {
+    "file": "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf",
     "tables": [
       {
         "name": "Classic Science Fiction",
