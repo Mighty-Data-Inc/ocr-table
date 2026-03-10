@@ -1,0 +1,372 @@
+{
+  "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf": {
+    "file": "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf",
+    "tables": [
+      {
+        "name": "Literary Fantasy",
+        "description": "Wonder with consequence -- nine novels where myth and imagination sharpen, rather than soften, the truths of ordinary life.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "The Once and Future King",
+            "AUTHOR": "T.H. White",
+            "SYNOPSIS": "White retells the Arthurian cycle as political education, tragic romance, and sly comedy, following Arthur from boyhood wonder to imperial collapse. A modern myth that remains heartbreakingly human."
+          },
+          {
+            "TITLE": "Jonathan Strange & Mr Norrell",
+            "AUTHOR": "Susanna Clarke",
+            "SYNOPSIS": "In Napoleonic England, two rival magicians restore practical magic to polite society and unleash forces they only half understand. Vast, eccentric, and written with dry wit to spare."
+          },
+          {
+            "TITLE": "The Name of the Wind",
+            "AUTHOR": "Patrick Rothfuss",
+            "SYNOPSIS": "Kvothe, already a legend in his own lifetime, recounts the hard years that shaped him: orphanhood, hunger, study, obsession, and music. A coming-of-age tale with the cadence of an old ballad."
+          },
+          {
+            "TITLE": "The Fifth Season",
+            "AUTHOR": "N.K. Jemisin",
+            "SYNOPSIS": "On a continent wracked by periodic cataclysm, a mother with forbidden power searches for her daughter through a world built on geological terror and social cruelty. Inventive and furious in equal measure."
+          },
+          {
+            "TITLE": "Piranesi",
+            "AUTHOR": "Susanna Clarke",
+            "SYNOPSIS": "A solitary man lives in an endless house of statues and tides, faithfully recording its moods until strange evidence suggests his reality is being curated by someone else. Quiet, uncanny, and emotionally precise."
+          },
+          {
+            "TITLE": "Tigana",
+            "AUTHOR": "Guy Gavriel Kay",
+            "SYNOPSIS": "In a peninsula occupied by two tyrants, one conquered province has had even its name erased from memory. A band of conspirators sets out to restore what has been taken and discovers the price of national longing."
+          },
+          {
+            "TITLE": "The Last Unicorn",
+            "AUTHOR": "Peter S. Beagle",
+            "SYNOPSIS": "Believing herself the final unicorn in the world, she leaves her forest to find the others and is drawn into a story of kings, carnivals, and irreversible choices. Lyrical and quietly devastating."
+          },
+          {
+            "TITLE": "A Wizard of Earthsea",
+            "AUTHOR": "Ursula K. Le Guin",
+            "SYNOPSIS": "Gifted young Ged studies true names and high magic, then unleashes a shadow he must pursue across the archipelago before it consumes him. A compact masterpiece about power, pride, and self-knowledge."
+          },
+          {
+            "TITLE": "The Buried Giant",
+            "AUTHOR": "Kazuo Ishiguro",
+            "SYNOPSIS": "An elderly couple travels through post-Arthurian Britain where a mysterious mist has stolen everyone's memories, including their own. A tender, unsettling meditation on forgetting and forgiveness."
+          }
+        ],
+        "page_start": 1,
+        "page_end": 2,
+        "notes": "Wonder with consequence -- nine novels where myth and imagination sharpen, rather than soften, the truths of ordinary life.",
+        "aggregations": ""
+      },
+      {
+        "name": "Historical Fiction",
+        "description": "The past as argument -- nine novels that reanimate lost eras to ask urgent questions about power, class, family, and survival.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "Wolf Hall",
+            "AUTHOR": "Hilary Mantel",
+            "SYNOPSIS": "Mantel reframes Tudor England through Thomas Cromwell, turning court politics into intimate drama and legal maneuvering into a kind of blood sport. Precise, ruthless, and unexpectedly tender."
+          },
+          {
+            "TITLE": "The Name of the Rose",
+            "AUTHOR": "Umberto Eco",
+            "SYNOPSIS": "In a fourteenth-century monastery, a Franciscan friar investigates a chain of ritualized deaths while theological disputes and political paranoia close in. A murder mystery built from ink, libraries, and heresy."
+          },
+          {
+            "TITLE": "I, Claudius",
+            "AUTHOR": "Robert Graves",
+            "SYNOPSIS": "The stammering, underestimated Claudius narrates the intrigues, purges, and family betrayals of Julio-Claudian Rome, proving that survival can be its own cunning art. Gossipy, darkly funny, and brutally effective."
+          },
+          {
+            "TITLE": "All the Light We Cannot See",
+            "AUTHOR": "Anthony Doerr",
+            "SYNOPSIS": "A blind French girl and a German radio prodigy move toward one another across occupied Europe as war narrows their options and hardens their moral choices. Delicate prose with steel underneath."
+          },
+          {
+            "TITLE": "A Gentleman in Moscow",
+            "AUTHOR": "Amor Towles",
+            "SYNOPSIS": "Condemned to lifelong house arrest in a grand hotel after the Russian Revolution, Count Rostov builds a life within shrinking borders and discovers freedom in small acts of attention. Elegant, charming, and quietly profound."
+          },
+          {
+            "TITLE": "Pachinko",
+            "AUTHOR": "Min Jin Lee",
+            "SYNOPSIS": "Beginning in occupied Korea and spanning generations in Japan, Lee's family saga tracks migration, discrimination, ambition, and endurance with steady moral clarity. Expansive storytelling that never loses sight of individual cost."
+          },
+          {
+            "TITLE": "Homegoing",
+            "AUTHOR": "Yaa Gyasi",
+            "SYNOPSIS": "Two half-sisters in eighteenth-century Ghana begin diverging bloodlines, one in West Africa and one in America, whose linked descendants carry the afterlives of slavery across centuries. Compressed, devastating, and brilliantly structured."
+          },
+          {
+            "TITLE": "The Book Thief",
+            "AUTHOR": "Markus Zusak",
+            "SYNOPSIS": "Narrated by Death, this wartime novel follows a German girl who steals books and reads aloud in bomb shelters while her foster family hides a Jewish man. Tender without sentimentality, and far sharper than its premise suggests."
+          },
+          {
+            "TITLE": "The Sympathizer",
+            "AUTHOR": "Viet Thanh Nguyen",
+            "SYNOPSIS": "A Communist double agent embedded among South Vietnamese exiles in Los Angeles reports to Hanoi while unraveling his own divided loyalties. A spy novel and political satire that refuses easy allegiances."
+          }
+        ],
+        "page_start": 2,
+        "page_end": 3,
+        "notes": "The past as argument -- nine novels that reanimate lost eras to ask urgent questions about power, class, family, and survival.",
+        "aggregations": ""
+      },
+      {
+        "name": "Modern Mystery & Crime",
+        "description": "Suspicion as method -- nine novels where the investigation is as much about systems and secrets as it is about solving a case.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "Tinker Tailor Soldier Spy",
+            "AUTHOR": "John le Carre",
+            "SYNOPSIS": "Retired intelligence officer George Smiley is pulled back in to identify a Soviet mole at the top of British espionage while old loyalties and bureaucratic rivalries cloud every lead. Patient, cerebral, and immensely rewarding."
+          },
+          {
+            "TITLE": "In the Woods",
+            "AUTHOR": "Tana French",
+            "SYNOPSIS": "A Dublin detective investigates a murdered girl near the woods where he was found traumatized as a child, the sole survivor of an unexplained disappearance. Psychological, atmospheric, and deeply unsettling."
+          },
+          {
+            "TITLE": "The Girl with the Dragon Tattoo",
+            "AUTHOR": "Stieg Larsson",
+            "SYNOPSIS": "Journalist Mikael Blomkvist and hacker Lisbeth Salander team up to probe a decades-old disappearance inside one of Sweden's richest families, uncovering financial crimes and gendered violence in the process. A propulsive procedural with teeth."
+          },
+          {
+            "TITLE": "Gone Girl",
+            "AUTHOR": "Gillian Flynn",
+            "SYNOPSIS": "On their fifth anniversary, Amy Dunne vanishes and the nation watches as suspicion settles on her husband. Flynn weaponizes point of view, media frenzy, and marital resentment into one of the sharpest thrillers of the century."
+          },
+          {
+            "TITLE": "The Dry",
+            "AUTHOR": "Jane Harper",
+            "SYNOPSIS": "Federal agent Aaron Falk returns to his drought-stricken hometown for a funeral and is pulled into investigating an apparent murder-suicide that may connect to long-buried local secrets. Heat, silence, and suspicion dominate every page."
+          },
+          {
+            "TITLE": "Bluebird, Bluebird",
+            "AUTHOR": "Attica Locke",
+            "SYNOPSIS": "Texas Ranger Darren Matthews investigates two linked deaths in a small East Texas town where race, history, and jurisdictional politics tangle every witness statement. Lean, humane, and extraordinarily controlled."
+          },
+          {
+            "TITLE": "The Secret History",
+            "AUTHOR": "Donna Tartt",
+            "SYNOPSIS": "A tight-knit classics cohort at an elite college commits a murder, then implodes under pressure as guilt and self-mythology distort every relationship. A campus novel turned crime chronicle with relentless psychological tension."
+          },
+          {
+            "TITLE": "The Black Echo",
+            "AUTHOR": "Michael Connelly",
+            "SYNOPSIS": "LAPD detective Harry Bosch investigates the death of a fellow Vietnam tunnel rat and uncovers a sophisticated bank-heist operation hiding in plain sight. The start of a long-running series that establishes Bosch's moral stubbornness immediately."
+          },
+          {
+            "TITLE": "Razorblade Tears",
+            "AUTHOR": "S.A. Cosby",
+            "SYNOPSIS": "Two fathers, each estranged from his murdered son, join forces to hunt the killers and confront their own histories of violence, prejudice, and regret. Fast, brutal, and unexpectedly moving."
+          }
+        ],
+        "page_start": 3,
+        "page_end": 4,
+        "notes": "Twenty-seven books. Twenty-seven arguments that fiction, at its best, makes us more attentive to the world rather than less. Literary fantasy enlarges reality by naming forces ordinary language cannot hold. Historical fiction shows that the present is built from choices somebody made. Modern mystery and crime insists that the truth has a cost, and someone still has to pay it.\n\nThese are not casual reads, exactly. But they are the kind of books you finish and immediately want to hand to someone else, if only to compare notes on where they hurt and where they healed. That impulse to recruit another reader remains our favorite test of a worthwhile novel.\n\nWe hope at least one title on this list does that to you. We hope it reshapes your evenings, derails your bedtime, and makes the first cold morning feel a little less abrupt. See you in the winter.",
+        "aggregations": "Twenty-seven books."
+      }
+    ],
+    "metadata": {
+      "Magazine Name": "PAGE TURNER",
+      "Season": "Fall"
+    }
+  },
+  "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf": {
+    "file": "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf",
+    "tables": [
+      {
+        "name": "Classic Science Fiction",
+        "description": "The canon that invented tomorrow -- nine novels that asked the questions civilization is still catching up to.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "Dune",
+            "AUTHOR": "Frank Herbert",
+            "SYNOPSIS": "On the desert planet Arrakis, young Paul Atreides navigates political intrigue, betrayal, and messianic destiny amid the struggle to control the universe's most precious resource. As layered and unforgiving as the sand it describes."
+          },
+          {
+            "TITLE": "Foundation",
+            "AUTHOR": "Isaac Asimov",
+            "SYNOPSIS": "A mathematician foresees the collapse of a galactic empire and races to preserve human knowledge through the dark age that will follow. The first volume of a series that shaped every space opera that came after it."
+          },
+          {
+            "TITLE": "The Left Hand of Darkness",
+            "AUTHOR": "Ursula K. Le Guin",
+            "SYNOPSIS": "A human envoy visits a world whose inhabitants have no fixed gender, and the friendship he slowly forges with a disgraced politician across a frozen waste is one of the most moving relationships in all of science fiction."
+          },
+          {
+            "TITLE": "Brave New World",
+            "AUTHOR": "Aldous Huxley",
+            "SYNOPSIS": "In a society engineered for happiness, where history is forbidden and discomfort has been abolished, one man's desire for truth becomes an act of radical defiance -- and a tragedy the world will not pause to mourn."
+          },
+          {
+            "TITLE": "The War of the Worlds",
+            "AUTHOR": "H.G. Wells",
+            "SYNOPSIS": "Martian war-machines reduce Victorian England to rubble in hours, and one ordinary man chronicles humanity's panicked, helpless retreat. Reads faster than it has any right to at 130 years old."
+          },
+          {
+            "TITLE": "Fahrenheit 451",
+            "AUTHOR": "Ray Bradbury",
+            "SYNOPSIS": "In a future where firemen start fires rather than extinguish them, a book-burner begins to wonder what's inside the things he destroys. Bradbury's prose burns as hot as the pages it depicts."
+          },
+          {
+            "TITLE": "The Stars My Destination",
+            "AUTHOR": "Alfred Bester",
+            "SYNOPSIS": "Gully Foyle is a nobody stranded in space and left to die by a passing ship. He survives on pure hatred, stages one of fiction's great vendettas, and becomes something far more frightening than a villain."
+          },
+          {
+            "TITLE": "More Than Human",
+            "AUTHOR": "Theodore Sturgeon",
+            "SYNOPSIS": "Six misfits -- each fragmentary, each broken -- discover that together they form a gestalt organism with powers none of them possesses alone. A novel about belonging that doubles as one of the genre's strangest and most tender achievements."
+          },
+          {
+            "TITLE": "A Canticle for Leibowitz",
+            "AUTHOR": "Walter M. Miller Jr.",
+            "SYNOPSIS": "A desert monastery preserves the scattered relics of lost knowledge across three thousand years of civilization's collapse and painful recovery. Funny, bleak, and quietly devastating in equal measure."
+          }
+        ],
+        "page_start": 1,
+        "page_end": 2,
+        "notes": "",
+        "aggregations": ""
+      },
+      {
+        "name": "Gothic & Horror",
+        "description": "Fear as a lens -- nine novels that use dread to illuminate what sunlit fiction politely ignores.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "Frankenstein",
+            "AUTHOR": "Mary Shelley",
+            "SYNOPSIS": "A scientist creates life and immediately abandons it. The creature's anguished search for compassion -- and his turn toward destruction when none is offered -- makes this one of literature's most devastating arguments about responsibility."
+          },
+          {
+            "TITLE": "Dracula",
+            "AUTHOR": "Bram Stoker",
+            "SYNOPSIS": "Told entirely through letters, diaries, and newspaper clippings, the count's invasion of England unfolds as a breathless Victorian thriller laced with genuine menace. The epistolary form makes you feel like you're piecing together a catastrophe in real time."
+          },
+          {
+            "TITLE": "The Picture of Dorian Gray",
+            "AUTHOR": "Oscar Wilde",
+            "SYNOPSIS": "A beautiful young man trades his soul for eternal youth and watches a hidden portrait absorb every sin while his face stays pristine. Wilde's only novel, and it contains more aphorisms per page than most writers manage in a career."
+          },
+          {
+            "TITLE": "The Turn of the Screw",
+            "AUTHOR": "Henry James",
+            "SYNOPSIS": "A governess in a remote English manor becomes convinced her two angelic charges are haunted by the ghosts of former servants. Or has she simply lost her mind? After a hundred and twenty-five years, James still will not tell you."
+          },
+          {
+            "TITLE": "Rebecca",
+            "AUTHOR": "Daphne du Maurier",
+            "SYNOPSIS": "The new wife of a wealthy widower moves into his magnificent estate and discovers that the shadow of his first wife, the dazzling Rebecca, has never left -- and never intends to. The suspense is architectural; it builds in every room."
+          },
+          {
+            "TITLE": "The Haunting of Hill House",
+            "AUTHOR": "Shirley Jackson",
+            "SYNOPSIS": "Four strangers spend a summer in a house that was, Jackson tells us in the first paragraph, born bad. One of them will not be the same person who arrived. Opens with one of the finest first paragraphs in American fiction."
+          },
+          {
+            "TITLE": "We Have Always Lived in the Castle",
+            "AUTHOR": "Shirley Jackson",
+            "SYNOPSIS": "Merricat Blackwood and her sister live peacefully in their ancestral home, shunned by the village for reasons the novel reveals slowly and devastatingly. Told from inside one of fiction's most alarming and oddly lovable minds."
+          },
+          {
+            "TITLE": "Something Wicked This Way Comes",
+            "AUTHOR": "Ray Bradbury",
+            "SYNOPSIS": "A sinister carnival arrives in a small Midwestern town one October, and two thirteen-year-old boys discover that some rides steal years from your life. A novel about fathers and sons as much as it is about evil."
+          },
+          {
+            "TITLE": "House of Leaves",
+            "AUTHOR": "Mark Z. Danielewski",
+            "SYNOPSIS": "A scholarly apparatus -- footnotes, appendices, color-coded text -- surrounds a documentary about a house that is larger on the inside than the outside. Designed to be disorienting. Succeeds completely. Do not begin it on a night you plan to sleep."
+          }
+        ],
+        "page_start": 2,
+        "page_end": 3,
+        "notes": "",
+        "aggregations": ""
+      },
+      {
+        "name": "Hardboiled Detective Fiction",
+        "description": "The mean streets, the missing persons, the lies inside the lies -- nine novels that made cynicism into an art form.",
+        "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
+        "data": [
+          {
+            "TITLE": "The Big Sleep",
+            "AUTHOR": "Raymond Chandler",
+            "SYNOPSIS": "Philip Marlowe takes a case for a dying general and walks into a Los Angeles underworld of blackmail and murder"
+          },
+          {
+            "TITLE": "The Maltese Falcon",
+            "AUTHOR": "Dashiell Hammett",
+            "SYNOPSIS": "When Sam Spade's partner is killed while tailing a client, the trail leads to a priceless jeweled bird and every kind of liar. The novel that established the private eye as a moral figure in an immoral world."
+          },
+          {
+            "TITLE": "Farewell, My Lovely",
+            "AUTHOR": "Raymond Chandler",
+            "SYNOPSIS": "Marlowe is pulled into a search for an ex-con's missing girlfriend and ends up entangled in jewel theft, a corrupt cop, and a society murder. Many critics consider it Chandler's finest construction, and they are not wrong."
+          },
+          {
+            "TITLE": "The Long Goodbye",
+            "AUTHOR": "Raymond Chandler",
+            "SYNOPSIS": "A chance friendship with a charming drunk leads Marlowe into a case that strips away every comfortable illusion about loyalty, wealth, and love. Longer, slower, and more melancholy than the earlier books -- the one where Chandler lets himself be sad."
+          },
+          {
+            "TITLE": "Red Harvest",
+            "AUTHOR": "Dashiell Hammett",
+            "SYNOPSIS": "The Continental Op arrives in a company-owned mining town so thoroughly corrupt that the only way to clean it out is to play every faction against the others until they destroy each other. Lean, violent, and morally uncomfortable."
+          },
+          {
+            "TITLE": "I, the Jury",
+            "AUTHOR": "Mickey Spillane",
+            "SYNOPSIS": "Mike Hammer's best friend is murdered and Hammer vows to deliver the punishment himself, not through a courtroom but with his own hand. Spillane wrote this in nine days. It feels like it, in the best possible sense."
+          },
+          {
+            "TITLE": "The Moving Target",
+            "AUTHOR": "Ross Macdonald",
+            "SYNOPSIS": "Lew Archer is hired to find a missing millionaire and discovers a California family rotting from the inside out. The first Archer novel and an immediate argument that Macdonald deserved to stand alongside Hammett and Chandler."
+          },
+          {
+            "TITLE": "The Chill",
+            "AUTHOR": "Ross Macdonald",
+            "SYNOPSIS": "A young husband hires Archer to find his runaway bride, and the trail leads back through two decades of buried crimes toward a secret someone will kill again to protect. The novel in which Macdonald's method -- archaeology as detective work -- reaches its fullest expression."
+          },
+          {
+            "TITLE": "Devil in a Blue Dress",
+            "AUTHOR": "Walter Mosley",
+            "SYNOPSIS": "Easy Rawlins, an unemployed black veteran in 1948 Los Angeles, is hired to find a white woman who likes jazz clubs on Central Avenue, and stumbles into something far more dangerous -- and more revealing about postwar America -- than anyone warned him."
+          }
+        ],
+        "page_start": 3,
+        "page_end": 4,
+        "notes": "Twenty-seven books. Twenty-seven arguments that fiction, at its best, is not an escape from the world but a way of seeing it more clearly. Science fiction imagines the consequences of ideas before the world has to live them. Gothic and horror name the fears that polite conversation refuses to acknowledge. Hardboiled detective fiction insists that someone has to go looking for the truth even when everyone else has agreed to stop.\n\nThese are not comfort reads, exactly. But they are the kind of books you finish and immediately want to press into someone else's hands. That impulse -- the need to make someone else read the thing you just read -- is the closest thing to a definition of a great book that we have ever been able to agree on here at Page Turner.\n\nWe hope at least one title on this list does that to you. We hope it ruins your sleep, monopolizes your commute, and makes the end of summer feel like a small loss. See you in the fall.",
+        "aggregations": ""
+      },
+      {
+        "name": "Footer",
+        "description": "A single-row, three-column table providing the publication and issue title, theme or subject categories, and the website/contact information.",
+        "columns": ["Publication and Issue", "Themes", "Website"],
+        "data": [
+          {
+            "Publication and Issue": "Page Turner -- Summer Issue",
+            "Themes": "Books • Culture • Criticism",
+            "Website": "pageturnermag.example.com"
+          }
+        ],
+        "page_start": 5,
+        "page_end": 5,
+        "notes": "",
+        "aggregations": ""
+      }
+    ],
+    "metadata": {
+      "Magazine Name": "Page Turner",
+      "Season": "Summer"
+    }
+  }
+}
