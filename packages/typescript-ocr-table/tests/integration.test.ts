@@ -43,6 +43,18 @@ When you use a double-dash separator in your output, always put a space on both 
 EXAMPLE: YES: "I have a cat -- his name is Whiskers." NO: "I have a cat--his name is Whiskers."
 `;
 
+const ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER = `
+The table names are the names of genres. They do not include the words
+"Table" or "Part" or "Section" or anything like that. That may be how
+they're shown in the source document, but that verbiage is just for organizing
+the content visually for human readers. The structured data output should
+just have the genre names as the table names.
+
+When you list the column headers, write them in ALL CAPS.
+That's the way the column headers appear in the source document, 
+and we want to preserve that formatting in the structured data output.
+`;
+
 const createClient = (): OpenAI =>
   new OpenAI({
     apiKey: OPENAI_API_KEY,
@@ -59,7 +71,10 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       },
       `
 Don't include the word 'Magazine' in the name of the magazine.
+
 ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
+
+${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
 `
     );
 

@@ -1,9 +1,9 @@
 {
-  "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf": {
-    "file": "tests/fixtures/page_turner_magazine/autumn_reading-Page_Turner.pdf",
+  "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\autumn_reading-Page_Turner.pdf": {
+    "file": "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\autumn_reading-Page_Turner.pdf",
     "tables": [
       {
-        "name": "Literary Fantasy",
+        "name": "PART ONE Literary Fantasy",
         "description": "Wonder with consequence -- nine novels where myth and imagination sharpen, rather than soften, the truths of ordinary life.",
         "columns": ["TITLE", "AUTHOR", "SYNOPSIS"],
         "data": [
@@ -55,7 +55,7 @@
         ],
         "page_start": 1,
         "page_end": 2,
-        "notes": "Wonder with consequence -- nine novels where myth and imagination sharpen, rather than soften, the truths of ordinary life.",
+        "notes": "",
         "aggregations": ""
       },
       {
@@ -147,7 +147,7 @@
           {
             "TITLE": "Bluebird, Bluebird",
             "AUTHOR": "Attica Locke",
-            "SYNOPSIS": "Texas Ranger Darren Matthews investigates two linked deaths in a small East Texas town where race, history, and jurisdictional politics tangle every witness statement. Lean, humane, and extraordinarily controlled."
+            "SYNOPSIS": "Texas Ranger Darren Mathews investigates two linked deaths in a small East Texas town where race, history, and jurisdictional politics tangle every witness statement. Lean, humane, and extraordinarily controlled."
           },
           {
             "TITLE": "The Secret History",
@@ -167,17 +167,17 @@
         ],
         "page_start": 3,
         "page_end": 4,
-        "notes": "Twenty-seven books. Twenty-seven arguments that fiction, at its best, makes us more attentive to the world rather than less. Literary fantasy enlarges reality by naming forces ordinary language cannot hold. Historical fiction shows that the present is built from choices somebody made. Modern mystery and crime insists that the truth has a cost, and someone still has to pay it.\n\nThese are not casual reads, exactly. But they are the kind of books you finish and immediately want to hand to someone else, if only to compare notes on where they hurt and where they healed. That impulse to recruit another reader remains our favorite test of a worthwhile novel.\n\nWe hope at least one title on this list does that to you. We hope it reshapes your evenings, derails your bedtime, and makes the first cold morning feel a little less abrupt. See you in the winter.",
-        "aggregations": "Twenty-seven books."
+        "notes": "Suspicion as method -- nine novels where the investigation is as much about systems and secrets as it is about solving a case.",
+        "aggregations": ""
       }
     ],
     "metadata": {
-      "Magazine Name": "PAGE TURNER",
+      "Magazine Name": "Page Turner",
       "Season": "Fall"
     }
   },
-  "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf": {
-    "file": "tests/fixtures/page_turner_magazine/summer_reading-Page_Turner.pdf",
+  "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\summer_reading-Page_Turner.pdf": {
+    "file": "C:\\Users\\mvol\\Documents\\Projects\\MightyDataLLMKit\\ocr-table\\packages\\typescript-ocr-table\\tests\\fixtures\\page_turner_magazine\\summer_reading-Page_Turner.pdf",
     "tables": [
       {
         "name": "Classic Science Fiction",
@@ -232,7 +232,7 @@
         ],
         "page_start": 1,
         "page_end": 2,
-        "notes": "",
+        "notes": "The canon that invented tomorrow -- nine novels that asked the questions civilization is still catching up to.",
         "aggregations": ""
       },
       {
@@ -299,7 +299,7 @@
           {
             "TITLE": "The Big Sleep",
             "AUTHOR": "Raymond Chandler",
-            "SYNOPSIS": "Philip Marlowe takes a case for a dying general and walks into a Los Angeles underworld of blackmail and murder"
+            "SYNOPSIS": "Philip Marlowe takes a case for a dying general and walks into a Los Angeles underworld of blackmail and murder where every solution uncovers two new problems. The plot famously doesn't fully resolve, and it doesn't need to."
           },
           {
             "TITLE": "The Maltese Falcon",
@@ -345,17 +345,17 @@
         "page_start": 3,
         "page_end": 4,
         "notes": "Twenty-seven books. Twenty-seven arguments that fiction, at its best, is not an escape from the world but a way of seeing it more clearly. Science fiction imagines the consequences of ideas before the world has to live them. Gothic and horror name the fears that polite conversation refuses to acknowledge. Hardboiled detective fiction insists that someone has to go looking for the truth even when everyone else has agreed to stop.\n\nThese are not comfort reads, exactly. But they are the kind of books you finish and immediately want to press into someone else's hands. That impulse -- the need to make someone else read the thing you just read -- is the closest thing to a definition of a great book that we have ever been able to agree on here at Page Turner.\n\nWe hope at least one title on this list does that to you. We hope it ruins your sleep, monopolizes your commute, and makes the end of summer feel like a small loss. See you in the fall.",
-        "aggregations": ""
+        "aggregations": "Twenty-seven books. (This total refers to the complete reading list, not just the Hardboiled Detective Fiction table.)"
       },
       {
-        "name": "Footer",
-        "description": "A single-row, three-column table providing the publication and issue title, theme or subject categories, and the website/contact information.",
-        "columns": ["Publication and Issue", "Themes", "Website"],
+        "name": "Footer Information Row",
+        "description": "A single-row, three-segment horizontal layout at the bottom of the main content, displaying the issue label (left), a thematic description (center), and the publication's web address (right).",
+        "columns": ["Issue", "Theme", "Web Address"],
         "data": [
           {
-            "Publication and Issue": "Page Turner -- Summer Issue",
-            "Themes": "Books • Culture • Criticism",
-            "Website": "pageturnermag.example.com"
+            "Issue": "Page Turner -- Summer Issue",
+            "Theme": "Books • Culture • Criticism",
+            "Web Address": "pageturnermag.example.com"
           }
         ],
         "page_start": 5,
