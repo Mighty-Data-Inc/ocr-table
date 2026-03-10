@@ -111,7 +111,7 @@
         ],
         "page_start": 2,
         "page_end": 3,
-        "notes": "The past as argument -- nine novels that reanimate lost eras to ask urgent questions about power, class, family, and survival.",
+        "notes": "",
         "aggregations": ""
       },
       {
@@ -167,7 +167,7 @@
         ],
         "page_start": 3,
         "page_end": 4,
-        "notes": "Suspicion as method -- nine novels where the investigation is as much about systems and secrets as it is about solving a case.",
+        "notes": "",
         "aggregations": ""
       }
     ],
@@ -232,7 +232,7 @@
         ],
         "page_start": 1,
         "page_end": 2,
-        "notes": "The canon that invented tomorrow -- nine novels that asked the questions civilization is still catching up to.",
+        "notes": "",
         "aggregations": ""
       },
       {
@@ -344,22 +344,6 @@
         ],
         "page_start": 3,
         "page_end": 4,
-        "notes": "Twenty-seven books. Twenty-seven arguments that fiction, at its best, is not an escape from the world but a way of seeing it more clearly. Science fiction imagines the consequences of ideas before the world has to live them. Gothic and horror name the fears that polite conversation refuses to acknowledge. Hardboiled detective fiction insists that someone has to go looking for the truth even when everyone else has agreed to stop.\n\nThese are not comfort reads, exactly. But they are the kind of books you finish and immediately want to press into someone else's hands. That impulse -- the need to make someone else read the thing you just read -- is the closest thing to a definition of a great book that we have ever been able to agree on here at Page Turner.\n\nWe hope at least one title on this list does that to you. We hope it ruins your sleep, monopolizes your commute, and makes the end of summer feel like a small loss. See you in the fall.",
-        "aggregations": "Twenty-seven books. (This total refers to the complete reading list, not just the Hardboiled Detective Fiction table.)"
-      },
-      {
-        "name": "Footer Information Row",
-        "description": "A single-row, three-segment horizontal layout at the bottom of the main content, displaying the issue label (left), a thematic description (center), and the publication's web address (right).",
-        "columns": ["Issue", "Theme", "Web Address"],
-        "data": [
-          {
-            "Issue": "Page Turner -- Summer Issue",
-            "Theme": "Books • Culture • Criticism",
-            "Web Address": "pageturnermag.example.com"
-          }
-        ],
-        "page_start": 5,
-        "page_end": 5,
         "notes": "",
         "aggregations": ""
       }

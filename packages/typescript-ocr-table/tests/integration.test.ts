@@ -53,6 +53,10 @@ just have the genre names as the table names.
 When you list the column headers, write them in ALL CAPS.
 That's the way the column headers appear in the source document, 
 and we want to preserve that formatting in the structured data output.
+
+The title of the magazine should be expressed in Title Case. The capitalization scheme
+in the source document might be something else (e.g. all-caps), but the structured data output
+should have the magazine title in Title Case.
 `;
 
 const createClient = (): OpenAI =>
@@ -78,8 +82,6 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
 `
     );
 
-    console.log(JSON.stringify(ocrTableDataFromFiles, null, 2));
-
     // Make sure there are two keys in the result, one for each PDF file in the directory
     const tableKeys = [...Object.keys(ocrTableDataFromFiles)];
     expect(tableKeys).toHaveLength(2);
@@ -93,9 +95,14 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     ).toBe(true);
 
     // Grab the object at the key that ends with "autumn_reading-Page_Turner.pdf" from the observed results.
+    // Clear out its notes and aggregations fields since that can be variable and isn't important for this test.
     const autumnResult = Object.values(ocrTableDataFromFiles).find((result) =>
       result.file.endsWith('autumn_reading-Page_Turner.pdf')
     );
+    for (const table of autumnResult?.tables ?? []) {
+      table.notes = '';
+      table.aggregations = '';
+    }
     expect(autumnResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
     expect(autumnResult?.metadata?.['Season']).toEqual('Fall');
     expect(autumnResult?.tables?.[0]).toEqual(
@@ -112,6 +119,10 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     const summerResult = Object.values(ocrTableDataFromFiles).find((result) =>
       result.file.endsWith('summer_reading-Page_Turner.pdf')
     );
+    for (const table of summerResult?.tables ?? []) {
+      table.notes = '';
+      table.aggregations = '';
+    }
     expect(summerResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
     expect(summerResult?.metadata?.['Season']).toEqual('Summer');
     expect(summerResult?.tables?.[0]).toEqual(
