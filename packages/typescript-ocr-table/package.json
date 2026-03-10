@@ -34,7 +34,7 @@
     "chat"
   ],
   "dependencies": {
-    "@mightydatainc/gpt-conversation": "^1.4.0",
+    "@mightydatainc/gpt-conversation": "^2.0.0",
     "dotenv": "^17.3.1",
     "openai": "^6.2.0",
     "pdf-to-png-converter": "^3.14.0"

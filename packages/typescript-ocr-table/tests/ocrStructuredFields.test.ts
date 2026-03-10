@@ -5,26 +5,6 @@ import { fileURLToPath } from 'node:url';
 import { OpenAI } from 'openai';
 import { describe, expect, it } from 'vitest';
 
-import {
-  ocrTableAggregationsAndNotes,
-  ocrIdentifyTablesOnPage,
-  ocrTableColumnHeaders,
-  ocrTablesFromPngPages,
-  ocrTranscribeTableFromPages,
-  ocrTranscribeTableRowsFromCurrentPage,
-} from '../src/ocrTableData.js';
-import { OcrTable } from '../src/records.js';
-
-import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
-import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
-import wildernessProvisionsTable9 from './fixtures/wildprov-tbl9.json' with { type: 'json' };
-import wildernessProvisionsTable9Partial from './fixtures/wildprov-tbl9-partial.json' with { type: 'json' };
-import candidateEvalFullTable from './fixtures/candidate-eval-full-table.json' with { type: 'json' };
-import candidateEvalPg1 from './fixtures/candidate-eval-pg1.json' with { type: 'json' };
-import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: 'json' };
-import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
-import summerReadingHardboiled from './fixtures/summer-reading-hardboiled.json' with { type: 'json' };
-import summerReadingAllTables from './fixtures/summer-reading.json' with { type: 'json' };
 import { ocrStructuredFields } from '../src/ocrStructuredFields.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -120,5 +100,54 @@ describe('ocrStructuredFields (live API)', () => {
     );
 
     expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_EXPLICIT);
+  }, 180000);
+
+  it('can extract implied fields from late content in a document', async () => {
+    const openaiClient = createClient();
+    const pagesAsPngBuffers = loadFixturePngs(
+      'school-supplies-BOS-11pt-page-#'
+    );
+
+    const extractedFields = await ocrStructuredFields(
+      openaiClient,
+      pagesAsPngBuffers,
+      SCHOOL_SUPPLIES_FIELDS_QUERY_IMPLICIT
+    );
+
+    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_IMPLICIT);
+  }, 180000);
+
+  it('can extract all fields from a document', async () => {
+    const openaiClient = createClient();
+    const pagesAsPngBuffers = loadFixturePngs(
+      'school-supplies-BOS-11pt-page-#'
+    );
+
+    const extractedFields = await ocrStructuredFields(
+      openaiClient,
+      pagesAsPngBuffers,
+      SCHOOL_SUPPLIES_FIELDS_QUERY_ALL
+    );
+
+    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL);
+  }, 180000);
+
+  it('obeys additional instructions', async () => {
+    const openaiClient = createClient();
+    const pagesAsPngBuffers = loadFixturePngs(
+      'school-supplies-BOS-11pt-page-#'
+    );
+
+    const extractedFields = await ocrStructuredFields(
+      openaiClient,
+      pagesAsPngBuffers,
+      SCHOOL_SUPPLIES_FIELDS_QUERY_ALL,
+      `The phone number is a misprint. It's actually 555-818-2044. Not 010.`
+    );
+
+    expect(extractedFields).toEqual({
+      ...SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL,
+      'Contact Phone Number': '555-818-2044',
+    });
   }, 180000);
 });

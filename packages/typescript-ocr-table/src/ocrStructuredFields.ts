@@ -21,10 +21,11 @@ export const ocrStructuredFields = async (
 
   const extractionsSoFar: Record<string, OcrExtractionRecord> = {};
 
-  const convoBase = new GptConversation([], {
+  const convoBase = new GptConversation(
     openaiClient,
-    model: GPT_MODEL_VISION,
-  });
+    undefined,
+    GPT_MODEL_VISION
+  );
 
   convoBase.addDeveloperMessage(`
 The user will show you an image of pages from a document (presumably a PDF,
@@ -196,6 +197,7 @@ Any notes that might be helpful for future iterations as we look through more pa
 
     await convo.submit(undefined, undefined, {
       jsonResponse: { format: jsonSchemaForExtraction },
+      shotgun: 3,
     });
 
     const iterNotesThisIteration = convo.getLastReplyDictField(
@@ -217,12 +219,6 @@ Any notes that might be helpful for future iterations as we look through more pa
         };
       }
     }
-
-    console.log(convo.getLastReplyDict());
-    console.log(
-      `Extracted fields so far after iteration ${i + 1}:`,
-      extractionsSoFar
-    );
   }
 
   const retval: Record<string, string> = {};

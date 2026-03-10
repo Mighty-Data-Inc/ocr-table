@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,11 +17,11 @@ describe('renderPdfPagesToPngBuffers', () => {
       'school-supplies-BOS-14pt.pdf'
     );
 
-    await readFile(fixturePdfPath);
+    readFileSync(fixturePdfPath);
 
     const actualBuffers = await renderPdfPagesToPngBuffers(fixturePdfPath);
 
-    const fixtureFiles = await readdir(fixturesDir);
+    const fixtureFiles = readdirSync(fixturesDir);
     const expectedPngFiles = fixtureFiles
       .filter((fileName) =>
         /^school-supplies-BOS-14pt-page-\d+\.png$/i.test(fileName)
@@ -36,7 +36,7 @@ describe('renderPdfPagesToPngBuffers', () => {
     expect(actualBuffers.length).toBe(expectedPngFiles.length);
 
     for (const [index, fileName] of expectedPngFiles.entries()) {
-      const expectedBuffer = await readFile(path.join(fixturesDir, fileName));
+      const expectedBuffer = readFileSync(path.join(fixturesDir, fileName));
       expect(actualBuffers[index]?.equals(expectedBuffer)).toBe(true);
     }
   });

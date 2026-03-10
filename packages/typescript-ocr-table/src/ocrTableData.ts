@@ -30,10 +30,7 @@ const _startOcrTableConversation = (
   tableDescription?: string,
   columnNames?: string[]
 ): GptConversation => {
-  const convo = new GptConversation([], {
-    openaiClient,
-    model: GPT_MODEL_VISION,
-  });
+  const convo = new GptConversation(openaiClient, undefined, GPT_MODEL_VISION);
 
   const messageText =
     pagePositionInDocument === 'first'

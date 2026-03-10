@@ -15,7 +15,6 @@ import {
 } from '../src/ocrTableData.js';
 import { OcrTable } from '../src/records.js';
 
-import wildernessProvisionsTable7 from './fixtures/wilderness-provisions-table-7.json' with { type: 'json' };
 import wildernessProvisionsTable8 from './fixtures/wilderness-provisions-table-8.json' with { type: 'json' };
 import wildernessProvisionsTable9 from './fixtures/wildprov-tbl9.json' with { type: 'json' };
 import wildernessProvisionsTable9Partial from './fixtures/wildprov-tbl9-partial.json' with { type: 'json' };
