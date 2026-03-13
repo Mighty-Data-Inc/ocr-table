@@ -1,6 +1,8 @@
-import { GPT_MODEL_VISION } from '@mightydatainc/gpt-conversation';
-import { GptConversation } from '@mightydatainc/gpt-conversation';
-import { OpenAI } from 'openai';
+import {
+  LLMConversation,
+  getModelName,
+  identifyLLMProvider,
+} from '@mightydatainc/llm-conversation';
 
 interface OcrExtractionRecord {
   field_name: string;
@@ -10,7 +12,7 @@ interface OcrExtractionRecord {
 }
 
 export const ocrStructuredFields = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   pagesAsPngBuffers: Buffer[],
   fieldsToExtract: Record<string, string>,
   additionalInstructions?: string
@@ -21,11 +23,10 @@ export const ocrStructuredFields = async (
 
   const extractionsSoFar: Record<string, OcrExtractionRecord> = {};
 
-  const convoBase = new GptConversation(
-    openaiClient,
-    undefined,
-    GPT_MODEL_VISION
-  );
+  const llmProvider = identifyLLMProvider(aiClient);
+  const modelName = getModelName(llmProvider, 'vision');
+
+  const convoBase = new LLMConversation(aiClient, undefined, modelName);
 
   convoBase.addDeveloperMessage(`
 The user will show you an image of pages from a document (presumably a PDF,

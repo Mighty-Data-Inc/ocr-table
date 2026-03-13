@@ -1,6 +1,6 @@
 {
   "name": "@mightydatainc/ocr-table",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Extract structured table data from PDFs, PNGs, etc., using LLM vision models",
   "author": "Mikhail Voloshin",
   "license": "MIT",
@@ -34,12 +34,12 @@
     "chat"
   ],
   "dependencies": {
-    "@mightydatainc/gpt-conversation": "^2.0.0",
-    "dotenv": "^17.3.1",
-    "openai": "^6.2.0",
+    "@mightydatainc/llm-conversation": "^1.0.5",
     "pdf-to-png-converter": "^3.14.0"
   },
   "devDependencies": {
+    "dotenv": "^17.3.1",
+    "openai": "^6.2.0",
     "@types/node": "^22.18.10",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"

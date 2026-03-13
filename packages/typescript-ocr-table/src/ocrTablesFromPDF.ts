@@ -1,4 +1,3 @@
-import OpenAI from 'openai';
 import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { renderPdfPagesToPngBuffers } from './pdfPagesToPngs.js';
@@ -19,7 +18,7 @@ import { ocrStructuredFields } from './ocrStructuredFields.js';
  * The PDF is first rendered to PNG page buffers, then table data and
  * field-level metadata are extracted from those page images.
  *
- * @param openaiClient OpenAI client used for OCR/transcription requests.
+ * @param aiClient AI client used for OCR/transcription requests.
  * @param pdfPath Absolute or relative path to the PDF file to process.
  * @param fieldsToExtract Field map where each key is the output field name
  * and each value describes what should be extracted.
@@ -29,20 +28,20 @@ import { ocrStructuredFields } from './ocrStructuredFields.js';
  * tables, and extracted metadata.
  */
 const _ocrTablesFromPDF_singleFile = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   pdfPath: string,
   fieldsToExtract: Record<string, string>,
   additionalInstructions?: string
 ): Promise<OcrTablesFromFile> => {
   const pagesAsPngBuffers = await renderPdfPagesToPngBuffers(pdfPath);
   const extractedTables: OcrTable[] = await ocrTablesFromPngPages(
-    openaiClient,
+    aiClient,
     pagesAsPngBuffers,
     additionalInstructions
   );
 
   const metadataFromFile = await ocrStructuredFields(
-    openaiClient,
+    aiClient,
     pagesAsPngBuffers,
     fieldsToExtract,
     additionalInstructions
@@ -98,7 +97,7 @@ const _discoverPdfFiles = async (
 };
 
 export async function ocrTablesFromPDFs(
-  openaiClient: OpenAI,
+  aiClient: any,
   pdfPaths: string | string[],
   fieldsToExtract: Record<string, string>,
   additionalInstructions?: string,
@@ -111,7 +110,7 @@ export async function ocrTablesFromPDFs(
 
   for (const pdfPath of discoveredPdfFiles) {
     const resultForFile = await _ocrTablesFromPDF_singleFile(
-      openaiClient,
+      aiClient,
       pdfPath,
       fieldsToExtract,
       additionalInstructions

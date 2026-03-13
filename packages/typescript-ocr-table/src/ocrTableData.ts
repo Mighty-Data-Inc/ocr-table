@@ -1,27 +1,26 @@
-import { GPT_MODEL_VISION } from '@mightydatainc/gpt-conversation';
 import {
-  ConversationMessage,
-  GptConversation,
-} from '@mightydatainc/gpt-conversation';
-import { JSONSchemaFormat } from '@mightydatainc/gpt-conversation';
+  LLMConversation,
+  JSONSchemaFormat,
+  getModelName,
+  identifyLLMProvider,
+} from '@mightydatainc/llm-conversation';
 import { OcrTable } from './records.js';
-import { OpenAI } from 'openai';
 
 /**
- * Initializes a `GptConversation` for OCR table detection on a single page.
+ * Initializes a `LLMConversation` for OCR table detection on a single page.
  *
  * Seeds the conversation with a user message that includes the page image,
  * adds a base developer instruction to scan for tabular data, and optionally
  * appends caller-provided user instructions.
  *
- * @param openaiClient OpenAI client used by the conversation.
+ * @param aiClient AI client used by the conversation.
  * @param pagePngBuffer PNG bytes for the page being analyzed.
  * @param pagePositionInDocument Optional page position hint (`first`, `middle`, or `last`) used to tailor the initial page-context text.
  * @param additionalInstructions Optional user-level instructions to append to the conversation.
- * @returns A preconfigured `GptConversation` ready for OCR-table prompts/submissions.
+ * @returns A preconfigured `LLMConversation` ready for OCR-table prompts/submissions.
  */
 const _startOcrTableConversation = (
-  openaiClient: OpenAI,
+  aiClient: any,
   pagePngBuffer: Buffer,
   pagePositionInDocument?: 'first' | 'last' | 'middle',
   additionalInstructions?: string,
@@ -29,8 +28,11 @@ const _startOcrTableConversation = (
   tableName?: string,
   tableDescription?: string,
   columnNames?: string[]
-): GptConversation => {
-  const convo = new GptConversation(openaiClient, undefined, GPT_MODEL_VISION);
+): LLMConversation => {
+  const llmProvider = identifyLLMProvider(aiClient);
+  const modelName = getModelName(llmProvider, 'vision');
+
+  const convo = new LLMConversation(aiClient, undefined, modelName);
 
   const messageText =
     pagePositionInDocument === 'first'
@@ -38,7 +40,7 @@ const _startOcrTableConversation = (
       : pagePositionInDocument === 'last'
         ? `Here is the last page of a PDF document.`
         : pagePositionInDocument === 'middle'
-          ? `Here is a from the middle of a PDF document.`
+          ? `Here is a page from the middle of a PDF document.`
           : `Here is a page of a PDF document.`;
 
   const imgDataUrl = `data:image/png;base64,${pagePngBuffer.toString('base64')}`;
@@ -132,7 +134,7 @@ Columns:
  * enumerate tables that start on this page, and requests structured JSON
  * containing table names and descriptions.
  *
- * @param openaiClient OpenAI client used to submit the OCR conversation.
+ * @param aiClient AI client used to submit the OCR conversation.
  * @param pagePngBuffer PNG bytes for the page being analyzed.
  * @param pagePositionInDocument Optional page position hint (`first`, `middle`, or `last`) used for initial context.
  * @param nameOfFirstTableOnPage Optional table name to treat as the first table that starts on this page (used to ignore overflow rows from a prior page).
@@ -141,7 +143,7 @@ Columns:
  * @returns List of extracted-table objects for the page, populated from LLM output with names and descriptions plus default values for other fields.
  */
 export const ocrIdentifyTablesOnPage = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   pagePngBuffer: Buffer,
   pagePositionInDocument?: 'first' | 'last' | 'middle',
   ignoreEverythingAbove?: string,
@@ -150,7 +152,7 @@ export const ocrIdentifyTablesOnPage = async (
   nextPagePngBuffer?: Buffer
 ): Promise<{ name: string; description: string }[]> => {
   const convo = _startOcrTableConversation(
-    openaiClient,
+    aiClient,
     pagePngBuffer,
     pagePositionInDocument,
     additionalInstructions,
@@ -316,7 +318,7 @@ that started on the previous page.
  * names — either by reading explicit header rows or by inferring them from the
  * cell content when no header row is present.
  *
- * @param openaiClient OpenAI client used to drive the conversation.
+ * @param aiClient AI client used to drive the conversation.
  * @param tableName Name or identifier of the table to target on the page.
  * @param pagePngBuffer PNG bytes of the document page containing the table.
  * @param additionalInstructions Optional caller-provided instructions to guide the OCR process.
@@ -325,7 +327,7 @@ that started on the previous page.
  * @returns Ordered array of column name strings extracted from the table.
  */
 export const ocrTableColumnHeaders = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   tableName: string,
   pagePngBuffer: Buffer,
   additionalInstructions?: string,
@@ -333,7 +335,7 @@ export const ocrTableColumnHeaders = async (
   nextPagePngBuffer?: Buffer
 ): Promise<string[]> => {
   const convo = _startOcrTableConversation(
-    openaiClient,
+    aiClient,
     pagePngBuffer,
     undefined,
     additionalInstructions,
@@ -427,7 +429,7 @@ then the value for that column should be an empty string.
 };
 
 const _isAnyPageContentBelowLastRow = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   pagePngBuffer: Buffer,
   tableName: string,
   tableDescription: string,
@@ -441,7 +443,7 @@ const _isAnyPageContentBelowLastRow = async (
   }
 
   const convo = _startOcrTableConversation(
-    openaiClient,
+    aiClient,
     pagePngBuffer,
     undefined,
     additionalInstructions,
@@ -503,7 +505,7 @@ Or is this last row basically at the bottom of the page with no more page conten
 /**
  * Transcribes the body rows of a named table from a single page image.
  *
- * @param openaiClient OpenAI client used to drive the OCR conversation.
+ * @param aiClient AI client used to drive the OCR conversation.
  * @param tableName Name or identifier of the table to transcribe.
  * @param tableDescription A brief description of the table's purpose, used to help the model locate it.
  * @param columns Ordered list of column names for the table.
@@ -515,7 +517,7 @@ Or is this last row basically at the bottom of the page with no more page conten
  * @returns An object containing the extracted body rows, a flag indicating whether the table continues onto the next page, and a flag indicating whether the last row was split across the page break.
  */
 export const ocrTranscribeTableRowsFromCurrentPage = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   tableName: string,
   tableDescription: string,
   columns: string[],
@@ -530,7 +532,7 @@ export const ocrTranscribeTableRowsFromCurrentPage = async (
   doesLastRowGetSplitAcrossPageBreak: boolean;
 }> => {
   const convo = _startOcrTableConversation(
-    openaiClient,
+    aiClient,
     pagePngBuffer,
     undefined,
     additionalInstructions,
@@ -690,7 +692,7 @@ ${JSON.stringify(rows[rows.length - 1], null, 2)}
   // If there's more page content below the table, then we can be pretty confident that
   // the table doesn't continue onto the next page.
   const isTherePageContentBelowLastRow = await _isAnyPageContentBelowLastRow(
-    openaiClient,
+    aiClient,
     pagePngBuffer,
     tableName,
     tableDescription,
@@ -748,6 +750,7 @@ your observations.
       'ocr_does_last_row_look_split_across_page_break',
       `Determine whether the last row of the table on this page looks like it got split across a page break.`
     ),
+    shotgun: 3,
   });
   const doesLastRowLookSplitAcrossPageBreak = convo.getLastReplyDictField(
     'does_last_row_look_split_across_page_break',
@@ -972,7 +975,7 @@ combining the information from both pages.
  * summary rows (totals, averages, counts, etc.) that appear in or immediately
  * around the table, and to return them as plain text strings.
  *
- * @param openaiClient OpenAI client used to drive the OCR conversation.
+ * @param aiClient AI client used to drive the OCR conversation.
  * @param tableName Name or identifier of the table to examine.
  * @param tableDescription A brief description of the table's purpose, used to help the model locate it.
  * @param numPageStart 1-based index of the first page the table appears on.
@@ -982,7 +985,7 @@ combining the information from both pages.
  * @returns An object with a `notes` string (any textual annotations found) and an `aggregations` string (any summary/aggregation data found); either may be an empty string if nothing was found.
  */
 export const ocrTableAggregationsAndNotes = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   tableName: string,
   tableDescription: string,
   numPageStart: number,
@@ -991,7 +994,7 @@ export const ocrTableAggregationsAndNotes = async (
   additionalInstructions?: string
 ): Promise<{ notes: string; aggregations: string }> => {
   const convo = _startOcrTableConversation(
-    openaiClient,
+    aiClient,
     pagePngBuffers[numPageStart - 1],
     undefined,
     additionalInstructions,
@@ -1119,7 +1122,7 @@ Discuss whatever notes or aggregations you might see in or around the table.
  * continues. Split rows that straddle a page break are detected and their corrected
  * transcription is carried forward as the `splitRowToIgnore` hint on the next page.
  *
- * @param openaiClient OpenAI client used for all OCR conversations.
+ * @param aiClient AI client used for all OCR conversations.
  * @param tableName Name or identifier of the table to extract.
  * @param tableDescription A brief description of the table's purpose.
  * @param numPageStart 1-based index of the page on which the table starts.
@@ -1128,7 +1131,7 @@ Discuss whatever notes or aggregations you might see in or around the table.
  * @returns A fully populated `OcrTable` containing the table's name, description, columns, data rows, and the page range it was found on.
  */
 export const ocrTranscribeTableFromPages = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   tableName: string,
   tableDescription: string,
   numPageStart: number,
@@ -1146,7 +1149,7 @@ export const ocrTranscribeTableFromPages = async (
   let splitRowToIgnore: Record<string, string> | undefined = undefined;
 
   const columns = await ocrTableColumnHeaders(
-    openaiClient,
+    aiClient,
     tableName,
     pagePngBufferCurrent,
     additionalInstructions,
@@ -1165,7 +1168,7 @@ export const ocrTranscribeTableFromPages = async (
     }
 
     const tableScanThisPage = await ocrTranscribeTableRowsFromCurrentPage(
-      openaiClient,
+      aiClient,
       tableName,
       tableDescription,
       columns,
@@ -1193,7 +1196,7 @@ export const ocrTranscribeTableFromPages = async (
   // Last step: extract any notes or aggregations that are associated with this table,
   // which will be attached to the table object that we return.
   const { notes, aggregations } = await ocrTableAggregationsAndNotes(
-    openaiClient,
+    aiClient,
     tableName,
     tableDescription,
     numPageStart,
@@ -1227,13 +1230,13 @@ export const ocrTranscribeTableFromPages = async (
  * extracted row so the next call to `ocrIdentifyTablesOnPage` can correctly
  * ignore the already-processed portion at the top of that page.
  *
- * @param openaiClient OpenAI client used for all OCR conversations.
+ * @param aiClient AI client used for all OCR conversations.
  * @param pagesAsPngBuffers Array of PNG buffers representing every page of the document, in order.
  * @param additionalInstructions Optional caller-provided instructions to guide the OCR process across all pages and tables.
  * @returns Array of fully populated `OcrTable` objects for every table found in the document.
  */
 export const ocrTablesFromPngPages = async (
-  openaiClient: OpenAI,
+  aiClient: any,
   pagesAsPngBuffers: Buffer[],
   additionalInstructions?: string
 ): Promise<OcrTable[]> => {
@@ -1276,7 +1279,7 @@ ${JSON.stringify(lastTableLastRow, null, 2)}
     }
 
     const tablesOnThisPage = await ocrIdentifyTablesOnPage(
-      openaiClient,
+      aiClient,
       pagePngBufferCurrent,
       pagePositionInDocument,
       ignoreEverythingAbove,
@@ -1297,7 +1300,7 @@ ${JSON.stringify(lastTableLastRow, null, 2)}
     let maxPageEnd = numPageCurrent;
     for (const tableNameDesc of tablesOnThisPage) {
       const tableObj = await ocrTranscribeTableFromPages(
-        openaiClient,
+        aiClient,
         tableNameDesc.name,
         tableNameDesc.description,
         numPageCurrent,
