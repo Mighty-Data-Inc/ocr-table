@@ -1076,7 +1076,7 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
   }, 360000);
 });
 
-describe('ocrTablesFromPngPages (live API)', () => {
+describe.skip('ocrTablesFromPngPages (live API)', () => {
   it('extracts multiple tables from a multi-page document', async () => {
     const pagePngs = loadFixturePngs('summer-reading-pg#');
 

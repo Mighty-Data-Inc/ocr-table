@@ -169,6 +169,7 @@ Let's start with a general discussion of what you see on this page. Describe its
 layout and the tables (or table fragments) that you see on it.
 `);
   await convo.submit();
+  console.log(convo.getLastReplyStr());
 
   if (ignoreEverythingAbove) {
     convo.addDeveloperMessage(`
@@ -197,6 +198,15 @@ If there are some table rows above this table, ignore them; they're from some pr
 that started on the previous page.
 `);
   }
+  await convo.submit();
+
+  convo.addUserMessage(`Are there any other tables you see on the page?`);
+  await convo.submit();
+
+  convo.addUserMessage(
+    `Let's formalize our findings into a JSON object. ` +
+      `Here, we will present all of the tables we see on this page.`
+  );
 
   await convo.submit(undefined, undefined, {
     jsonResponse: JSONSchemaFormat(

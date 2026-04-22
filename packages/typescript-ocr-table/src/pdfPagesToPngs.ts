@@ -1,4 +1,22 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
+
 import { pdfToPng } from 'pdf-to-png-converter';
+
+// pdf-to-png-converter normalizes cMap/font paths using the platform separator,
+// but PDF.js requires those factory URLs to end with a forward slash.
+// On Windows, this produces a trailing backslash that PDF.js rejects.
+if (process.platform === 'win32') {
+  const requireCjs = createRequire(import.meta.url);
+  const converterEntryPoint = requireCjs.resolve('pdf-to-png-converter');
+  const converterDir = path.dirname(converterEntryPoint);
+  const normalizePathModule = requireCjs(
+    path.join(converterDir, 'normalizePath.js')
+  );
+  const normalizePathOriginalFunction = normalizePathModule.normalizePath;
+  normalizePathModule.normalizePath = (p: string) =>
+    normalizePathOriginalFunction(p).replace(/\\/g, '/');
+}
 
 /**
  * Converts all pages of a PDF file into PNG image buffers.
