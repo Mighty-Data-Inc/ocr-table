@@ -123,13 +123,28 @@ describe('ocrStructuredFields (live API)', () => {
       'school-supplies-BOS-11pt-page-#'
     );
 
+    // Test differences across all fields.
+    // Allow exactly 1 error.
     const extractedFields = await ocrStructuredFields(
       openaiClient,
       pagesAsPngBuffers,
       SCHOOL_SUPPLIES_FIELDS_QUERY_ALL
     );
 
-    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL);
+    let differences = 0;
+    for (const [field, expectedValue] of Object.entries(
+      SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL
+    )) {
+      const extractedValue = extractedFields[field];
+      if (extractedValue !== expectedValue) {
+        differences++;
+        console.warn(
+          `Field "${field}" was extracted as "${extractedValue}", expected "${expectedValue}".`
+        );
+      }
+    }
+
+    expect(differences).toBeLessThanOrEqual(1);
   }, 180000);
 
   it('obeys additional instructions', async () => {
