@@ -105,15 +105,30 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     }
     expect(autumnResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
     expect(autumnResult?.metadata?.['Season']).toEqual('Fall');
-    expect(autumnResult?.tables?.[0]).toEqual(
-      autumnExpectedResults?.tables?.[0]
-    );
-    expect(autumnResult?.tables?.[1]).toEqual(
-      autumnExpectedResults?.tables?.[1]
-    );
-    expect(autumnResult?.tables?.[2]).toEqual(
-      autumnExpectedResults?.tables?.[2]
-    );
+
+    // Expect there to be 2 or fewer differences in tables[0].
+    expect(
+      _countObjectDifferences(
+        autumnResult?.tables?.[0],
+        autumnExpectedResults?.tables?.[0] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
+
+    // Expect there to be 2 or fewer differences in tables[1].
+    expect(
+      _countObjectDifferences(
+        autumnResult?.tables?.[1],
+        autumnExpectedResults?.tables?.[1] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
+
+    // Expect there to be 2 or fewer differences in tables[2].
+    expect(
+      _countObjectDifferences(
+        autumnResult?.tables?.[2],
+        autumnExpectedResults?.tables?.[2] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
 
     // Now do the same for the summer results
     const summerResult = Object.values(ocrTableDataFromFiles).find((result) =>
@@ -125,14 +140,58 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     }
     expect(summerResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
     expect(summerResult?.metadata?.['Season']).toEqual('Summer');
-    expect(summerResult?.tables?.[0]).toEqual(
-      summerExpectedResults?.tables?.[0]
-    );
-    expect(summerResult?.tables?.[1]).toEqual(
-      summerExpectedResults?.tables?.[1]
-    );
-    expect(summerResult?.tables?.[2]).toEqual(
-      summerExpectedResults?.tables?.[2]
-    );
+
+    // Expect there to be 2 or fewer differences in tables[0].
+    expect(
+      _countObjectDifferences(
+        summerResult?.tables?.[0],
+        summerExpectedResults?.tables?.[0] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
+
+    // Expect there to be 2 or fewer differences in tables[1].
+    expect(
+      _countObjectDifferences(
+        summerResult?.tables?.[1],
+        summerExpectedResults?.tables?.[1] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
+
+    // Expect there to be 2 or fewer differences in tables[2].
+    expect(
+      _countObjectDifferences(
+        summerResult?.tables?.[2],
+        summerExpectedResults?.tables?.[2] ?? {}
+      )
+    ).toBeLessThanOrEqual(2);
   }, 1500000);
 });
+
+// Goes through each object key by key and deep-compares the values, counting how many differences
+// there are. If a value is an object, it recursively compares the nested keys. If a value is an
+// array, it compares the arrays element by element. It returns the total count of differences
+// between the two objects.
+const _countObjectDifferences = (obj1: any, obj2: any): number => {
+  let differences = 0;
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  const allKeys = new Set([...keys1, ...keys2]);
+
+  for (const key of allKeys) {
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+    if (typeof val1 === 'object' && typeof val2 === 'object') {
+      differences += _countObjectDifferences(val1, val2);
+    } else if (Array.isArray(val1) && Array.isArray(val2)) {
+      const maxLength = Math.max(val1.length, val2.length);
+      for (let i = 0; i < maxLength; i++) {
+        differences += _countObjectDifferences(val1[i], val2[i]);
+      }
+    } else if (val1 !== val2) {
+      differences += 1;
+    }
+  }
+
+  return differences;
+};

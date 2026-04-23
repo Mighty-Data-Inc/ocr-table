@@ -169,7 +169,6 @@ Let's start with a general discussion of what you see on this page. Describe its
 layout and the tables (or table fragments) that you see on it.
 `);
   await convo.submit();
-  console.log(convo.getLastReplyStr());
 
   if (ignoreEverythingAbove) {
     convo.addDeveloperMessage(`
