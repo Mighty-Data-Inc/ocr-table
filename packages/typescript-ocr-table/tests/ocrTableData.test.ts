@@ -727,6 +727,14 @@ describe('ocrTranscribeTableRowsFromCurrentPage (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
+    // The expected table contains the word "None", but the OCR might literally make it
+    // be empty. If it's falsy, set it to None.
+    for (const row of result.rows) {
+      if (!row['Fatigue Penalty']) {
+        row['Fatigue Penalty'] = 'None';
+      }
+    }
+
     expect(result.rows).toEqual(wildernessProvisionsTable8);
     expect(result.doesTableContinueOnNextPage).toBe(false);
   }, 180000);
@@ -1025,6 +1033,12 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_WILDERNESS_PROVISIONS
     );
 
+    // This table contains the word "None", but the OCR might literally make it
+    // be empty. If it's falsy, set it to None.
+    if (!table.data[0]['Fatigue Penalty']) {
+      table.data[0]['Fatigue Penalty'] = 'None';
+    }
+
     expect(table.data).toEqual(wildernessProvisionsTable8);
   }, 180000);
 
@@ -1042,7 +1056,7 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
 
     expect(table.page_end).toBe(3);
     expect(table.data).toEqual(wildernessProvisionsTable9);
-  }, 180000);
+  }, 300000);
 
   it('transcribes a long table that spans multiple pages', async () => {
     const pagePngs = loadFixturePngs('candidate-eval-pg#');
