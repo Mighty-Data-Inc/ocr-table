@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.1.7] - 2026-04-24
+## [1.1.7], [1.1.8] - 2026-04-24
 
 ### Diagnostics
 
