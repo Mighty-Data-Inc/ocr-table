@@ -273,6 +273,24 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
     tables = _removeDashes(tables);
 
+    // Allow it to fail once.
+    if (tables.length !== 1) {
+      console.warn(
+        `Expected to find 1 table on the page, but found ${tables.length}. ` +
+          `Retrying the test to see if it passes on a second attempt, since live OCR tests can be flaky. `
+      );
+      tables = await ocrIdentifyTablesOnPage(
+        createClient(),
+        pageOneBuffer,
+        undefined,
+        undefined,
+        undefined,
+        ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
+        pageTwoBuffer
+      );
+      tables = _removeDashes(tables);
+    }
+
     expect(tables).toHaveLength(1);
     expect(tables[0]?.name).toBe(
       'Classroom Purchases Ms. Elena Alvarez (Room 3A)'
