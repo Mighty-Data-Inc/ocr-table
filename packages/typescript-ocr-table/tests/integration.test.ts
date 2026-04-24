@@ -86,7 +86,13 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     const tableKeys = [...Object.keys(ocrTableDataFromFiles)];
 
     // Make sure there are two keys in the result, one for each PDF file in the directory.
-    // NOTE: This might fail in the CI/CD environment for some reason. Let's keep an eye on it.
+    // In the CI/CD environment, for some damn reason, sometimes this is 12.
+    // We need to understand why.
+    console.log(JSON.stringify(tableKeys, null, 2));
+    if (tableKeys.length !== 2) {
+      console.error(JSON.stringify(tableKeys, null, 2));
+      expect(tableKeys).toBe([]); // Force the test to fail if there aren't exactly 2 keys, so we can investigate this issue in CI/CD.
+    }
     expect(tableKeys).toHaveLength(2);
 
     // Make sure one of them ends with "autumn_reading-Page_Turner.pdf" and the other ends with "summer_reading-Page_Turner.pdf"

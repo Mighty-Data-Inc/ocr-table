@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.1.7] - 2026-04-24
+
+### Diagnostics
+
+Added a console log to try to figure out why there are 12 files in the "page_turner_magazine" folder.
+
 ## [1.1.6] - 2026-04-24
 
 ### Chore
