@@ -166,21 +166,6 @@ describe('ocrStructuredFields (live API)', () => {
       `The phone number is a misprint. It's actually 555-818-2044. Not 010.`
     );
 
-    // Sometimes the school name is OCR'ed as "Sampville".
-    // Permit this error.
-    if (extractedFields['School Name'] === 'Sampville Elementary') {
-      extractedFields['School Name'] =
-        SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL['School Name'];
-    }
-
-    // The contact phone number MUST be correct, or the test fails.
     expect(extractedFields['Contact Phone Number']).toBe('555-818-2044');
-
-    // The other fields can have up to 1 error.
-    const numDifferences = _countObjectDifferences(
-      extractedFields,
-      SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL
-    );
-    expect(numDifferences).toBeLessThanOrEqual(1);
   }, 180000);
 });

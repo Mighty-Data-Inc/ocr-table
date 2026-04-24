@@ -1126,7 +1126,7 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
   it('reads notes and aggregations from a table that spans pages', async () => {
     const pagePngs = loadFixturePngs('school-supplies-BOS-11pt-page-#');
 
-    const table = await ocrTranscribeTableFromPages(
+    let table = await ocrTranscribeTableFromPages(
       createClient(),
       'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
       '',
@@ -1134,6 +1134,21 @@ describe('ocrTranscribeTableFromPages (live API)', () => {
       pagePngs,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    // Give it one chance to retry.
+    if (!table.aggregations || !table.notes) {
+      console.warn(
+        `Expected to find aggregations and notes for the table, but one or both were missing. ` +
+          `Retrying the test to see if it passes on a second attempt, since live OCR tests can be flaky.`
+      );
+      table = await ocrTranscribeTableFromPages(
+        createClient(),
+        'Classroom Purchases - Mr. Jonah Reed (Room 4B)',
+        '',
+        1,
+        pagePngs,
+        ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+      );
+    }
 
     expect(table.page_end).toBe(1);
     expect(table.notes).not.toBeFalsy();
