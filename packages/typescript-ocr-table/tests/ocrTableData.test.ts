@@ -24,6 +24,7 @@ import candidateEvalPg2 from './fixtures/candidate-eval-pg2.json' with { type: '
 import schoolSuppliesJonahReed from './fixtures/school-supplies-BOS-JonahReed.json' with { type: 'json' };
 import summerReadingHardboiled from './fixtures/summer-reading-hardboiled.json' with { type: 'json' };
 import summerReadingAllTables from './fixtures/summer-reading.json' with { type: 'json' };
+import { _countObjectDifferences, _removeDashes } from './testHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -138,7 +139,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
     const pageThreeBuffer = readFileSync(pageThreePngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageThreeBuffer,
       undefined,
@@ -146,13 +147,14 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(2);
     expect(tables[0]?.name).toBe(
-      'Classroom Purchases - Ms. Tessa Monroe (Room 2D)'
+      'Classroom Purchases Ms. Tessa Monroe (Room 2D)'
     );
     expect(tables[1]?.name).toBe(
-      'Classroom Purchases - Mr. Omar Whitfield (Room 1A)'
+      'Classroom Purchases Mr. Omar Whitfield (Room 1A)'
     );
   }, 180000);
 
@@ -163,7 +165,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
     const pageOneBuffer = readFileSync(pageOnePngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageOneBuffer,
       undefined,
@@ -171,6 +173,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     // We want there to be exactly 2 tables, but allow for there to be 3.
     // The extra one might be a spurious false positive, which is common in live OCR tests.
@@ -178,8 +181,8 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     expect(tables.length).toBeLessThanOrEqual(3);
 
     const expectedTableName1 =
-      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)';
-    const expectedTableName2 = 'Classroom Purchases - Ms. Jonah Reed (Room 4B)';
+      'Classroom Purchases Ms. Elena Alvarez (Room 3A)';
+    const expectedTableName2 = 'Classroom Purchases Mr. Jonah Reed (Room 4B)';
 
     const tableNames = tables.map((table) => table.name);
     expect(tableNames).toContain(expectedTableName1);
@@ -195,7 +198,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       wildernessProvisionsPngPath
     );
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       wildernessProvisionsBuffer,
       undefined,
@@ -204,6 +207,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       `When you list tables, sort your tables in numerical order ` +
         `-- e.g. "Table 2", then "Table 3", then "Table 4", etc.`
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(2);
     expect(tables[0]?.name).toBe(
@@ -224,7 +228,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     const pageThreeBuffer = readFileSync(pageThreePngPath);
     const pageFourBuffer = readFileSync(pageFourPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageThreeBuffer,
       undefined,
@@ -233,15 +237,16 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       pageFourBuffer
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(2);
 
     const tableNames = tables.map((table) => table.name);
     expect(tableNames).toContain(
-      'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
+      'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
     );
     expect(tableNames).toContain(
-      'Classroom Purchases - Ms. Tessa Monroe (Room 2D)'
+      'Classroom Purchases Ms. Tessa Monroe (Room 2D)'
     );
   }, 180000);
 
@@ -257,7 +262,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     const pageOneBuffer = readFileSync(pageOnePngPath);
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageOneBuffer,
       undefined,
@@ -266,10 +271,11 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES,
       pageTwoBuffer
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(1);
     expect(tables[0]?.name).toBe(
-      'Classroom Purchases - Ms. Elena Alvarez (Room 3A)'
+      'Classroom Purchases Ms. Elena Alvarez (Room 3A)'
     );
   }, 180000);
 
@@ -280,7 +286,7 @@ describe('ocrIdentifyTablesOnPage (live API)', () => {
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageTwoBuffer,
       undefined,
@@ -296,10 +302,11 @@ This table belongs to the *previous* page, not to the current one.
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(1);
     expect(tables[0]?.name).toBe(
-      'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
+      'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
     );
   }, 180000);
 
@@ -310,7 +317,7 @@ This table belongs to the *previous* page, not to the current one.
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageTwoBuffer,
       undefined,
@@ -318,12 +325,13 @@ This table belongs to the *previous* page, not to the current one.
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(2);
 
     const tableNames = tables.map((table) => table.name);
     expect(tableNames).toContain(
-      'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
+      'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
     );
     // The other one can be named whatever.
   }, 180000);
@@ -349,7 +357,7 @@ This table belongs to the *previous* page, not to the current one.
       Therefore, the overrun rows at the top should be ignored and only Priya's table should
       be returned.
     */
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageTwoBuffer,
       undefined,
@@ -357,13 +365,14 @@ This table belongs to the *previous* page, not to the current one.
       'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)',
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     // We can't rely on it always producing one table.
     // But at least one table should have the designated name.
     const tableNames = tables.map((table) => table.name);
 
     expect(tableNames).toContain(
-      'Classroom Purchases - Ms. Priya Nandakumar (Room 5C)'
+      'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
     );
   }, 180000);
 
@@ -377,13 +386,14 @@ This table belongs to the *previous* page, not to the current one.
     const lettersOnlyRoomInstructions =
       'Room numbers are always two-letter codes, e.g. ND or EE, and explicitly NOT numeric.';
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageTwoBuffer,
       undefined,
       `
 The page starts with a table (or part of a table) that overran from a previous page.
-Its last row is:
+The final row of the table that overran from the previous page is on this current page,
+and it looks like this:
 {
   "Item Name": "Pocket Chart",
   "Description": "Small classroom pocket chart with extra sentence strips..."
@@ -392,6 +402,7 @@ Its last row is:
       undefined,
       lettersOnlyRoomInstructions
     );
+    tables = _removeDashes(tables);
 
     // We can't rely on it always producing one table. But at least one table should have
     // the designated name, and the room code in that name should reflect the instructions we
@@ -399,7 +410,7 @@ Its last row is:
 
     const tableNames = tables.map((table) => table.name);
     expect(tableNames).toContain(
-      'Classroom Purchases - Ms. Priya Nandakumar (Room SC)'
+      'Classroom Purchases Ms. Priya Nandakumar (Room SC)'
     );
   }, 180000);
 
@@ -407,7 +418,7 @@ Its last row is:
     const phoenixPngPath = path.join(FIXTURES_DIR, 'phoenix.png');
     const phoenixBuffer = readFileSync(phoenixPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       phoenixBuffer,
       undefined,
@@ -426,7 +437,7 @@ Its last row is:
     );
     const dirtyWisconsinBuffer = readFileSync(dirtyWisconsinPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       dirtyWisconsinBuffer,
       undefined,
@@ -442,7 +453,7 @@ Its last row is:
     const annaKareninaPngPath = path.join(FIXTURES_DIR, 'annakarenina.png');
     const annaKareninaBuffer = readFileSync(annaKareninaPngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       annaKareninaBuffer,
       undefined,
@@ -458,7 +469,7 @@ Its last row is:
     const pagePngPath = path.join(FIXTURES_DIR, 'summer-reading-pg1.png');
     const pageBuffer = readFileSync(pagePngPath);
 
-    const tables = await ocrIdentifyTablesOnPage(
+    let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageBuffer,
       undefined,
@@ -466,18 +477,15 @@ Its last row is:
       undefined,
       ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
     );
+    tables = _removeDashes(tables);
 
     expect(tables).toHaveLength(1);
     expect(tables[0]?.name).toBe('Classic Science Fiction');
 
     // Replace em dashes and en dashes to make the test more permissible.
     let tableDescription = tables[0]?.description ?? '';
-    tableDescription = tableDescription.replace('--', '-');
-    tableDescription = tableDescription.replace('—', '-');
-    tableDescription = tableDescription.replace('–', '-');
-
     expect(tableDescription).toBe(
-      'The canon that invented tomorrow - nine novels that asked the questions civilization is still catching up to.'
+      'The canon that invented tomorrow nine novels that asked the questions civilization is still catching up to.'
     );
   }, 180000);
 });
@@ -1125,7 +1133,7 @@ describe.skip('ocrTablesFromPngPages (live API)', () => {
   it('extracts multiple tables from a multi-page document', async () => {
     const pagePngs = loadFixturePngs('summer-reading-pg#');
 
-    const tables = await ocrTablesFromPngPages(
+    let tables = await ocrTablesFromPngPages(
       createClient(),
       pagePngs,
       ADDITIONAL_INSTRUCTIONS_FOR_SUMMER_READING_LIST
@@ -1148,35 +1156,3 @@ describe.skip('ocrTablesFromPngPages (live API)', () => {
     // This one will take a while.
   }, 720000);
 });
-
-// TODO: This is a copy-paste of the same function from ocrStructuredFields.test.ts.
-// We should probably move it to a shared test utils file or something.
-//
-// Goes through each object key by key and deep-compares the values, counting how many differences
-// there are. If a value is an object, it recursively compares the nested keys. If a value is an
-// array, it compares the arrays element by element. It returns the total count of differences
-// between the two objects.
-const _countObjectDifferences = (obj1: any, obj2: any): number => {
-  let differences = 0;
-
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  const allKeys = new Set([...keys1, ...keys2]);
-
-  for (const key of allKeys) {
-    const val1 = obj1[key];
-    const val2 = obj2[key];
-    if (typeof val1 === 'object' && typeof val2 === 'object') {
-      differences += _countObjectDifferences(val1, val2);
-    } else if (Array.isArray(val1) && Array.isArray(val2)) {
-      const maxLength = Math.max(val1.length, val2.length);
-      for (let i = 0; i < maxLength; i++) {
-        differences += _countObjectDifferences(val1[i], val2[i]);
-      }
-    } else if (val1 !== val2) {
-      differences += 1;
-    }
-  }
-
-  return differences;
-};

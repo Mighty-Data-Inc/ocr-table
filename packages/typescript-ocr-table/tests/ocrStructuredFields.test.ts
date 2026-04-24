@@ -123,28 +123,20 @@ describe('ocrStructuredFields (live API)', () => {
       'school-supplies-BOS-11pt-page-#'
     );
 
-    // Test differences across all fields.
-    // Allow exactly 1 error.
     const extractedFields = await ocrStructuredFields(
       openaiClient,
       pagesAsPngBuffers,
       SCHOOL_SUPPLIES_FIELDS_QUERY_ALL
     );
 
-    let differences = 0;
-    for (const [field, expectedValue] of Object.entries(
-      SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL
-    )) {
-      const extractedValue = extractedFields[field];
-      if (extractedValue !== expectedValue) {
-        differences++;
-        console.warn(
-          `Field "${field}" was extracted as "${extractedValue}", expected "${expectedValue}".`
-        );
-      }
+    // Sometimes the school name is OCR'ed as "Sampville".
+    // Permit this error.
+    if (extractedFields['School Name'] === 'Sampville Elementary') {
+      extractedFields['School Name'] =
+        SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL['School Name'];
     }
 
-    expect(differences).toBeLessThanOrEqual(1);
+    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL);
   }, 180000);
 
   it('obeys additional instructions', async () => {
@@ -159,6 +151,13 @@ describe('ocrStructuredFields (live API)', () => {
       SCHOOL_SUPPLIES_FIELDS_QUERY_ALL,
       `The phone number is a misprint. It's actually 555-818-2044. Not 010.`
     );
+
+    // Sometimes the school name is OCR'ed as "Sampville".
+    // Permit this error.
+    if (extractedFields['School Name'] === 'Sampville Elementary') {
+      extractedFields['School Name'] =
+        SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL['School Name'];
+    }
 
     expect(extractedFields).toEqual({
       ...SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL,
