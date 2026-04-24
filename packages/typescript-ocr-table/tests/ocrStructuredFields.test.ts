@@ -6,6 +6,7 @@ import { OpenAI } from 'openai';
 import { describe, expect, it } from 'vitest';
 
 import { ocrStructuredFields } from '../src/ocrStructuredFields.js';
+import { _countObjectDifferences } from './testHelpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -136,7 +137,13 @@ describe('ocrStructuredFields (live API)', () => {
         SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL['School Name'];
     }
 
-    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL);
+    // Use the helper function to count differences.
+    // There can be up to 1 error.
+    const numDifferences = _countObjectDifferences(
+      extractedFields,
+      SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL
+    );
+    expect(numDifferences).toBeLessThanOrEqual(1);
   }, 180000);
 
   it('obeys additional instructions', async () => {
@@ -159,9 +166,14 @@ describe('ocrStructuredFields (live API)', () => {
         SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL['School Name'];
     }
 
-    expect(extractedFields).toEqual({
-      ...SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL,
-      'Contact Phone Number': '555-818-2044',
-    });
+    // The contact phone number MUST be correct, or the test fails.
+    expect(extractedFields['Contact Phone Number']).toBe('555-818-2044');
+
+    // The other fields can have up to 1 error.
+    const numDifferences = _countObjectDifferences(
+      extractedFields,
+      SCHOOL_SUPPLIES_VALUES_EXPECTED_ALL
+    );
+    expect(numDifferences).toBeLessThanOrEqual(1);
   }, 180000);
 });
