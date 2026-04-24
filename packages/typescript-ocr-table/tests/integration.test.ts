@@ -7,17 +7,20 @@ import { describe, expect, it } from 'vitest';
 import { ocrTablesFromPDFs } from '../src/ocrTablesFromPDF.js';
 
 import readingOcrExpectedResults from './fixtures/page_turner_magazine/results.json' with { type: 'json' };
-import { _countObjectDifferences } from './testHelpers.js';
+import { _countObjectDifferences, _removeDashes } from './testHelpers.js';
 
 // The expected results is a dict with two keys.
 // One of them ends with "autumn_reading-Page_Turner.pdf" and the other ends with "summer_reading-Page_Turner.pdf".
 // Extract them.
-const autumnExpectedResults = Object.values(readingOcrExpectedResults).find(
+let autumnExpectedResults = Object.values(readingOcrExpectedResults).find(
   (result) => result.file.endsWith('autumn_reading-Page_Turner.pdf')
 );
-const summerExpectedResults = Object.values(readingOcrExpectedResults).find(
+autumnExpectedResults = _removeDashes(autumnExpectedResults);
+
+let summerExpectedResults = Object.values(readingOcrExpectedResults).find(
   (result) => result.file.endsWith('summer_reading-Page_Turner.pdf')
 );
+summerExpectedResults = _removeDashes(summerExpectedResults);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -55,8 +58,9 @@ When you list the column headers, write them in ALL CAPS.
 That's the way the column headers appear in the source document, 
 and we want to preserve that formatting in the structured data output.
 
-The title of the magazine should be expressed in Title Case. The capitalization scheme
-in the source document might be something else (e.g. all-caps), but the structured data output
+The title of the magazine, which should be prominently visible at the top of the page,
+should be expressed in Title Case. The capitalization scheme in the source document 
+might be something else (e.g. all-caps), but the structured data output
 should have the magazine title in Title Case.
 `;
 
@@ -67,7 +71,7 @@ const createClient = (): OpenAI =>
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
   it('reads PDFs from a directory and returns their tables and metadata', async () => {
-    const ocrTableDataFromFiles = await ocrTablesFromPDFs(
+    let ocrTableDataFromFiles = await ocrTablesFromPDFs(
       createClient(),
       FIXTURES_DIR + '/page_turner_magazine',
       {
@@ -82,6 +86,7 @@ ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
 `
     );
+    ocrTableDataFromFiles = _removeDashes(ocrTableDataFromFiles);
 
     const tableKeys = [...Object.keys(ocrTableDataFromFiles)];
 
@@ -96,17 +101,18 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
     expect(tableKeys).toHaveLength(2);
 
     // Make sure one of them ends with "autumn_reading-Page_Turner.pdf" and the other ends with "summer_reading-Page_Turner.pdf"
+    // NOTE: Dashes have been converted to spaces due to the _removeDashes function.
     expect(
-      tableKeys.some((key) => key.endsWith('autumn_reading-Page_Turner.pdf'))
+      tableKeys.some((key) => key.endsWith('autumn_reading Page_Turner.pdf'))
     ).toBe(true);
     expect(
-      tableKeys.some((key) => key.endsWith('summer_reading-Page_Turner.pdf'))
+      tableKeys.some((key) => key.endsWith('summer_reading Page_Turner.pdf'))
     ).toBe(true);
 
     // Grab the object at the key that ends with "autumn_reading-Page_Turner.pdf" from the observed results.
     // Clear out its notes and aggregations fields since that can be variable and isn't important for this test.
     const autumnResult = Object.values(ocrTableDataFromFiles).find((result) =>
-      result.file.endsWith('autumn_reading-Page_Turner.pdf')
+      result.file.endsWith('autumn_reading Page_Turner.pdf')
     );
     for (const table of autumnResult?.tables ?? []) {
       table.notes = '';
@@ -141,7 +147,7 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
 
     // Now do the same for the summer results
     const summerResult = Object.values(ocrTableDataFromFiles).find((result) =>
-      result.file.endsWith('summer_reading-Page_Turner.pdf')
+      result.file.endsWith('summer_reading Page_Turner.pdf')
     );
     for (const table of summerResult?.tables ?? []) {
       table.notes = '';
