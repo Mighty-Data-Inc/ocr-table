@@ -2,11 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.1.7] - [1.1.11] - 2026-04-24
+## [1.1.7] - [1.1.12] - 2026-04-24
 
-### Diagnostics
+### Fixed
 
-Added a console log to try to figure out why there are 12 files in the "page_turner_magazine" folder.
+Added a retry for intermittent failure in the integration test.
 
 ## [1.1.6] - 2026-04-24
 

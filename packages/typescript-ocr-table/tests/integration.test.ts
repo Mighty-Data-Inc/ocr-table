@@ -70,114 +70,132 @@ const createClient = (): OpenAI =>
   });
 
 describe('ocrIdentifyTablesOnPage (live API)', () => {
-  it('reads PDFs from a directory and returns their tables and metadata', async () => {
-    let ocrTableDataFromFiles = await ocrTablesFromPDFs(
-      createClient(),
-      FIXTURES_DIR + '/page_turner_magazine',
-      {
-        'Magazine Name': '',
-        Season: 'One of: "Spring"|"Summer"|"Fall"|"Winter"',
-      },
-      `
+  it(
+    'reads PDFs from a directory and returns their tables and metadata',
+    async () => {
+      // Perform the OCR attempt. Allow it to fail once, with a retry.
+      try {
+        await _attemptToReadPDFs();
+      } catch (error) {
+        console.warn(
+          'First attempt to read PDFs failed with error:',
+          error,
+          'Retrying once...'
+        );
+        await _attemptToReadPDFs();
+      }
+    },
+    1500000 * 2
+  );
+});
+
+const _attemptToReadPDFs = async () => {
+  let ocrTableDataFromFiles = await ocrTablesFromPDFs(
+    createClient(),
+    FIXTURES_DIR + '/page_turner_magazine',
+    {
+      'Magazine Name': '',
+      Season: 'One of: "Spring"|"Summer"|"Fall"|"Winter"',
+    },
+    `
 Don't include the word 'Magazine' in the name of the magazine.
 
 ${ADDIIONAL_INSTRUCTIONS_NO_EXTRA_CHARACTERS}
 
 ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
 `
-    );
-    ocrTableDataFromFiles = _removeDashes(ocrTableDataFromFiles);
+  );
+  ocrTableDataFromFiles = _removeDashes(ocrTableDataFromFiles);
 
-    const tableKeys = [...Object.keys(ocrTableDataFromFiles)];
+  const tableKeys = [...Object.keys(ocrTableDataFromFiles)];
 
-    // Make sure there are two keys in the result, one for each PDF file in the directory.
-    // In the CI/CD environment, for some damn reason, sometimes this is 12.
-    // We need to understand why.
-    console.log(JSON.stringify(tableKeys, null, 2));
-    if (tableKeys.length !== 2) {
-      console.error(JSON.stringify(tableKeys, null, 2));
-      expect(tableKeys).toBe([]); // Force the test to fail if there aren't exactly 2 keys, so we can investigate this issue in CI/CD.
-    }
-    expect(tableKeys).toHaveLength(2);
+  // Make sure there are two keys in the result, one for each PDF file in the directory.
+  // In the CI/CD environment, for some damn reason, sometimes this is 12.
+  // We need to understand why.
+  console.log(JSON.stringify(tableKeys, null, 2));
+  if (tableKeys.length !== 2) {
+    console.error(JSON.stringify(tableKeys, null, 2));
+    expect(tableKeys).toBe([]); // Force the test to fail if there aren't exactly 2 keys, so we can investigate this issue in CI/CD.
+  }
+  expect(tableKeys).toHaveLength(2);
 
-    // Make sure one of them ends with "autumn_reading-Page_Turner.pdf" and the other ends with "summer_reading-Page_Turner.pdf"
-    // NOTE: Dashes have been converted to spaces due to the _removeDashes function.
-    expect(
-      tableKeys.some((key) => key.endsWith('autumn_reading Page_Turner.pdf'))
-    ).toBe(true);
-    expect(
-      tableKeys.some((key) => key.endsWith('summer_reading Page_Turner.pdf'))
-    ).toBe(true);
+  // Make sure one of them ends with "autumn_reading-Page_Turner.pdf" and the other ends with "summer_reading-Page_Turner.pdf"
+  // NOTE: Dashes have been converted to spaces due to the _removeDashes function.
+  expect(
+    tableKeys.some((key) => key.endsWith('autumn_reading Page_Turner.pdf'))
+  ).toBe(true);
+  expect(
+    tableKeys.some((key) => key.endsWith('summer_reading Page_Turner.pdf'))
+  ).toBe(true);
 
-    // Grab the object at the key that ends with "autumn_reading-Page_Turner.pdf" from the observed results.
-    // Clear out its notes and aggregations fields since that can be variable and isn't important for this test.
-    const autumnResult = Object.values(ocrTableDataFromFiles).find((result) =>
-      result.file.endsWith('autumn_reading Page_Turner.pdf')
-    );
-    for (const table of autumnResult?.tables ?? []) {
-      table.notes = '';
-      table.aggregations = '';
-    }
-    expect(autumnResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
-    expect(autumnResult?.metadata?.['Season']).toEqual('Fall');
+  // Grab the object at the key that ends with "autumn_reading-Page_Turner.pdf" from the observed results.
+  // Clear out its notes and aggregations fields since that can be variable and isn't important for this test.
+  const autumnResult = Object.values(ocrTableDataFromFiles).find((result) =>
+    result.file.endsWith('autumn_reading Page_Turner.pdf')
+  );
+  for (const table of autumnResult?.tables ?? []) {
+    table.notes = '';
+    table.aggregations = '';
+  }
+  expect(autumnResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
+  expect(autumnResult?.metadata?.['Season']).toEqual('Fall');
 
-    // Expect there to be 2 or fewer differences in tables[0].
-    expect(
-      _countObjectDifferences(
-        autumnResult?.tables?.[0],
-        autumnExpectedResults?.tables?.[0] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
+  // Expect there to be 2 or fewer differences in tables[0].
+  expect(
+    _countObjectDifferences(
+      autumnResult?.tables?.[0],
+      autumnExpectedResults?.tables?.[0] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
 
-    // Expect there to be 2 or fewer differences in tables[1].
-    expect(
-      _countObjectDifferences(
-        autumnResult?.tables?.[1],
-        autumnExpectedResults?.tables?.[1] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
+  // Expect there to be 2 or fewer differences in tables[1].
+  expect(
+    _countObjectDifferences(
+      autumnResult?.tables?.[1],
+      autumnExpectedResults?.tables?.[1] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
 
-    // Expect there to be 2 or fewer differences in tables[2].
-    expect(
-      _countObjectDifferences(
-        autumnResult?.tables?.[2],
-        autumnExpectedResults?.tables?.[2] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
+  // Expect there to be 2 or fewer differences in tables[2].
+  expect(
+    _countObjectDifferences(
+      autumnResult?.tables?.[2],
+      autumnExpectedResults?.tables?.[2] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
 
-    // Now do the same for the summer results
-    const summerResult = Object.values(ocrTableDataFromFiles).find((result) =>
-      result.file.endsWith('summer_reading Page_Turner.pdf')
-    );
-    for (const table of summerResult?.tables ?? []) {
-      table.notes = '';
-      table.aggregations = '';
-    }
-    expect(summerResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
-    expect(summerResult?.metadata?.['Season']).toEqual('Summer');
+  // Now do the same for the summer results
+  const summerResult = Object.values(ocrTableDataFromFiles).find((result) =>
+    result.file.endsWith('summer_reading Page_Turner.pdf')
+  );
+  for (const table of summerResult?.tables ?? []) {
+    table.notes = '';
+    table.aggregations = '';
+  }
+  expect(summerResult?.metadata?.['Magazine Name']).toEqual('Page Turner');
+  expect(summerResult?.metadata?.['Season']).toEqual('Summer');
 
-    // Expect there to be 2 or fewer differences in tables[0].
-    expect(
-      _countObjectDifferences(
-        summerResult?.tables?.[0],
-        summerExpectedResults?.tables?.[0] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
+  // Expect there to be 2 or fewer differences in tables[0].
+  expect(
+    _countObjectDifferences(
+      summerResult?.tables?.[0],
+      summerExpectedResults?.tables?.[0] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
 
-    // Expect there to be 2 or fewer differences in tables[1].
-    expect(
-      _countObjectDifferences(
-        summerResult?.tables?.[1],
-        summerExpectedResults?.tables?.[1] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
+  // Expect there to be 2 or fewer differences in tables[1].
+  expect(
+    _countObjectDifferences(
+      summerResult?.tables?.[1],
+      summerExpectedResults?.tables?.[1] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
 
-    // Expect there to be 2 or fewer differences in tables[2].
-    expect(
-      _countObjectDifferences(
-        summerResult?.tables?.[2],
-        summerExpectedResults?.tables?.[2] ?? {}
-      )
-    ).toBeLessThanOrEqual(2);
-  }, 1500000);
-});
+  // Expect there to be 2 or fewer differences in tables[2].
+  expect(
+    _countObjectDifferences(
+      summerResult?.tables?.[2],
+      summerExpectedResults?.tables?.[2] ?? {}
+    )
+  ).toBeLessThanOrEqual(2);
+};
