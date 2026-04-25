@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.1.16] - 2026-04-24
+
+### Fixed
+
+- Added `src/index.ts` to properly expose public API via package entry point.
+
 ## [1.1.7] - [1.1.15] - 2026-04-24
 
 ### Fixed
