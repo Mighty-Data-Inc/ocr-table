@@ -1,6 +1,6 @@
 {
   "name": "@mightydatainc/ocr-table",
-  "version": "1.1.16",
+  "version": "1.1.18",
   "description": "Extract structured table data from PDFs, PNGs, etc., using LLM vision models",
   "author": "Mikhail Voloshin",
   "license": "MIT",
