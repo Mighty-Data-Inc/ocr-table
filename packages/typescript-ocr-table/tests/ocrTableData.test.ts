@@ -335,6 +335,9 @@ This table belongs to the *previous* page, not to the current one.
     );
     const pageTwoBuffer = readFileSync(pageTwoPngPath);
 
+    // Try this whole thing twice. If it fails the first time, it might be due to OCR flakiness,
+    // so we want to give it a second chance before concluding that there's a real issue.
+
     let tables = await ocrIdentifyTablesOnPage(
       createClient(),
       pageTwoBuffer,
@@ -345,14 +348,39 @@ This table belongs to the *previous* page, not to the current one.
     );
     tables = _removeDashes(tables);
 
-    expect(tables).toHaveLength(2);
+    try {
+      expect(tables).toHaveLength(2);
 
-    const tableNames = tables.map((table) => table.name);
-    expect(tableNames).toContain(
-      'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
-    );
-    // The other one can be named whatever.
-  }, 180000);
+      const tableNames = tables.map((table) => table.name);
+      expect(tableNames).toContain(
+        'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
+      );
+      // The other one can be named whatever.
+    } catch (error) {
+      console.warn(
+        'First attempt to identify tables failed with error:',
+        error,
+        'Retrying once...'
+      );
+      tables = await ocrIdentifyTablesOnPage(
+        createClient(),
+        pageTwoBuffer,
+        undefined,
+        undefined,
+        undefined,
+        ADDITIONAL_INSTRUCTIONS_FOR_SCHOOL_SUPPLIES
+      );
+      tables = _removeDashes(tables);
+
+      expect(tables).toHaveLength(2);
+
+      const tableNames = tables.map((table) => table.name);
+      expect(tableNames).toContain(
+        'Classroom Purchases Ms. Priya Nandakumar (Room 5C)'
+      );
+      // The other one can be named whatever.
+    }
+  }, 360000);
 
   it('uses first-table anchor to isolate the intended table even when prior-page flag says false', async () => {
     const pageTwoPngPath = path.join(

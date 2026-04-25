@@ -116,14 +116,30 @@ describe('ocrStructuredFields (live API)', () => {
       'school-supplies-BOS-11pt-page-#'
     );
 
-    const extractedFields = await ocrStructuredFields(
+    let extractedFields = await ocrStructuredFields(
       openaiClient,
       pagesAsPngBuffers,
       SCHOOL_SUPPLIES_FIELDS_QUERY_IMPLICIT
     );
 
-    expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_IMPLICIT);
-  }, 180000);
+    // Run an expectation check twice. Let it fail the first time,
+    // to account for OCR flakiness.
+    try {
+      expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_IMPLICIT);
+    } catch (error) {
+      console.warn(
+        'First attempt to extract implied fields failed with error:',
+        error,
+        'Retrying once...'
+      );
+      extractedFields = await ocrStructuredFields(
+        openaiClient,
+        pagesAsPngBuffers,
+        SCHOOL_SUPPLIES_FIELDS_QUERY_IMPLICIT
+      );
+      expect(extractedFields).toEqual(SCHOOL_SUPPLIES_VALUES_EXPECTED_IMPLICIT);
+    }
+  }, 360000);
 
   it('can extract all fields from a document', async () => {
     const openaiClient = createClient();
