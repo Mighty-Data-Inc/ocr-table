@@ -157,6 +157,19 @@ ${ADDITIONAL_INSTRUCTIONS_FOR_PAGETURNER}
   ).toBeLessThanOrEqual(2);
 
   // Expect there to be 2 or fewer differences in tables[2].
+  // STOP! This test consistently fails for some damn reason.
+  const numDifferencesInTable2 = _countObjectDifferences(
+    autumnResult?.tables?.[2],
+    autumnExpectedResults?.tables?.[2] ?? {}
+  );
+  if (numDifferencesInTable2 > 2) {
+    console.error(
+      `There are ${numDifferencesInTable2} differences in tables[2] of the autumn reading results, which is more than the allowed threshold of 2. This is a problem that needs to be investigated.`
+    );
+    console.error(JSON.stringify(autumnResult?.tables?.[2], null, 2));
+    console.error(JSON.stringify(autumnExpectedResults?.tables?.[2], null, 2));
+  }
+
   expect(
     _countObjectDifferences(
       autumnResult?.tables?.[2],
