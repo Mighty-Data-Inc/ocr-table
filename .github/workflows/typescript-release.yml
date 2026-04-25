@@ -13,12 +13,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci-and-publish:
+  ci:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       contents: read
-      id-token: write
 
     environment: env-cicd
     env:
@@ -46,6 +45,40 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Build package
+        run: npm run build
+
+  publish:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
+
+    environment: env-cicd
+
+    defaults:
+      run:
+        working-directory: packages/typescript-ocr-table
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: packages/typescript-ocr-table/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build package
         run: npm run build
@@ -98,7 +131,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.version.outputs.should_publish == 'true' && steps.version.outputs.changed == 'true' && steps.published.outputs.exists != 'true'
-        run: npm publish --access public --provenance
+        run: npm publish --ignore-scripts --access public --provenance
 
       - name: Report release decision
         if: steps.version.outputs.should_publish != 'true' || steps.version.outputs.changed != 'true' || steps.published.outputs.exists == 'true'

@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.1.16] - [1.1.18] - 2026-04-24
+## [1.1.16] - [1.1.19] - 2026-04-24
 
 ### Fixed
 
