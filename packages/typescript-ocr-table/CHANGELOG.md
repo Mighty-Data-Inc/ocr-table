@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.1.20] - 2026-04-29
+
+### Fixed
+
+- In `_jsonSchemaForExtractingOneRowOfTableData`, added sanitization of column names: trims whitespace from each name, and deduplicates by renaming any repeated column to `Column_#` (where `#` is its 1-based index).
+
 ## [1.1.16] - [1.1.19] - 2026-04-24
 
 ### Fixed

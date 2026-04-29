@@ -401,6 +401,23 @@ table.
 const _jsonSchemaForExtractingOneRowOfTableData = (
   columnNames: string[]
 ): any => {
+  // Ensure that all column names are strings and trim any whitespace from them.
+  columnNames = columnNames.map((name) => `${name || ''}`.trim());
+
+  // Ensure that all column names are unique.
+  // If a column name is duplicated, call it "Column_#" where # is its index in the columnNames array.
+  const seenColumnNames = new Set<string>();
+  columnNames = columnNames.map((name, index) => {
+    if (seenColumnNames.has(name)) {
+      return `Column_${index + 1}`;
+    } else {
+      seenColumnNames.add(name);
+      return name;
+    }
+  });
+
+  // Create a JSON schema for extracting one row of table data, with keys corresponding to the column names.
+
   const schema: any = {
     type: 'object',
     properties: {
